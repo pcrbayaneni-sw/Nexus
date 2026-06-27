@@ -476,12 +476,11 @@ try {
 } catch(e) {}
 
 // ── EMAIL VIA GOOGLE APPS SCRIPT ──────────────────────────────────────────────
+// Uses GET + URL params to avoid CORS preflight — Apps Script handles this natively
 async function callMailer(payload) {
-  const resp = await fetch(CONFIG.apps_script_url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'text/plain' },
-    body: JSON.stringify(payload),
-  });
+  const params = new URLSearchParams({ data: JSON.stringify(payload) });
+  const url = CONFIG.apps_script_url + '?' + params.toString();
+  const resp = await fetch(url, { method: 'GET', redirect: 'follow' });
   const text = await resp.text();
   try { return JSON.parse(text); } catch(e) { return { ok: false, error: text }; }
 }
