@@ -381,7 +381,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 const CONFIG = {
   // ── Google Apps Script URL ─────────────────────────────────────────────
   // Paste your Web App deployment URL here after following the setup steps
-  apps_script_url: 'https://script.google.com/a/macros/validusfintech.com/s/AKfycbxTvXtyjskh3sJP9gmrtRWWVEg5y57Mq76RE8KgF-tTKgypKMbvM4JobjkVW5opp1gs/exec',
+  apps_script_url: 'https://script.google.com/macros/s/AKfycbwXyjdTgjtUwulKTNlt0Z3ewUGS0sfJHfxL8ooKDnBV1s9oj8NqSv-TgQiPD9dXoBmY8Q/exec',
 
   // ── Completion notification recipient (HR / L&D team) ─────────────────
   hr_email: 'purna.b@validusfintech.com',
@@ -477,7 +477,7 @@ try {
 
 // ── EMAIL VIA GOOGLE APPS SCRIPT ──────────────────────────────────────────────
 async function callMailer(payload) {
-  if (CONFIG.apps_script_url === 'YOUR_APPS_SCRIPT_URL') {
+  if (CONFIG.apps_script_url === 'https://script.google.com/macros/s/AKfycbwXyjdTgjtUwulKTNlt0Z3ewUGS0sfJHfxL8ooKDnBV1s9oj8NqSv-TgQiPD9dXoBmY8Q/execL') {
     // Demo mode — no URL configured yet
     console.log('DEMO MODE — email payload:', payload);
     return { ok: true, demo: true };
