@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nexus — Validus Learning Platform</title>
+<!-- Email handled via Google Apps Script — no external SDK needed -->
+<style>
+/* ── RESET & BASE ─────────────────────────────────────────────────────── */
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#F4F6FA;--surface:#FFFFFF;--surface2:#F0F4FA;--border:rgba(0,0,0,0.09);
+  --text:#1A2233;--text2:#4A5568;--text3:#8492A6;
+  --accent:#1A6BC8;--accent-bg:rgba(26,107,200,0.08);
+  --teal:#0D8A65;--teal-bg:rgba(13,138,101,0.08);
+  --gold:#C07800;--gold-bg:rgba(192,120,0,0.08);
+  --red:#B93030;--red-bg:rgba(185,48,48,0.08);
+  --radius:12px;--shadow:0 2px 16px rgba(0,0,0,0.08);
+  --font:'Inter',system-ui,sans-serif;
+}
+[data-theme=dark]{
+  --bg:#0F1117;--surface:#1A1D27;--surface2:#242736;--border:rgba(255,255,255,0.08);
+  --text:#E8EBF0;--text2:#9AA5B4;--text3:#6B7A8D;
+  --accent:#4A9EE8;--accent-bg:rgba(74,158,232,0.12);
+  --shadow:0 2px 20px rgba(0,0,0,0.4);
+}
+body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;transition:background .2s}
+
+/* ── SCREENS ──────────────────────────────────────────────────────────── */
+.screen{display:none;min-height:100vh}
+.screen.active{display:flex}
+
+/* ── LOGIN SCREEN ─────────────────────────────────────────────────────── */
+#screen-login{align-items:center;justify-content:center;padding:24px}
+.login-card{
+  background:var(--surface);border:1px solid var(--border);border-radius:20px;
+  padding:48px 44px;width:100%;max-width:440px;box-shadow:var(--shadow);text-align:center
+}
+.nexus-logo{
+  width:60px;height:60px;border-radius:16px;
+  background:linear-gradient(135deg,#1A6BC8,#0D8A65);
+  display:flex;align-items:center;justify-content:center;
+  font-size:28px;font-weight:800;color:#fff;margin:0 auto 20px;letter-spacing:-1px
+}
+.login-title{font-size:24px;font-weight:700;color:var(--text);margin-bottom:6px}
+.login-sub{font-size:14px;color:var(--text3);margin-bottom:32px;line-height:1.5}
+.input-group{margin-bottom:16px;text-align:left}
+.input-group label{display:block;font-size:12px;font-weight:600;color:var(--text2);margin-bottom:6px;letter-spacing:.4px;text-transform:uppercase}
+.input-group input{
+  width:100%;padding:12px 16px;border:1.5px solid var(--border);border-radius:10px;
+  font-size:15px;background:var(--surface);color:var(--text);outline:none;
+  transition:border-color .15s
+}
+.input-group input:focus{border-color:var(--accent)}
+.input-group input::placeholder{color:var(--text3)}
+.btn{
+  width:100%;padding:13px;border:none;border-radius:10px;font-size:15px;font-weight:600;
+  cursor:pointer;transition:all .15s;margin-top:4px
+}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{filter:brightness(1.1)}
+.btn-primary:disabled{opacity:.5;cursor:not-allowed}
+.btn-ghost{background:transparent;color:var(--text2);border:1.5px solid var(--border);margin-top:8px}
+.btn-ghost:hover{background:var(--surface2)}
+.otp-hint{font-size:13px;color:var(--text3);margin-top:12px;line-height:1.5}
+.otp-inputs{display:flex;gap:10px;justify-content:center;margin:20px 0}
+.otp-inputs input{
+  width:48px;height:56px;border:1.5px solid var(--border);border-radius:10px;
+  text-align:center;font-size:22px;font-weight:700;color:var(--text);
+  background:var(--surface);outline:none;transition:border-color .15s
+}
+.otp-inputs input:focus{border-color:var(--accent)}
+.error-msg{color:var(--red);font-size:13px;margin-top:8px;display:none}
+.success-msg{color:var(--teal);font-size:13px;margin-top:8px;display:none}
+
+/* ── PLATFORM SHELL ───────────────────────────────────────────────────── */
+#screen-platform{flex-direction:column}
+.topbar{
+  display:flex;align-items:center;gap:16px;padding:0 24px;height:60px;
+  background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100
+}
+.topbar-logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+.topbar-logo-icon{
+  width:32px;height:32px;border-radius:8px;
+  background:linear-gradient(135deg,#1A6BC8,#0D8A65);
+  display:flex;align-items:center;justify-content:center;
+  font-size:14px;font-weight:800;color:#fff
+}
+.topbar-logo-text{font-size:16px;font-weight:700;color:var(--text)}
+.topbar-logo-sub{font-size:11px;color:var(--text3);font-weight:400}
+.topbar-spacer{flex:1}
+.topbar-user{font-size:13px;color:var(--text2)}
+.topbar-avatar{
+  width:32px;height:32px;border-radius:50%;background:var(--accent-bg);
+  border:2px solid var(--accent);display:flex;align-items:center;justify-content:center;
+  font-size:12px;font-weight:700;color:var(--accent);cursor:pointer
+}
+.theme-btn{
+  padding:6px 12px;border:1px solid var(--border);border-radius:8px;background:transparent;
+  color:var(--text2);font-size:13px;cursor:pointer
+}
+.logout-btn{
+  padding:6px 14px;border:1px solid var(--border);border-radius:8px;background:transparent;
+  color:var(--text2);font-size:13px;cursor:pointer;transition:all .15s
+}
+.logout-btn:hover{background:var(--red-bg);color:var(--red);border-color:var(--red)}
+
+/* ── CATALOGUE VIEW ───────────────────────────────────────────────────── */
+#view-catalogue{padding:40px 32px;max-width:1100px;margin:0 auto;width:100%}
+.catalogue-hero{margin-bottom:40px}
+.catalogue-hero h1{font-size:28px;font-weight:700;color:var(--text);margin-bottom:6px}
+.catalogue-hero p{font-size:15px;color:var(--text2);line-height:1.6}
+.catalogue-stats{display:flex;gap:16px;margin-top:20px;flex-wrap:wrap}
+.stat-pill{
+  padding:8px 16px;background:var(--surface);border:1px solid var(--border);border-radius:99px;
+  font-size:13px;color:var(--text2)
+}
+.stat-pill span{font-weight:700;color:var(--accent)}
+
+.track-section{margin-bottom:40px}
+.track-label{
+  font-size:11px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;
+  color:var(--text3);margin-bottom:16px;padding-bottom:8px;border-bottom:1px solid var(--border)
+}
+.module-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+.module-card{
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+  padding:24px;cursor:pointer;transition:all .18s;position:relative;overflow:hidden
+}
+.module-card:hover{box-shadow:var(--shadow);border-color:var(--accent);transform:translateY(-2px)}
+.module-card.completed{border-color:var(--teal)}
+.module-card.locked{opacity:.5;cursor:not-allowed}
+.module-card.locked:hover{transform:none;box-shadow:none;border-color:var(--border)}
+.module-card-track{font-size:11px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;color:var(--text3);margin-bottom:8px}
+.module-card-title{font-size:16px;font-weight:600;color:var(--text);margin-bottom:6px;line-height:1.4}
+.module-card-desc{font-size:13px;color:var(--text2);line-height:1.5;margin-bottom:16px}
+.module-card-meta{display:flex;align-items:center;justify-content:space-between}
+.module-card-tag{
+  padding:3px 10px;border-radius:99px;font-size:11px;font-weight:600;
+}
+.tag-aif{background:var(--accent-bg);color:var(--accent)}
+.tag-compliance{background:var(--teal-bg);color:var(--teal)}
+.tag-ops{background:var(--gold-bg);color:var(--gold)}
+.tag-coming{background:var(--surface2);color:var(--text3)}
+.module-card-status{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:500}
+.status-dot{width:8px;height:8px;border-radius:50%}
+.dot-done{background:var(--teal)}
+.dot-open{background:var(--accent)}
+.dot-locked{background:var(--text3)}
+.module-card-ribbon{
+  position:absolute;top:12px;right:12px;
+  padding:2px 8px;border-radius:99px;font-size:10px;font-weight:700;
+}
+.ribbon-new{background:#E8F5E8;color:var(--teal)}
+.ribbon-done{background:#E8F5E8;color:var(--teal)}
+.progress-bar-thin{
+  height:3px;background:var(--border);border-radius:2px;margin-top:12px;overflow:hidden
+}
+.progress-bar-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--teal));border-radius:2px;transition:width .4s}
+
+/* ── MODULE VIEWER ────────────────────────────────────────────────────── */
+#view-module{display:none;flex-direction:column;height:calc(100vh - 60px)}
+.module-topbar{
+  display:flex;align-items:center;gap:12px;padding:0 20px;height:52px;
+  background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0
+}
+.back-btn{
+  display:flex;align-items:center;gap:6px;padding:6px 14px;border:1px solid var(--border);
+  border-radius:8px;background:transparent;color:var(--text2);font-size:13px;cursor:pointer;
+  transition:all .15s
+}
+.back-btn:hover{background:var(--surface2)}
+.module-topbar-title{font-size:14px;font-weight:600;color:var(--text)}
+.module-topbar-spacer{flex:1}
+.module-iframe-wrap{flex:1;overflow:hidden}
+.module-iframe-wrap iframe{width:100%;height:100%;border:none;background:var(--bg)}
+
+/* ── COMPLETION MODAL ─────────────────────────────────────────────────── */
+#modal-completion{
+  display:none;position:fixed;inset:0;z-index:1000;
+  background:rgba(0,0,0,0.5);backdrop-filter:blur(4px);
+  align-items:center;justify-content:center;padding:24px
+}
+#modal-completion.show{display:flex}
+.modal-card{
+  background:var(--surface);border-radius:20px;padding:44px;width:100%;max-width:520px;
+  box-shadow:0 20px 60px rgba(0,0,0,0.2);text-align:center
+}
+.modal-icon{font-size:52px;margin-bottom:16px}
+.modal-title{font-size:22px;font-weight:700;color:var(--text);margin-bottom:8px}
+.modal-sub{font-size:14px;color:var(--text2);line-height:1.6;margin-bottom:28px}
+.declaration-box{
+  background:var(--surface2);border:1px solid var(--border);border-radius:12px;
+  padding:20px;margin-bottom:24px;text-align:left
+}
+.declaration-text{font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:16px}
+.declaration-name{
+  width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:8px;
+  font-size:15px;background:var(--surface);color:var(--text);outline:none;
+  transition:border-color .15s
+}
+.declaration-name:focus{border-color:var(--accent)}
+.modal-actions{display:flex;flex-direction:column;gap:10px}
+.btn-submit{
+  padding:13px;border:none;border-radius:10px;font-size:15px;font-weight:600;
+  cursor:pointer;background:var(--teal);color:#fff;transition:all .15s
+}
+.btn-submit:hover{filter:brightness(1.1)}
+.btn-submit:disabled{opacity:.5;cursor:not-allowed}
+.btn-later{
+  padding:11px;border:1px solid var(--border);border-radius:10px;font-size:14px;
+  background:transparent;color:var(--text2);cursor:pointer
+}
+.sending-msg{font-size:13px;color:var(--text3);margin-top:8px;display:none}
+
+/* ── SUCCESS MODAL ────────────────────────────────────────────────────── */
+#modal-success{
+  display:none;position:fixed;inset:0;z-index:1000;
+  background:rgba(0,0,0,0.5);backdrop-filter:blur(4px);
+  align-items:center;justify-content:center;padding:24px
+}
+#modal-success.show{display:flex}
+
+/* ── TOAST ────────────────────────────────────────────────────────────── */
+.toast{
+  position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);
+  background:var(--text);color:var(--surface);padding:12px 24px;border-radius:99px;
+  font-size:14px;font-weight:500;z-index:2000;transition:transform .25s;white-space:nowrap
+}
+.toast.show{transform:translateX(-50%) translateY(0)}
+
+/* ── RESPONSIVE ───────────────────────────────────────────────────────── */
+@media(max-width:600px){
+  .login-card{padding:32px 24px}
+  #view-catalogue{padding:24px 16px}
+  .module-grid{grid-template-columns:1fr}
+  .catalogue-stats{gap:8px}
+}
+</style>
+</head>
+<body>
+
+<!-- ══ SCREEN: LOGIN ═══════════════════════════════════════════════════════ -->
+<div id="screen-login" class="screen active">
+  <div class="login-card">
+    <div class="nexus-logo">N</div>
+    <div class="login-title">Nexus</div>
+    <div class="login-sub">Validus Learning Platform<br>Sign in to access your training modules</div>
+
+    <!-- Step 1: Email entry -->
+    <div id="step-email">
+      <div class="input-group">
+        <label>Work email address</label>
+        <input type="email" id="login-email" placeholder="you@validusfintech.com" autocomplete="email">
+      </div>
+      <div class="error-msg" id="email-error">Please enter a valid email address.</div>
+      <button class="btn btn-primary" id="btn-send-otp" onclick="sendOTP()">Send verification code</button>
+      <p class="otp-hint" style="margin-top:16px">A 6-digit code will be sent to your email address.</p>
+    </div>
+
+    <!-- Step 2: OTP entry -->
+    <div id="step-otp" style="display:none">
+      <p style="font-size:14px;color:var(--text2);margin-bottom:20px;line-height:1.6">
+        We sent a 6-digit code to <strong id="otp-email-display"></strong><br>
+        Enter it below to sign in.
+      </p>
+      <div class="otp-inputs">
+        <input type="text" maxlength="1" id="otp0" oninput="otpInput(0)" onkeydown="otpKey(event,0)">
+        <input type="text" maxlength="1" id="otp1" oninput="otpInput(1)" onkeydown="otpKey(event,1)">
+        <input type="text" maxlength="1" id="otp2" oninput="otpInput(2)" onkeydown="otpKey(event,2)">
+        <input type="text" maxlength="1" id="otp3" oninput="otpInput(3)" onkeydown="otpKey(event,3)">
+        <input type="text" maxlength="1" id="otp4" oninput="otpInput(4)" onkeydown="otpKey(event,4)">
+        <input type="text" maxlength="1" id="otp5" oninput="otpInput(5)" onkeydown="otpKey(event,5)">
+      </div>
+      <div class="error-msg" id="otp-error">Incorrect code. Please try again.</div>
+      <button class="btn btn-primary" id="btn-verify-otp" onclick="verifyOTP()">Verify &amp; sign in</button>
+      <button class="btn btn-ghost" onclick="backToEmail()">← Change email</button>
+      <p class="otp-hint">Code expires in 10 minutes. <a href="#" onclick="resendOTP(); return false;" style="color:var(--accent)">Resend code</a></p>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SCREEN: PLATFORM ════════════════════════════════════════════════════ -->
+<div id="screen-platform" class="screen">
+
+  <!-- Top bar -->
+  <div class="topbar">
+    <a class="topbar-logo" href="#" onclick="showCatalogue(); return false;">
+      <div class="topbar-logo-icon">N</div>
+      <div>
+        <div class="topbar-logo-text">Nexus</div>
+        <div class="topbar-logo-sub">Validus Learning Platform</div>
+      </div>
+    </a>
+    <div class="topbar-spacer"></div>
+    <span class="topbar-user" id="topbar-user-email"></span>
+    <button class="theme-btn" onclick="toggleTheme()">☀ Light</button>
+    <button class="logout-btn" onclick="logout()">Sign out</button>
+  </div>
+
+  <!-- Catalogue view -->
+  <div id="view-catalogue" style="display:block">
+    <div class="catalogue-hero">
+      <h1>Welcome back, <span id="welcome-name">learner</span></h1>
+      <p>Your professional learning hub. Complete modules at your own pace and earn completion certificates for each track.</p>
+      <div class="catalogue-stats">
+        <div class="stat-pill">Modules available: <span id="stat-available">1</span></div>
+        <div class="stat-pill">Completed: <span id="stat-completed">0</span></div>
+        <div class="stat-pill">In progress: <span id="stat-inprogress">0</span></div>
+      </div>
+    </div>
+
+    <!-- AIF Track -->
+    <div class="track-section">
+      <div class="track-label">AIF Operations Track</div>
+      <div class="module-grid" id="grid-aif"></div>
+    </div>
+
+    <!-- Coming soon tracks -->
+    <div class="track-section">
+      <div class="track-label">Coming Soon</div>
+      <div class="module-grid" id="grid-coming"></div>
+    </div>
+  </div>
+
+  <!-- Module viewer -->
+  <div id="view-module" style="display:none;flex-direction:column;height:calc(100vh - 60px)">
+    <div class="module-topbar">
+      <button class="back-btn" onclick="showCatalogue()">← Back to catalogue</button>
+      <span class="module-topbar-title" id="module-topbar-title"></span>
+      <div class="module-topbar-spacer"></div>
+      <button class="btn-primary" style="padding:8px 18px;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;color:#fff;background:var(--teal)" onclick="triggerCompletion()" id="btn-mark-complete">
+        ✓ Mark as complete
+      </button>
+    </div>
+    <div class="module-iframe-wrap">
+      <iframe id="module-iframe" src="" title="Training module" sandbox="allow-scripts allow-same-origin allow-forms"></iframe>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL: COMPLETION DECLARATION ══════════════════════════════════════ -->
+<div id="modal-completion">
+  <div class="modal-card">
+    <div class="modal-icon">🎓</div>
+    <div class="modal-title">Declare module completion</div>
+    <div class="modal-sub">You are about to declare that you have completed this training module. A completion certificate will be emailed to your HR and Learning & Development team, with a copy to you.</div>
+    <div class="declaration-box">
+      <div class="declaration-text">
+        I, <strong id="decl-name-display">[your name]</strong>, declare that I have completed the training module <strong id="decl-module-name"></strong> on <strong id="decl-date"></strong> on the Validus Nexus Learning Platform. I confirm that I have reviewed all sections of the module to the best of my ability.
+      </div>
+      <input type="text" class="declaration-name" id="learner-name" placeholder="Enter your full name to sign" oninput="updateDeclName(this.value)">
+    </div>
+    <div class="modal-actions">
+      <button class="btn-submit" id="btn-confirm-complete" onclick="confirmCompletion()" disabled>Submit declaration &amp; send certificate</button>
+      <button class="btn-later" onclick="closeCompletionModal()">I'll complete this later</button>
+    </div>
+    <div class="sending-msg" id="sending-msg">⏳ Sending completion certificate…</div>
+    <div class="error-msg" id="completion-error" style="margin-top:8px">Could not send email. Please contact your administrator.</div>
+  </div>
+</div>
+
+<!-- ══ MODAL: SUCCESS ═════════════════════════════════════════════════════ -->
+<div id="modal-success">
+  <div class="modal-card">
+    <div class="modal-icon">✅</div>
+    <div class="modal-title">Completion recorded!</div>
+    <div class="modal-sub" id="success-sub"></div>
+    <button class="btn-submit" onclick="closeSuccessModal()" style="margin-top:8px">Back to catalogue</button>
+  </div>
+</div>
+
+<!-- ══ TOAST ══════════════════════════════════════════════════════════════ -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ════════════════════════════════════════════════════════════════════════════
+// CONFIGURATION — update these for production deployment
+// ════════════════════════════════════════════════════════════════════════════
+
+const CONFIG = {
+  // ── Google Apps Script URL ─────────────────────────────────────────────
+  // Paste your Web App deployment URL here after following the setup steps
+  apps_script_url: 'https://script.google.com/a/macros/validusfintech.com/s/AKfycbxTvXtyjskh3sJP9gmrtRWWVEg5y57Mq76RE8KgF-tTKgypKMbvM4JobjkVW5opp1gs/exec',
+
+  // ── Completion notification recipient (HR / L&D team) ─────────────────
+  hr_email: 'purna.b@validusfintech.com',
+  hr_name:  'Purna B',
+
+  // ── OTP expiry ────────────────────────────────────────────────────────
+  otp_expiry_minutes: 10,
+
+  // ── Domain whitelist — only these email domains can log in ────────────
+  // Set to [] to allow any email address
+  allowed_domains: ['validusfintech.com'],
+};
+
+// ════════════════════════════════════════════════════════════════════════════
+// MODULE REGISTRY — add future modules here
+// ════════════════════════════════════════════════════════════════════════════
+
+const MODULE_REGISTRY = [
+  {
+    id: 'aif-mastery',
+    title: 'AIF Mastery',
+    subtitle: 'Alternative Investment Fund — Complete RTA Operations',
+    description: '29 modules covering the full AIF lifecycle — regulatory framework, investor onboarding, drawdown management, NAV, compliance, taxation, commercials, and client preparation.',
+    track: 'aif',
+    tag: 'tag-aif',
+    tagLabel: 'AIF Operations',
+    duration: '4–6 hours',
+    modules: 29,
+    url: 'AIF_Mastery_Module.html',
+    status: 'available',  // available | coming_soon
+    isNew: true,
+  },
+];
+
+// Placeholder modules for coming soon tracks
+const COMING_SOON = [
+  {
+    id: 'mf-rta',
+    title: 'Mutual Fund RTA Operations',
+    description: 'Investor servicing, transaction processing, NAV-based allotments, and SEBI compliance for MF RTA operations.',
+    track: 'coming',
+    tag: 'tag-coming',
+    tagLabel: 'Coming soon',
+    status: 'coming_soon',
+  },
+  {
+    id: 'compliance-deep',
+    title: 'Compliance & Regulatory Framework',
+    description: 'Deep-dive into PMLA, AML, FATCA/CRS, SEBI inspection readiness, and the Digital Personal Data Protection Act 2023.',
+    track: 'coming',
+    tag: 'tag-compliance',
+    tagLabel: 'Coming soon',
+    status: 'coming_soon',
+  },
+  {
+    id: 'client-engagement',
+    title: 'Client Engagement & Delivery',
+    description: 'Sales process, delivery management, SLA governance, objection handling, and client escalation frameworks.',
+    track: 'coming',
+    tag: 'tag-ops',
+    tagLabel: 'Coming soon',
+    status: 'coming_soon',
+  },
+  {
+    id: 'platform-ops',
+    title: 'Validus Platform Operations',
+    description: 'Hands-on training for the Front Office App, Investment Manager App, Investor App, and Communication Command Center.',
+    track: 'coming',
+    tag: 'tag-aif',
+    tagLabel: 'Coming soon',
+    status: 'coming_soon',
+  },
+];
+
+// ════════════════════════════════════════════════════════════════════════════
+// STATE
+// ════════════════════════════════════════════════════════════════════════════
+
+let state = {
+  email: '',
+  otp: '',
+  otpExpiry: null,
+  currentModule: null,
+  completions: {},  // { moduleId: { date, name } }
+  dark: false,
+};
+
+// Restore completions from localStorage
+try {
+  const saved = localStorage.getItem('nexus_completions');
+  if (saved) state.completions = JSON.parse(saved);
+} catch(e) {}
+
+// ── EMAIL VIA GOOGLE APPS SCRIPT ──────────────────────────────────────────────
+async function callMailer(payload) {
+  if (CONFIG.apps_script_url === 'YOUR_APPS_SCRIPT_URL') {
+    // Demo mode — no URL configured yet
+    console.log('DEMO MODE — email payload:', payload);
+    return { ok: true, demo: true };
+  }
+  const resp = await fetch(CONFIG.apps_script_url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain' }, // Apps Script requires text/plain for doPost
+    body: JSON.stringify(payload),
+  });
+  const text = await resp.text();
+  try { return JSON.parse(text); } catch(e) { return { ok: false, error: text }; }
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// LOGIN: OTP FLOW
+// ════════════════════════════════════════════════════════════════════════════
+
+function generateOTP() {
+  return Math.floor(100000 + Math.random() * 900000).toString();
+}
+
+function isValidEmail(email) {
+  const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!re.test(email)) return false;
+  if (CONFIG.allowed_domains.length === 0) return true;
+  const domain = email.split('@')[1].toLowerCase();
+  return CONFIG.allowed_domains.includes(domain);
+}
+
+async function sendOTP() {
+  const email = document.getElementById('login-email').value.trim();
+  const errEl = document.getElementById('email-error');
+  errEl.style.display = 'none';
+
+  if (!isValidEmail(email)) {
+    errEl.style.display = 'block';
+    errEl.textContent = CONFIG.allowed_domains.length > 0
+      ? 'Only ' + CONFIG.allowed_domains.join(', ') + ' email addresses are permitted.'
+      : 'Please enter a valid email address.';
+    return;
+  }
+
+  state.email = email;
+  state.otp = generateOTP();
+  state.otpExpiry = Date.now() + CONFIG.otp_expiry_minutes * 60 * 1000;
+
+  const btn = document.getElementById('btn-send-otp');
+  btn.disabled = true;
+  btn.textContent = 'Sending…';
+
+  let result;
+  try {
+    result = await callMailer({
+      type: 'otp',
+      to_email: email,
+      to_name: email.split('@')[0],
+      otp_code: state.otp,
+      expiry_minutes: CONFIG.otp_expiry_minutes,
+    });
+  } catch(e) {
+    result = { ok: false, demo: true };
+    console.warn('Mailer error:', e);
+  }
+
+  btn.disabled = false;
+  btn.textContent = 'Send verification code';
+
+  if (result.demo) {
+    console.log('DEMO MODE — OTP:', state.otp);
+    showToast('Demo mode: OTP is ' + state.otp + ' (check console)');
+  }
+
+  // Show OTP step
+  document.getElementById('step-email').style.display = 'none';
+  document.getElementById('step-otp').style.display = 'block';
+  document.getElementById('otp-email-display').textContent = email;
+  document.getElementById('otp0').focus();
+}
+
+function otpInput(idx) {
+  const val = document.getElementById('otp' + idx).value;
+  if (val && idx < 5) {
+    document.getElementById('otp' + (idx + 1)).focus();
+  }
+  // Auto-verify when all 6 entered
+  const code = Array.from({length:6}, (_,i) => (document.getElementById('otp'+i).value || '')).join('');
+  if (code.length === 6) setTimeout(verifyOTP, 80);
+}
+
+function otpKey(e, idx) {
+  if (e.key === 'Backspace' && !document.getElementById('otp' + idx).value && idx > 0) {
+    document.getElementById('otp' + (idx - 1)).focus();
+  }
+}
+
+function verifyOTP() {
+  const code = Array.from({length:6}, (_,i) => (document.getElementById('otp'+i).value || '')).join('');
+  const errEl = document.getElementById('otp-error');
+
+  if (Date.now() > state.otpExpiry) {
+    errEl.textContent = 'Code has expired. Please request a new one.';
+    errEl.style.display = 'block';
+    return;
+  }
+
+  if (code !== state.otp) {
+    errEl.textContent = 'Incorrect code. Please try again.';
+    errEl.style.display = 'block';
+    Array.from({length:6}, (_,i) => { document.getElementById('otp'+i).value = ''; });
+    document.getElementById('otp0').focus();
+    return;
+  }
+
+  errEl.style.display = 'none';
+  enterPlatform();
+}
+
+async function resendOTP() {
+  state.otp = generateOTP();
+  state.otpExpiry = Date.now() + CONFIG.otp_expiry_minutes * 60 * 1000;
+  Array.from({length:6}, (_,i) => { document.getElementById('otp'+i).value = ''; });
+  document.getElementById('otp-error').style.display = 'none';
+
+  try {
+    result = await callMailer({
+      type: 'otp',
+      to_email: state.email,
+      to_name: state.email.split('@')[0],
+      otp_code: state.otp,
+      expiry_minutes: CONFIG.otp_expiry_minutes,
+    });
+  } catch(e) {
+    result = { ok: false, demo: true };
+  }
+
+  if (result.demo) console.log('DEMO MODE — New OTP:', state.otp);
+  showToast('New code sent' + (result.demo ? ' (demo: ' + state.otp + ')' : ''));
+  document.getElementById('otp0').focus();
+}
+
+function backToEmail() {
+  document.getElementById('step-otp').style.display = 'none';
+  document.getElementById('step-email').style.display = 'block';
+  document.getElementById('otp-error').style.display = 'none';
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// PLATFORM
+// ════════════════════════════════════════════════════════════════════════════
+
+function enterPlatform() {
+  document.getElementById('screen-login').classList.remove('active');
+  document.getElementById('screen-platform').classList.add('active');
+
+  const name = state.email.split('@')[0].replace(/[._]/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+  document.getElementById('welcome-name').textContent = name;
+  document.getElementById('topbar-user-email').textContent = state.email;
+
+  renderCatalogue();
+  showCatalogue();
+}
+
+function logout() {
+  state.email = '';
+  state.otp = '';
+  state.currentModule = null;
+  document.getElementById('screen-platform').classList.remove('active');
+  document.getElementById('screen-login').classList.add('active');
+  document.getElementById('step-email').style.display = 'block';
+  document.getElementById('step-otp').style.display = 'none';
+  document.getElementById('login-email').value = '';
+  Array.from({length:6}, (_,i) => { document.getElementById('otp'+i).value = ''; });
+  document.getElementById('module-iframe').src = '';
+}
+
+function renderCatalogue() {
+  const completed = Object.keys(state.completions).length;
+  const total = MODULE_REGISTRY.filter(m => m.status === 'available').length;
+  document.getElementById('stat-available').textContent = total;
+  document.getElementById('stat-completed').textContent = completed;
+  document.getElementById('stat-inprogress').textContent = total - completed;
+
+  // AIF track
+  const aifGrid = document.getElementById('grid-aif');
+  aifGrid.innerHTML = '';
+  MODULE_REGISTRY.forEach(m => {
+    if (m.track !== 'aif') return;
+    const isComplete = !!state.completions[m.id];
+    const card = document.createElement('div');
+    card.className = 'module-card' + (isComplete ? ' completed' : '');
+    card.onclick = () => openModule(m);
+    card.innerHTML = `
+      ${m.isNew && !isComplete ? '<span class="module-card-ribbon ribbon-new">NEW</span>' : ''}
+      ${isComplete ? '<span class="module-card-ribbon ribbon-done">✓ DONE</span>' : ''}
+      <div class="module-card-track">${m.track.toUpperCase()} OPERATIONS</div>
+      <div class="module-card-title">${m.title}</div>
+      <div class="module-card-desc">${m.description}</div>
+      <div class="module-card-meta">
+        <span class="module-card-tag ${m.tag}">${m.tagLabel}</span>
+        <span class="module-card-status">
+          <span class="status-dot ${isComplete ? 'dot-done' : 'dot-open'}"></span>
+          ${isComplete ? 'Completed ' + state.completions[m.id].date : m.duration + ' · ' + m.modules + ' modules'}
+        </span>
+      </div>
+      <div class="progress-bar-thin"><div class="progress-bar-fill" style="width:${isComplete ? 100 : 0}%"></div></div>
+    `;
+    aifGrid.appendChild(card);
+  });
+
+  // Coming soon
+  const comingGrid = document.getElementById('grid-coming');
+  comingGrid.innerHTML = '';
+  COMING_SOON.forEach(m => {
+    const card = document.createElement('div');
+    card.className = 'module-card locked';
+    card.innerHTML = `
+      <div class="module-card-track">COMING SOON</div>
+      <div class="module-card-title">${m.title}</div>
+      <div class="module-card-desc">${m.description}</div>
+      <div class="module-card-meta">
+        <span class="module-card-tag ${m.tag}">${m.tagLabel}</span>
+        <span class="module-card-status">
+          <span class="status-dot dot-locked"></span>
+          Not yet available
+        </span>
+      </div>
+    `;
+    comingGrid.appendChild(card);
+  });
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// MODULE VIEWER
+// ════════════════════════════════════════════════════════════════════════════
+
+function openModule(mod) {
+  if (mod.status !== 'available') return;
+  state.currentModule = mod;
+  document.getElementById('view-catalogue').style.display = 'none';
+  const view = document.getElementById('view-module');
+  view.style.display = 'flex';
+  document.getElementById('module-topbar-title').textContent = mod.title;
+  document.getElementById('module-iframe').src = mod.url;
+
+  const isComplete = !!state.completions[mod.id];
+  const btn = document.getElementById('btn-mark-complete');
+  if (isComplete) {
+    btn.textContent = '✓ Completed';
+    btn.style.background = 'var(--teal)';
+    btn.style.opacity = '0.7';
+    btn.onclick = null;
+  } else {
+    btn.textContent = '✓ Mark as complete';
+    btn.style.background = 'var(--teal)';
+    btn.style.opacity = '1';
+    btn.onclick = triggerCompletion;
+  }
+}
+
+function showCatalogue() {
+  document.getElementById('view-catalogue').style.display = 'block';
+  document.getElementById('view-module').style.display = 'none';
+  document.getElementById('module-iframe').src = '';
+  state.currentModule = null;
+  renderCatalogue();
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// COMPLETION DECLARATION & EMAIL
+// ════════════════════════════════════════════════════════════════════════════
+
+function triggerCompletion() {
+  if (!state.currentModule) return;
+  const mod = state.currentModule;
+
+  document.getElementById('decl-module-name').textContent = '"' + mod.title + '"';
+  const today = new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
+  document.getElementById('decl-date').textContent = today;
+  document.getElementById('decl-name-display').textContent = '[your name]';
+  document.getElementById('learner-name').value = '';
+  document.getElementById('btn-confirm-complete').disabled = true;
+  document.getElementById('completion-error').style.display = 'none';
+  document.getElementById('sending-msg').style.display = 'none';
+
+  document.getElementById('modal-completion').classList.add('show');
+}
+
+function updateDeclName(val) {
+  const trimmed = val.trim();
+  document.getElementById('decl-name-display').textContent = trimmed || '[your name]';
+  document.getElementById('btn-confirm-complete').disabled = trimmed.length < 2;
+}
+
+function closeCompletionModal() {
+  document.getElementById('modal-completion').classList.remove('show');
+}
+
+async function confirmCompletion() {
+  const learnerName = document.getElementById('learner-name').value.trim();
+  if (!learnerName || learnerName.length < 2) return;
+
+  const mod = state.currentModule;
+  const today = new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
+  const todayShort = new Date().toLocaleDateString('en-IN');
+
+  document.getElementById('btn-confirm-complete').disabled = true;
+  document.getElementById('sending-msg').style.display = 'block';
+  document.getElementById('completion-error').style.display = 'none';
+
+  let emailResult = { ok: false, demo: true };
+  try {
+    emailResult = await callMailer({
+      type: 'completion',
+      learner_name:    learnerName,
+      learner_email:   state.email,
+      module_title:    mod.title,
+      completion_date: today,
+      declaration:     'I, ' + learnerName + ', declare that I have completed the training module "' + mod.title + '" on ' + today + ' on the Validus Nexus Learning Platform. I confirm that I have reviewed all sections of the module to the best of my ability.',
+      hr_email:        CONFIG.hr_email,
+      hr_name:         CONFIG.hr_name,
+    });
+  } catch(e) {
+    console.warn('Completion email error:', e);
+    emailResult = { ok: false, error: e.message };
+  }
+
+  const emailSent = emailResult.ok && !emailResult.demo;
+
+  // Save completion locally regardless of email status
+  state.completions[mod.id] = { date: todayShort, name: learnerName };
+  try { localStorage.setItem('nexus_completions', JSON.stringify(state.completions)); } catch(e) {}
+
+  document.getElementById('sending-msg').style.display = 'none';
+
+  if (!emailResult.ok && !emailResult.demo) {
+    document.getElementById('completion-error').style.display = 'block';
+    document.getElementById('btn-confirm-complete').disabled = false;
+    return;
+  }
+
+  // Show success
+  closeCompletionModal();
+  document.getElementById('modal-success').classList.add('show');
+  document.getElementById('success-sub').innerHTML = emailSent
+    ? 'Your completion of <strong>' + mod.title + '</strong> has been recorded and a certificate has been emailed to <strong>' + CONFIG.hr_email + '</strong> with a copy to <strong>' + state.email + '</strong>.'
+    : '(Demo mode) Your completion of <strong>' + mod.title + '</strong> has been recorded locally. Paste your Apps Script URL into CONFIG to enable email delivery.';
+}
+
+function closeSuccessModal() {
+  document.getElementById('modal-success').classList.remove('show');
+  showCatalogue();
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// UI UTILITIES
+// ════════════════════════════════════════════════════════════════════════════
+
+let toastTimer;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 3500);
+}
+
+function toggleTheme() {
+  state.dark = !state.dark;
+  document.documentElement.setAttribute('data-theme', state.dark ? 'dark' : 'light');
+  document.querySelector('.theme-btn').textContent = state.dark ? '☾ Dark' : '☀ Light';
+}
+
+// Enter key on email field
+document.getElementById('login-email').addEventListener('keydown', e => {
+  if (e.key === 'Enter') sendOTP();
+});
+</script>
+</body>
+</html>
