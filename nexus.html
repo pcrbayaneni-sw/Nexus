@@ -381,7 +381,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 const CONFIG = {
   // ── Google Apps Script URL ─────────────────────────────────────────────
   // Paste your Web App deployment URL here after following the setup steps
-  apps_script_url: 'https://script.google.com/macros/s/AKfycbwXyjdTgjtUwulKTNlt0Z3ewUGS0sfJHfxL8ooKDnBV1s9oj8NqSv-TgQiPD9dXoBmY8Q/exec',
+  apps_script_url: 'https://script.google.com/a/macros/validusfintech.com/s/AKfycbxTvXtyjskh3sJP9gmrtRWWVEg5y57Mq76RE8KgF-tTKgypKMbvM4JobjkVW5opp1gs/exec',
 
   // ── Completion notification recipient (HR / L&D team) ─────────────────
   hr_email: 'purna.b@validusfintech.com',
@@ -477,14 +477,9 @@ try {
 
 // ── EMAIL VIA GOOGLE APPS SCRIPT ──────────────────────────────────────────────
 async function callMailer(payload) {
-  if (CONFIG.apps_script_url === 'https://script.google.com/macros/s/AKfycbwXyjdTgjtUwulKTNlt0Z3ewUGS0sfJHfxL8ooKDnBV1s9oj8NqSv-TgQiPD9dXoBmY8Q/execL') {
-    // Demo mode — no URL configured yet
-    console.log('DEMO MODE — email payload:', payload);
-    return { ok: true, demo: true };
-  }
   const resp = await fetch(CONFIG.apps_script_url, {
     method: 'POST',
-    headers: { 'Content-Type': 'text/plain' }, // Apps Script requires text/plain for doPost
+    headers: { 'Content-Type': 'text/plain' },
     body: JSON.stringify(payload),
   });
   const text = await resp.text();
@@ -538,16 +533,17 @@ async function sendOTP() {
       expiry_minutes: CONFIG.otp_expiry_minutes,
     });
   } catch(e) {
-    result = { ok: false, demo: true };
+    result = { ok: false, error: e.message };
     console.warn('Mailer error:', e);
   }
 
   btn.disabled = false;
   btn.textContent = 'Send verification code';
 
-  if (result.demo) {
-    console.log('DEMO MODE — OTP:', state.otp);
-    showToast('Demo mode: OTP is ' + state.otp + ' (check console)');
+  if (!result.ok) {
+    document.getElementById('email-error').textContent = 'Could not send verification code. Please try again.';
+    document.getElementById('email-error').style.display = 'block';
+    return;
   }
 
   // Show OTP step
@@ -610,11 +606,10 @@ async function resendOTP() {
       expiry_minutes: CONFIG.otp_expiry_minutes,
     });
   } catch(e) {
-    result = { ok: false, demo: true };
+    result = { ok: false, error: e.message };
   }
 
-  if (result.demo) console.log('DEMO MODE — New OTP:', state.otp);
-  showToast('New code sent' + (result.demo ? ' (demo: ' + state.otp + ')' : ''));
+  showToast(result.ok ? 'New code sent to ' + state.email : 'Could not resend — please try again.');
   document.getElementById('otp0').focus();
 }
 
@@ -787,7 +782,7 @@ async function confirmCompletion() {
   document.getElementById('sending-msg').style.display = 'block';
   document.getElementById('completion-error').style.display = 'none';
 
-  let emailResult = { ok: false, demo: true };
+  let emailResult = { ok: false };
   try {
     emailResult = await callMailer({
       type: 'completion',
@@ -804,7 +799,7 @@ async function confirmCompletion() {
     emailResult = { ok: false, error: e.message };
   }
 
-  const emailSent = emailResult.ok && !emailResult.demo;
+  const emailSent = emailResult.ok;
 
   // Save completion locally regardless of email status
   state.completions[mod.id] = { date: todayShort, name: learnerName };
@@ -812,7 +807,7 @@ async function confirmCompletion() {
 
   document.getElementById('sending-msg').style.display = 'none';
 
-  if (!emailResult.ok && !emailResult.demo) {
+  if (!emailResult.ok) {
     document.getElementById('completion-error').style.display = 'block';
     document.getElementById('btn-confirm-complete').disabled = false;
     return;
@@ -823,7 +818,7 @@ async function confirmCompletion() {
   document.getElementById('modal-success').classList.add('show');
   document.getElementById('success-sub').innerHTML = emailSent
     ? 'Your completion of <strong>' + mod.title + '</strong> has been recorded and a certificate has been emailed to <strong>' + CONFIG.hr_email + '</strong> with a copy to <strong>' + state.email + '</strong>.'
-    : '(Demo mode) Your completion of <strong>' + mod.title + '</strong> has been recorded locally. Paste your Apps Script URL into CONFIG to enable email delivery.';
+    : 'Completion recorded locally. The certificate email could not be delivered — please contact your administrator.';
 }
 
 function closeSuccessModal() {
