@@ -195,6 +195,70 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
   background:var(--surface2);border:1px solid var(--border);border-radius:10px;
   padding:14px 16px;text-align:left;font-size:12px;color:var(--text3);line-height:1.7
 }
+/* ── FORCE CHANGE SCREEN ── */
+.force-change-card{
+  background:var(--surface);border:2px solid var(--gold);border-radius:20px;
+  padding:40px 44px;width:100%;max-width:440px;box-shadow:var(--shadow);text-align:center
+}
+/* ── ADMIN PANEL ── */
+.admin-topbar-btn{
+  padding:6px 14px;border:1.5px solid var(--accent);border-radius:8px;
+  background:var(--accent-bg);color:var(--accent);font-size:13px;font-weight:600;cursor:pointer;transition:all .15s
+}
+.admin-topbar-btn:hover{background:var(--accent);color:#fff}
+#view-admin{padding:36px 32px;max-width:900px;margin:0 auto;width:100%}
+.admin-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;flex-wrap:wrap;gap:12px}
+.admin-header h2{font-size:22px;font-weight:700}
+.admin-add-form{
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+  padding:24px;margin-bottom:28px
+}
+.admin-add-form h3{font-size:15px;font-weight:600;margin-bottom:16px;color:var(--text2)}
+.form-row{display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end}
+.form-row .input-group{flex:1;min-width:180px;margin-bottom:0}
+.form-row select{
+  width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:10px;
+  font-size:14px;background:var(--surface);color:var(--text);outline:none;cursor:pointer
+}
+.form-row select:focus{border-color:var(--accent)}
+.btn-add-user{
+  padding:11px 22px;border:none;border-radius:10px;font-size:14px;font-weight:600;
+  cursor:pointer;background:var(--accent);color:#fff;white-space:nowrap;transition:all .15s;height:43px
+}
+.btn-add-user:hover{filter:brightness(1.1)}
+.btn-add-user:disabled{opacity:.5;cursor:not-allowed}
+.users-table{width:100%;border-collapse:collapse}
+.users-table th{
+  padding:10px 14px;background:var(--surface2);border:1px solid var(--border);
+  font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;text-align:left
+}
+.users-table td{
+  padding:11px 14px;border:1px solid var(--border);font-size:13px;color:var(--text);
+  vertical-align:middle
+}
+.users-table tr:nth-child(even) td{background:var(--surface2)}
+.role-badge{
+  display:inline-block;padding:2px 10px;border-radius:99px;font-size:11px;font-weight:600
+}
+.role-admin{background:var(--accent-bg);color:var(--accent)}
+.role-learner{background:var(--teal-bg);color:var(--teal)}
+.must-change{
+  display:inline-block;padding:2px 8px;border-radius:99px;font-size:11px;
+  background:var(--gold-bg);color:var(--gold);font-weight:600
+}
+.btn-remove{
+  padding:4px 12px;border:1px solid var(--red);border-radius:6px;background:transparent;
+  color:var(--red);font-size:12px;cursor:pointer;transition:all .15s
+}
+.btn-remove:hover{background:var(--red);color:#fff}
+.admin-msg{font-size:13px;margin-top:10px;padding:10px 14px;border-radius:8px;display:none}
+.admin-msg.ok{background:var(--teal-bg);color:var(--teal)}
+.admin-msg.err{background:var(--red-bg);color:var(--red)}
+@media(max-width:600px){
+  .form-row{flex-direction:column}
+  .btn-add-user{width:100%;height:auto;padding:12px}
+  #view-admin{padding:20px 14px}
+}
 
 /* toast */
 .toast{
@@ -241,27 +305,20 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
       </div>
     </div>
 
-    <!-- Forgot / change password -->
+    <!-- Forgot / reset password (no current password needed) -->
     <div id="step-forgot" style="display:none">
       <div style="text-align:left;margin-bottom:20px">
-        <div style="font-size:15px;font-weight:600;margin-bottom:4px">Change your password</div>
-        <div style="font-size:13px;color:var(--text3)">Enter your email and current password, then choose a new one.</div>
+        <div style="font-size:15px;font-weight:600;margin-bottom:4px">Reset your password</div>
+        <div style="font-size:13px;color:var(--text3)">Enter your email and choose a new password.</div>
       </div>
       <div class="input-group">
         <label>Email address</label>
         <input type="email" id="cp-email" placeholder="you@validusfintech.com">
       </div>
       <div class="input-group">
-        <label>Current password</label>
-        <div class="pw-input-wrap">
-          <input type="password" id="cp-old" placeholder="Current password">
-          <button class="pw-toggle" type="button" onclick="togglePw('cp-old',this)">👁</button>
-        </div>
-      </div>
-      <div class="input-group">
         <label>New password</label>
         <div class="pw-input-wrap">
-          <input type="password" id="cp-new" placeholder="Min 8 chars" oninput="checkStrength(this.value)">
+          <input type="password" id="cp-new" placeholder="Min 8 characters" oninput="checkStrength(this.value,'cp')">
           <button class="pw-toggle" type="button" onclick="togglePw('cp-new',this)">👁</button>
         </div>
         <div class="strength-bar"><div class="strength-fill" id="strength-fill" style="width:0%"></div></div>
@@ -275,14 +332,43 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
         </div>
       </div>
       <div class="error-msg" id="cp-error"></div>
-      <div class="success-msg" id="cp-success" style="color:var(--teal);font-size:13px;margin-top:8px;display:none"></div>
-      <button class="btn btn-primary" id="btn-change-pw" onclick="doChangePassword()">Update password</button>
+      <div style="color:var(--teal);font-size:13px;margin-top:8px;display:none" id="cp-success"></div>
+      <button class="btn btn-primary" id="btn-change-pw" onclick="doResetPassword()">Reset password</button>
       <button class="btn btn-ghost" onclick="showLoginStep()">← Back to sign in</button>
     </div>
   </div>
 </div>
 
 <!-- ══ PLATFORM SCREEN ════════════════════════════════════════════════════ -->
+<!-- ══ FORCE CHANGE PASSWORD SCREEN ══════════════════════════════════════ -->
+<div id="screen-force-change" class="screen" style="align-items:center;justify-content:center;padding:24px">
+  <div class="force-change-card">
+    <div style="font-size:36px;margin-bottom:12px">🔑</div>
+    <div class="login-title" style="margin-bottom:6px">Set your password</div>
+    <div class="login-sub" style="margin-bottom:28px">
+      This is your first sign-in.<br>Please set a personal password to continue.
+    </div>
+    <div class="input-group">
+      <label>New password</label>
+      <div class="pw-input-wrap">
+        <input type="password" id="fc-new" placeholder="Min 8 characters" oninput="checkStrength(this.value,'fc')">
+        <button class="pw-toggle" type="button" onclick="togglePw('fc-new',this)">👁</button>
+      </div>
+      <div class="strength-bar"><div class="strength-fill" id="fc-strength-fill" style="width:0%"></div></div>
+      <div class="strength-label" id="fc-strength-label"></div>
+    </div>
+    <div class="input-group">
+      <label>Confirm new password</label>
+      <div class="pw-input-wrap">
+        <input type="password" id="fc-confirm" placeholder="Repeat password">
+        <button class="pw-toggle" type="button" onclick="togglePw('fc-confirm',this)">👁</button>
+      </div>
+    </div>
+    <div class="error-msg" id="fc-error"></div>
+    <button class="btn btn-primary" id="btn-fc" onclick="doForceChange()" style="margin-top:8px">Set password &amp; continue →</button>
+  </div>
+</div>
+
 <div id="screen-platform" class="screen">
   <div class="topbar">
     <div class="topbar-logo" onclick="showCatalogue()">
@@ -294,6 +380,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
     </div>
     <div class="topbar-spacer"></div>
     <span class="topbar-user" id="topbar-user"></span>
+    <button class="admin-topbar-btn" id="btn-admin-panel" style="display:none" onclick="showAdmin()">⚙ Users</button>
     <button class="theme-btn" onclick="toggleTheme()">☀ Light</button>
     <button class="logout-btn" onclick="logout()">Sign out</button>
   </div>
@@ -317,6 +404,50 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
       <div class="track-label">Coming Soon</div>
       <div class="module-grid" id="grid-coming"></div>
     </div>
+  </div>
+
+  <!-- Admin panel -->
+  <div id="view-admin" style="display:none">
+    <div class="admin-header">
+      <div>
+        <h2>User Management</h2>
+        <p style="font-size:13px;color:var(--text3);margin-top:4px">Add or remove Nexus users. New users receive the default password and must change it on first login.</p>
+      </div>
+      <button class="btn-ghost" style="width:auto;padding:8px 18px" onclick="showCatalogue()">← Back to catalogue</button>
+    </div>
+    <div class="admin-add-form">
+      <h3>Add new user</h3>
+      <div class="form-row">
+        <div class="input-group">
+          <label>Full name</label>
+          <input type="text" id="au-name" placeholder="e.g. Ganesh Venkatachalam">
+        </div>
+        <div class="input-group">
+          <label>Email address</label>
+          <input type="email" id="au-email" placeholder="name@validusfintech.com">
+        </div>
+        <div class="input-group" style="max-width:160px">
+          <label>Role</label>
+          <select id="au-role">
+            <option value="learner">Learner</option>
+            <option value="admin">Admin</option>
+          </select>
+        </div>
+        <button class="btn-add-user" id="btn-add-user" onclick="adminAddUser()">+ Add user</button>
+      </div>
+      <div class="admin-msg" id="admin-add-msg"></div>
+    </div>
+    <table class="users-table" id="users-table">
+      <thead>
+        <tr>
+          <th>Name</th><th>Email</th><th>Role</th><th>Status</th><th>Last login</th><th>Added</th><th></th>
+        </tr>
+      </thead>
+      <tbody id="users-tbody">
+        <tr><td colspan="7" style="text-align:center;color:var(--text3);padding:24px">Loading users…</td></tr>
+      </tbody>
+    </table>
+    <div class="admin-msg" id="admin-remove-msg"></div>
   </div>
 
   <!-- Module viewer -->
@@ -378,19 +509,19 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 <div class="toast" id="toast"></div>
 
 <script>
-// ════════════════════════════════════════════════════════════════════════════
+// ============================================================================
 // CONFIG
-// ════════════════════════════════════════════════════════════════════════════
+// ============================================================================
 const CONFIG = {
   allowed_domain: 'validusfintech.com',
-  auth_url:       'https://script.google.com/macros/s/AKfycbzICD_-QbS62FwdfiIqp2jG1jDEva4QHUHfIHeONnvGVYQmJXZlxTjKNGWe8NHF5pUx/exec',  // NexusAuth.gs deployment URL
+  auth_url:       'PASTE_NEXUSAUTH_APPS_SCRIPT_URL_HERE',  // NexusAuth.gs deployment URL
   hr_email:       'purna.b@validusfintech.com',
   hr_name:        'Purna B',
 };
 
-// ════════════════════════════════════════════════════════════════════════════
-// MODULE REGISTRY — add future modules here
-// ════════════════════════════════════════════════════════════════════════════
+// ============================================================================
+// MODULE REGISTRY = add future modules here
+// ============================================================================
 const MODULES = [
   {
     id: 'aif-mastery',
@@ -411,55 +542,55 @@ const COMING_SOON = [
   { id: 'platform-ops',     title: 'Validus Platform Operations',       description: 'Hands-on training for the Front Office App, Investment Manager App, Investor App, and Communication Command Center.',               tag: 'tag-aif', tagLabel: 'Coming soon' },
 ];
 
-// ════════════════════════════════════════════════════════════════════════════
+// ============================================================================
 // STATE
-// ════════════════════════════════════════════════════════════════════════════
+// ============================================================================
 let state = {
   email: '',
   userName: '',
+  role: '',
   currentModule: null,
+  certData: null,
   completions: {},
   dark: false,
 };
 
 try { state.completions = JSON.parse(localStorage.getItem('nexus_completions') || '{}'); } catch(e) {}
 
-// ════════════════════════════════════════════════════════════════════════════
-// AUTH — email + password, verified against Google Sheet via Apps Script
-// ════════════════════════════════════════════════════════════════════════════
+// ============================================================================
+// AUTH = email + password via NexusAuth Apps Script
+// ============================================================================
 
 async function callAuth(payload) {
   const resp = await fetch(CONFIG.auth_url, {
-    method: 'POST',
+    method:  'POST',
     headers: { 'Content-Type': 'text/plain' },
-    body: JSON.stringify(payload),
+    body:    JSON.stringify(payload),
   });
   try { return await resp.json(); }
   catch(e) { return { ok: false, error: 'Server error — please try again' }; }
 }
 
+// -- SIGN IN -------------------------------------------------------------------
 async function doLogin() {
   const email    = (document.getElementById('login-email').value    || '').trim().toLowerCase();
   const password = (document.getElementById('login-password').value || '').trim();
   const errEl    = document.getElementById('login-error');
   errEl.style.display = 'none';
 
-  if (!email) { errEl.textContent = 'Please enter your email.'; errEl.style.display = 'block'; return; }
+  if (!email)    { errEl.textContent = 'Please enter your email.';    errEl.style.display = 'block'; return; }
+  if (!password) { errEl.textContent = 'Please enter your password.'; errEl.style.display = 'block'; return; }
   if (!email.endsWith('@' + CONFIG.allowed_domain)) {
-    errEl.textContent = 'Only @' + CONFIG.allowed_domain + ' email addresses can sign in.';
+    errEl.textContent = 'Only @' + CONFIG.allowed_domain + ' addresses can sign in.';
     errEl.style.display = 'block'; return;
   }
-  if (!password) { errEl.textContent = 'Please enter your password.'; errEl.style.display = 'block'; return; }
 
   const btn = document.getElementById('btn-login');
   btn.disabled = true; btn.textContent = 'Signing in…';
 
   let result;
-  try {
-    result = await callAuth({ action: 'login', email, password });
-  } catch(e) {
-    result = { ok: false, error: 'Could not reach authentication server.' };
-  }
+  try { result = await callAuth({ action: 'login', email, password }); }
+  catch(e) { result = { ok: false, error: 'Could not reach authentication server.' }; }
 
   btn.disabled = false; btn.textContent = 'Sign in →';
 
@@ -470,109 +601,223 @@ async function doLogin() {
     return;
   }
 
-  state.email = email;
+  state.email    = email;
   state.userName = result.name || email.split('@')[0];
+  state.role     = result.role || 'learner';
+
+  if (result.mustChangePassword) {
+    // Force password change before entering the platform
+    showScreen('screen-force-change');
+    document.getElementById('fc-new').value     = '';
+    document.getElementById('fc-confirm').value = '';
+    document.getElementById('fc-error').style.display = 'none';
+    document.getElementById('fc-strength-fill').style.width = '0%';
+    document.getElementById('fc-strength-label').textContent = '';
+  } else {
+    enterPlatform();
+  }
+}
+
+// -- FORCED PASSWORD CHANGE (first login) --------------------------------------
+async function doForceChange() {
+  const newPw   = (document.getElementById('fc-new').value     || '').trim();
+  const confirm = (document.getElementById('fc-confirm').value || '').trim();
+  const errEl   = document.getElementById('fc-error');
+  errEl.style.display = 'none';
+
+  if (!newPw || !confirm) { errEl.textContent = 'Please fill in both fields.'; errEl.style.display = 'block'; return; }
+  if (newPw.length < 8)   { errEl.textContent = 'Password must be at least 8 characters.'; errEl.style.display = 'block'; return; }
+  if (newPw !== confirm)  { errEl.textContent = 'Passwords do not match.'; errEl.style.display = 'block'; return; }
+
+  const btn = document.getElementById('btn-fc');
+  btn.disabled = true; btn.textContent = 'Saving…';
+
+  let result;
+  try { result = await callAuth({ action: 'resetPassword', email: state.email, newPassword: newPw }); }
+  catch(e) { result = { ok: false, error: 'Could not reach server.' }; }
+
+  btn.disabled = false; btn.textContent = 'Set password & continue →';
+
+  if (!result.ok) {
+    errEl.textContent = result.error || 'Could not update password.';
+    errEl.style.display = 'block'; return;
+  }
+
   enterPlatform();
 }
 
-async function doChangePassword() {
+// -- FORGOT / RESET PASSWORD (no current password) -----------------------------
+async function doResetPassword() {
   const email   = (document.getElementById('cp-email').value   || '').trim().toLowerCase();
-  const oldPw   = (document.getElementById('cp-old').value     || '').trim();
   const newPw   = (document.getElementById('cp-new').value     || '').trim();
   const confirm = (document.getElementById('cp-confirm').value || '').trim();
   const errEl   = document.getElementById('cp-error');
   const sucEl   = document.getElementById('cp-success');
   errEl.style.display = 'none'; sucEl.style.display = 'none';
 
-  if (!email || !oldPw || !newPw || !confirm) {
-    errEl.textContent = 'All fields are required.'; errEl.style.display = 'block'; return;
-  }
-  if (!email.endsWith('@' + CONFIG.allowed_domain)) {
-    errEl.textContent = 'Only @' + CONFIG.allowed_domain + ' accounts.'; errEl.style.display = 'block'; return;
-  }
-  if (newPw.length < 8) {
-    errEl.textContent = 'New password must be at least 8 characters.'; errEl.style.display = 'block'; return;
-  }
-  if (newPw !== confirm) {
-    errEl.textContent = 'New passwords do not match.'; errEl.style.display = 'block'; return;
-  }
-  if (newPw === oldPw) {
-    errEl.textContent = 'New password must be different from the current password.'; errEl.style.display = 'block'; return;
-  }
+  if (!email || !newPw || !confirm) { errEl.textContent = 'All fields are required.'; errEl.style.display = 'block'; return; }
+  if (!email.endsWith('@' + CONFIG.allowed_domain)) { errEl.textContent = 'Only @' + CONFIG.allowed_domain + ' accounts.'; errEl.style.display = 'block'; return; }
+  if (newPw.length < 8) { errEl.textContent = 'Password must be at least 8 characters.'; errEl.style.display = 'block'; return; }
+  if (newPw !== confirm) { errEl.textContent = 'Passwords do not match.'; errEl.style.display = 'block'; return; }
 
   const btn = document.getElementById('btn-change-pw');
-  btn.disabled = true; btn.textContent = 'Updating…';
+  btn.disabled = true; btn.textContent = 'Resetting…';
 
   let result;
-  try {
-    result = await callAuth({ action: 'changePassword', email, oldPassword: oldPw, newPassword: newPw });
-  } catch(e) {
-    result = { ok: false, error: 'Could not reach server.' };
-  }
+  try { result = await callAuth({ action: 'resetPassword', email, newPassword: newPw }); }
+  catch(e) { result = { ok: false, error: 'Could not reach server.' }; }
 
-  btn.disabled = false; btn.textContent = 'Update password';
+  btn.disabled = false; btn.textContent = 'Reset password';
 
-  if (!result.ok) {
-    errEl.textContent = result.error || 'Could not update password.'; errEl.style.display = 'block'; return;
-  }
+  if (!result.ok) { errEl.textContent = result.error || 'Could not reset password.'; errEl.style.display = 'block'; return; }
 
-  sucEl.textContent = '✓ Password updated successfully. You can now sign in with your new password.';
+  sucEl.textContent = '✓ Password reset. You can now sign in.';
   sucEl.style.display = 'block';
-  document.getElementById('cp-old').value = '';
-  document.getElementById('cp-new').value = '';
-  document.getElementById('cp-confirm').value = '';
+  document.getElementById('cp-new').value = document.getElementById('cp-confirm').value = '';
   document.getElementById('strength-fill').style.width = '0%';
   document.getElementById('strength-label').textContent = '';
-  setTimeout(showLoginStep, 2000);
+  document.getElementById('login-email').value = email;
+  setTimeout(showLoginStep, 1800);
+}
+
+// -- ADMIN: ADD USER -----------------------------------------------------------
+async function adminAddUser() {
+  const name  = (document.getElementById('au-name').value  || '').trim();
+  const email = (document.getElementById('au-email').value || '').trim().toLowerCase();
+  const role  = document.getElementById('au-role').value;
+  const msg   = document.getElementById('admin-add-msg');
+  msg.style.display = 'none';
+
+  if (!name)  { showAdminMsg('admin-add-msg', 'Please enter a name.', false); return; }
+  if (!email) { showAdminMsg('admin-add-msg', 'Please enter an email address.', false); return; }
+  if (!email.endsWith('@' + CONFIG.allowed_domain)) {
+    showAdminMsg('admin-add-msg', 'Email must end with @' + CONFIG.allowed_domain, false); return;
+  }
+
+  const btn = document.getElementById('btn-add-user');
+  btn.disabled = true; btn.textContent = 'Adding…';
+
+  let result;
+  try { result = await callAuth({ action: 'addUser', requestedBy: state.email, email, name, role }); }
+  catch(e) { result = { ok: false, error: 'Could not reach server.' }; }
+
+  btn.disabled = false; btn.textContent = '+ Add user';
+
+  if (!result.ok) { showAdminMsg('admin-add-msg', result.error || 'Could not add user.', false); return; }
+
+  showAdminMsg('admin-add-msg', '✓ ' + email + ' added. Default password: Nexus@2026', true);
+  document.getElementById('au-name').value = '';
+  document.getElementById('au-email').value = '';
+  document.getElementById('au-role').value = 'learner';
+  loadUsers();
+}
+
+async function adminRemoveUser(email) {
+  if (!confirm('Remove ' + email + ' from Nexus? They will lose access immediately.')) return;
+
+  let result;
+  try { result = await callAuth({ action: 'removeUser', requestedBy: state.email, email }); }
+  catch(e) { result = { ok: false, error: 'Could not reach server.' }; }
+
+  if (!result.ok) { showAdminMsg('admin-remove-msg', result.error || 'Could not remove user.', false); return; }
+  showAdminMsg('admin-remove-msg', '✓ ' + email + ' removed.', true);
+  loadUsers();
+}
+
+async function loadUsers() {
+  const tbody = document.getElementById('users-tbody');
+  tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--text3);padding:20px">Loading…</td></tr>';
+
+  let result;
+  try { result = await callAuth({ action: 'listUsers', requestedBy: state.email }); }
+  catch(e) { result = { ok: false, error: 'Could not load users.' }; }
+
+  if (!result.ok) {
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--red)">' + (result.error || 'Error') + '</td></tr>';
+    return;
+  }
+
+  if (!result.users || result.users.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--text3)">No users found.</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = result.users.map(u => {
+    const isMe = u.email === state.email;
+    return '<tr>' +
+      '<td style="font-weight:600">' + u.name + '</td>' +
+      '<td>' + u.email + '</td>' +
+      '<td><span class="role-badge role-' + u.role + '">' + u.role + '</span></td>' +
+      '<td>' + (u.mustChange ? '<span class="must-change">⚠ Must change password</span>' : '<span style="color:var(--teal);font-size:12px">✓ Active</span>') + '</td>' +
+      '<td style="color:var(--text3);font-size:12px">' + (u.last_login || 'Never') + '</td>' +
+      '<td style="color:var(--text3);font-size:12px">' + (u.created_at || '') + '</td>' +
+      '<td>' + (isMe ? '' : '<button class="btn-remove" onclick="adminRemoveUser(\'' + u.email + '\')">Remove</button>') + '</td>' +
+      '</tr>';
+  }).join('');
+}
+
+function showAdminMsg(id, msg, ok) {
+  const el = document.getElementById(id);
+  el.textContent = msg;
+  el.className = 'admin-msg ' + (ok ? 'ok' : 'err');
+  el.style.display = 'block';
+  setTimeout(() => { el.style.display = 'none'; }, 4000);
+}
+
+// -- SCREEN NAVIGATION ---------------------------------------------------------
+function showScreen(id) {
+  ['screen-login','screen-force-change','screen-platform'].forEach(s => {
+    const el = document.getElementById(s);
+    if (el) el.classList.remove('active');
+  });
+  const target = document.getElementById(id);
+  if (target) target.classList.add('active');
 }
 
 function showLoginStep() {
   document.getElementById('step-forgot').style.display = 'none';
-  document.getElementById('step-login').style.display = 'block';
+  document.getElementById('step-login').style.display  = 'block';
   document.getElementById('login-error').style.display = 'none';
-  // Pre-fill email if change-password email was set
   const cpEmail = document.getElementById('cp-email').value;
   if (cpEmail) document.getElementById('login-email').value = cpEmail;
 }
 
 function showForgotStep() {
-  document.getElementById('step-login').style.display = 'none';
+  document.getElementById('step-login').style.display  = 'none';
   document.getElementById('step-forgot').style.display = 'block';
-  // Pre-fill email from login field
   const loginEmail = document.getElementById('login-email').value;
   if (loginEmail) document.getElementById('cp-email').value = loginEmail;
-  document.getElementById('cp-error').style.display = 'none';
+  document.getElementById('cp-error').style.display   = 'none';
   document.getElementById('cp-success').style.display = 'none';
 }
 
+// -- UI HELPERS ----------------------------------------------------------------
 function togglePw(inputId, btn) {
   const inp = document.getElementById(inputId);
-  if (inp.type === 'password') { inp.type = 'text';     btn.textContent = '🙈'; }
-  else                         { inp.type = 'password'; btn.textContent = '👁';  }
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+  btn.textContent = inp.type === 'password' ? '👁' : '🙈';
 }
 
-function checkStrength(pw) {
+function checkStrength(pw, prefix) {
+  prefix = prefix || 'cp';
   let score = 0;
-  if (pw.length >= 8)               score++;
-  if (pw.length >= 12)              score++;
-  if (/[A-Z]/.test(pw))            score++;
-  if (/[0-9]/.test(pw))            score++;
-  if (/[^A-Za-z0-9]/.test(pw))    score++;
-
-  const fill  = document.getElementById('strength-fill');
-  const label = document.getElementById('strength-label');
-  const pcts  = ['0%','20%','40%','70%','90%','100%'];
+  if (pw.length >= 8)           score++;
+  if (pw.length >= 12)          score++;
+  if (/[A-Z]/.test(pw))        score++;
+  if (/[0-9]/.test(pw))        score++;
+  if (/[^A-Za-z0-9]/.test(pw)) score++;
+  const pcts   = ['0%','20%','40%','70%','90%','100%'];
   const colors = ['','#B93030','#C07800','#C07800','#0D8A65','#0D8A65'];
   const labels = ['','Weak','Fair','Good','Strong','Very strong'];
-  fill.style.width      = pcts[score];
-  fill.style.background = colors[score];
-  label.textContent     = pw.length > 0 ? labels[score] : '';
-  label.style.color     = colors[score];
+  const fill  = document.getElementById(prefix + '-strength-fill') || document.getElementById('strength-fill');
+  const label = document.getElementById(prefix + '-strength-label') || document.getElementById('strength-label');
+  if (fill)  { fill.style.width = pcts[score]; fill.style.background = colors[score]; }
+  if (label) { label.textContent = pw.length > 0 ? labels[score] : ''; label.style.color = colors[score]; }
 }
 
-// ════════════════════════════════════════════════════════════════════════════
+// ============================================================================
 // PLATFORM
-// ════════════════════════════════════════════════════════════════════════════
+// ============================================================================
 function enterPlatform() {
   document.getElementById('screen-login').classList.remove('active');
   document.getElementById('screen-platform').classList.add('active');
@@ -662,19 +907,16 @@ function openModule(mod) {
 
 function showCatalogue() {
   document.getElementById('view-catalogue').style.display = 'block';
-  document.getElementById('view-module').style.display = 'none';
-  document.getElementById('step-login').style.display = 'block';
-  document.getElementById('step-forgot').style.display = 'none';
-  document.getElementById('login-email').value = '';
-  document.getElementById('login-password').value = '';
+  document.getElementById('view-module').style.display    = 'none';
+  document.getElementById('view-admin').style.display     = 'none';
   document.getElementById('module-iframe').src = '';
   state.currentModule = null;
   renderCatalogue();
 }
 
-// ════════════════════════════════════════════════════════════════════════════
-// COMPLETION — declaration + mailto: link (opens Outlook/Gmail pre-filled)
-// ════════════════════════════════════════════════════════════════════════════
+// ============================================================================
+// COMPLETION = declaration + mailto: link (opens Outlook/Gmail pre-filled)
+// ============================================================================
 function triggerCompletion() {
   if (!state.currentModule) return;
   const today = new Date().toLocaleDateString('en-IN',{day:'numeric',month:'long',year:'numeric'});
@@ -738,7 +980,7 @@ function confirmCompletion() {
   document.getElementById('modal-success').classList.add('show');
 }
 
-// ── PDF CERTIFICATE GENERATOR ──────────────────────────────────────────────
+// -- PDF CERTIFICATE GENERATOR ----------------------------------------------
 function downloadCertificate() {
   const d = state.certData;
   if (!d) return;
@@ -747,7 +989,7 @@ function downloadCertificate() {
   const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
   const W = 297, H = 210;  // A4 landscape dimensions in mm
 
-  // ── Background ────────────────────────────────────────────────────────────
+  // -- Background ------------------------------------------------------------
   // Outer border fill (deep blue)
   doc.setFillColor(20, 60, 120);
   doc.rect(0, 0, W, H, 'F');
@@ -756,7 +998,7 @@ function downloadCertificate() {
   doc.setFillColor(255, 255, 255);
   doc.roundedRect(10, 10, W-20, H-20, 4, 4, 'F');
 
-  // Top accent bar (gradient approximation — two rects)
+  // Top accent bar (gradient approximation = two rects)
   doc.setFillColor(26, 107, 200);
   doc.rect(10, 10, (W-20)/2, 18, 'F');
   doc.setFillColor(13, 138, 101);
@@ -779,7 +1021,7 @@ function downloadCertificate() {
   cm(18, H-24, false); // bottom-left (adjusted)
   cm(W-18, H-24, true);// bottom-right
 
-  // ── Header text in top bar ─────────────────────────────────────────────────
+  // -- Header text in top bar -------------------------------------------------
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(11);
   doc.setTextColor(255, 255, 255);
@@ -788,19 +1030,19 @@ function downloadCertificate() {
   doc.setFont('helvetica', 'normal');
   doc.text('SEBI-Registered Registrar and Transfer Agent  ·  Nexus Learning Platform', W/2, 23, { align:'center' });
 
-  // ── Certificate heading ────────────────────────────────────────────────────
+  // -- Certificate heading ----------------------------------------------------
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(11);
   doc.setTextColor(100, 120, 150);
   doc.text('C E R T I F I C A T E   O F   C O M P L E T I O N', W/2, 44, { align:'center' });
 
-  // ── "This certifies that" ──────────────────────────────────────────────────
+  // -- "This certifies that" --------------------------------------------------
   doc.setFont('helvetica', 'italic');
   doc.setFontSize(12);
   doc.setTextColor(80, 90, 110);
   doc.text('This is to certify that', W/2, 58, { align:'center' });
 
-  // ── Learner name (large) ───────────────────────────────────────────────────
+  // -- Learner name (large) ---------------------------------------------------
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(32);
   doc.setTextColor(20, 60, 120);
@@ -812,13 +1054,13 @@ function downloadCertificate() {
   doc.setLineWidth(0.6);
   doc.line(W/2 - nameWidth/2, 79, W/2 + nameWidth/2, 79);
 
-  // ── "has successfully completed" ──────────────────────────────────────────
+  // -- "has successfully completed" ------------------------------------------
   doc.setFont('helvetica', 'italic');
   doc.setFontSize(12);
   doc.setTextColor(80, 90, 110);
   doc.text('has successfully completed the training module', W/2, 91, { align:'center' });
 
-  // ── Module name ────────────────────────────────────────────────────────────
+  // -- Module name ------------------------------------------------------------
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(18);
   doc.setTextColor(26, 107, 200);
@@ -826,13 +1068,13 @@ function downloadCertificate() {
   const moduleLines = doc.splitTextToSize(d.moduleName, 200);
   doc.text(moduleLines, W/2, 103, { align:'center' });
 
-  // ── Divider ────────────────────────────────────────────────────────────────
+  // -- Divider ----------------------------------------------------------------
   const divY = moduleLines.length > 1 ? 117 : 113;
   doc.setDrawColor(220, 228, 240);
   doc.setLineWidth(0.3);
   doc.line(30, divY, W-30, divY);
 
-  // ── Details row ────────────────────────────────────────────────────────────
+  // -- Details row ------------------------------------------------------------
   const detY = divY + 11;
   // Three columns: date | email | platform
   const cols = [
@@ -854,7 +1096,7 @@ function downloadCertificate() {
     doc.text(wrapped, cx, detY + 6, { align:'center' });
   });
 
-  // ── Declaration box ────────────────────────────────────────────────────────
+  // -- Declaration box --------------------------------------------------------
   const declY = detY + 22;
   doc.setFillColor(247, 249, 252);
   doc.setDrawColor(210, 220, 235);
@@ -866,19 +1108,19 @@ function downloadCertificate() {
   const declLines = doc.splitTextToSize('"' + d.declaration + '"', W - 70);
   doc.text(declLines.slice(0, 2), W/2, declY + 5, { align:'center' });
 
-  // ── Bottom bar ─────────────────────────────────────────────────────────────
+  // -- Bottom bar -------------------------------------------------------------
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(8);
   doc.setTextColor(255, 255, 255);
   doc.text('Validus Fintech Services Pvt. Ltd.  ·  Hyderabad, India  ·  nexus.validusfintech.com', W/2, H-14, { align:'center' });
 
-  // ── Certificate ID (bottom right) ─────────────────────────────────────────
+  // -- Certificate ID (bottom right) -----------------------------------------
   const certId = 'CERT-' + Date.now().toString(36).toUpperCase();
   doc.setFontSize(7);
   doc.setTextColor(180, 195, 215);
   doc.text('Certificate ID: ' + certId, W-15, H-14, { align:'right' });
 
-  // ── Save ───────────────────────────────────────────────────────────────────
+  // -- Save -------------------------------------------------------------------
   const filename = 'Nexus_Certificate_' + d.learnerName.replace(/\s+/g,'_') + '_' + d.moduleName.replace(/[^a-zA-Z0-9]+/g,'_').slice(0,30) + '.pdf';
   doc.save(filename);
 }
@@ -886,9 +1128,9 @@ function downloadCertificate() {
 function closeModal(id)    { document.getElementById(id).classList.remove('show'); }
 function closeSuccessModal(){ closeModal('modal-success'); showCatalogue(); }
 
-// ════════════════════════════════════════════════════════════════════════════
+// ============================================================================
 // UTILITIES
-// ════════════════════════════════════════════════════════════════════════════
+// ============================================================================
 let toastTimer;
 function showToast(msg) {
   const t = document.getElementById('toast');
@@ -908,6 +1150,12 @@ document.getElementById('login-email').addEventListener('keydown', e => {
 });
 document.getElementById('login-password').addEventListener('keydown', e => {
   if (e.key === 'Enter') doLogin();
+});
+document.getElementById('fc-new').addEventListener('keydown', e => {
+  if (e.key === 'Enter') document.getElementById('fc-confirm').focus();
+});
+document.getElementById('fc-confirm').addEventListener('keydown', e => {
+  if (e.key === 'Enter') doForceChange();
 });
 </script>
 </body>
