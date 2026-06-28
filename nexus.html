@@ -514,7 +514,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 // ============================================================================
 const CONFIG = {
   allowed_domain: 'validusfintech.com',
-  auth_url:       'https://script.google.com/macros/s/AKfycbzICD_-QbS62FwdfiIqp2jG1jDEva4QHUHfIHeONnvGVYQmJXZlxTjKNGWe8NHF5pUx/exec',  // NexusAuth.gs deployment URL
+  auth_url:       'PASTE_NEXUSAUTH_APPS_SCRIPT_URL_HERE',  // NexusAuth.gs deployment URL
   hr_email:       'purna.b@validusfintech.com',
   hr_name:        'Purna B',
 };
@@ -756,6 +756,13 @@ async function loadUsers() {
   }).join('');
 }
 
+function showAdmin() {
+  document.getElementById('view-catalogue').style.display = 'none';
+  document.getElementById('view-module').style.display    = 'none';
+  document.getElementById('view-admin').style.display     = 'block';
+  loadUsers();
+}
+
 function showAdminMsg(id, msg, ok) {
   const el = document.getElementById(id);
   el.textContent = msg;
@@ -819,27 +826,26 @@ function checkStrength(pw, prefix) {
 // PLATFORM
 // ============================================================================
 function enterPlatform() {
-  document.getElementById('screen-login').classList.remove('active');
-  document.getElementById('screen-platform').classList.add('active');
+  showScreen('screen-platform');
   const name = state.userName || state.email.split('@')[0].replace(/[._]/g,' ').replace(/\b\w/g,c=>c.toUpperCase());
   document.getElementById('welcome-name').textContent = name;
-  document.getElementById('topbar-user').textContent = state.email;
+  document.getElementById('topbar-user').textContent  = state.email;
+  const adminBtn = document.getElementById('btn-admin-panel');
+  if (adminBtn) adminBtn.style.display = (state.role === 'admin') ? 'inline-block' : 'none';
   renderCatalogue();
   showCatalogue();
 }
 
 function logout() {
-  state.email = ''; state.userName = ''; state.currentModule = null;
-  document.getElementById('screen-platform').classList.remove('active');
-  document.getElementById('screen-login').classList.add('active');
-  document.getElementById('step-email').style.display = 'block';
+  state.email = ''; state.userName = ''; state.role = ''; state.currentModule = null; state.certData = null;
+  showScreen('screen-login');
+  document.getElementById('step-login').style.display  = 'block';
   document.getElementById('step-forgot').style.display = 'none';
-  document.getElementById('login-email').value = '';
-  document.getElementById('step-login').style.display = 'block';
-  document.getElementById('step-forgot').style.display = 'none';
-  document.getElementById('login-email').value = '';
+  document.getElementById('login-email').value    = '';
   document.getElementById('login-password').value = '';
-  document.getElementById('module-iframe').src = '';
+  document.getElementById('module-iframe').src    = '';
+  const adminBtn = document.getElementById('btn-admin-panel');
+  if (adminBtn) adminBtn.style.display = 'none';
 }
 
 function renderCatalogue() {
