@@ -58,23 +58,18 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 .error-msg{color:var(--red);font-size:13px;margin-top:10px;display:none;text-align:left}
 
 /* OTP display box */
-.otp-display{
-  background:linear-gradient(135deg,var(--accent-bg),var(--teal-bg));
-  border:1.5px solid var(--accent);border-radius:14px;padding:28px 24px;margin:20px 0;
+.pw-input-wrap{position:relative;margin-bottom:16px}
+.pw-input-wrap input{padding-right:44px}
+.pw-toggle{
+  position:absolute;right:12px;top:50%;transform:translateY(-50%);
+  background:none;border:none;cursor:pointer;color:var(--text3);font-size:16px;
+  padding:4px;line-height:1
 }
-.otp-display-label{font-size:12px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;color:var(--text3);margin-bottom:10px}
-.otp-display-code{font-size:48px;font-weight:800;letter-spacing:16px;color:var(--accent);font-family:'Courier New',monospace;line-height:1}
-.otp-display-expiry{font-size:12px;color:var(--text3);margin-top:10px}
-.otp-display-timer{font-weight:700;color:var(--gold)}
-
-/* OTP input */
-.otp-inputs{display:flex;gap:10px;justify-content:center;margin:20px 0}
-.otp-inputs input{
-  width:48px;height:56px;border:1.5px solid var(--border);border-radius:10px;
-  text-align:center;font-size:22px;font-weight:700;color:var(--text);
-  background:var(--surface);outline:none;transition:border-color .15s
-}
-.otp-inputs input:focus{border-color:var(--accent)}
+.strength-bar{height:3px;border-radius:2px;background:var(--border);margin-top:6px;overflow:hidden}
+.strength-fill{height:100%;border-radius:2px;transition:width .3s,background .3s}
+.strength-label{font-size:11px;color:var(--text3);margin-top:4px}
+.link-btn{background:none;border:none;color:var(--accent);font-size:13px;cursor:pointer;padding:0;text-decoration:underline}
+.link-btn:hover{opacity:.8}
 
 /* ── PLATFORM ── */
 #screen-platform{flex-direction:column}
@@ -189,12 +184,17 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 
 /* success */
 .success-actions{display:flex;flex-direction:column;gap:10px;margin-top:8px}
-.btn-mailto{
-  padding:13px;border:none;border-radius:10px;font-size:14px;font-weight:600;
-  cursor:pointer;background:var(--accent);color:#fff;text-decoration:none;display:block
+.btn-download{
+  padding:14px;border:none;border-radius:10px;font-size:15px;font-weight:600;
+  cursor:pointer;background:linear-gradient(135deg,#1A6BC8,#0D8A65);color:#fff;
+  display:flex;align-items:center;justify-content:center;gap:10px;transition:all .15s
 }
-.btn-mailto:hover{filter:brightness(1.1)}
-.mailto-note{font-size:12px;color:var(--text3);margin-top:4px;line-height:1.5}
+.btn-download:hover{filter:brightness(1.1);transform:translateY(-1px);box-shadow:0 4px 16px rgba(26,107,200,0.3)}
+.btn-download:active{transform:translateY(0)}
+.cert-preview{
+  background:var(--surface2);border:1px solid var(--border);border-radius:10px;
+  padding:14px 16px;text-align:left;font-size:12px;color:var(--text3);line-height:1.7
+}
 
 /* toast */
 .toast{
@@ -208,9 +208,9 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
   .login-card{padding:32px 24px}
   #view-catalogue{padding:24px 16px}
   .module-grid{grid-template-columns:1fr}
-  .otp-display-code{font-size:36px;letter-spacing:10px}
 }
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body>
 
@@ -221,38 +221,63 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
     <div class="login-title">Nexus</div>
     <div class="login-sub">Validus Learning Platform<br>Sign in with your Validus email to continue</div>
 
-    <!-- Step 1: Email -->
-    <div id="step-email">
+    <!-- Login form -->
+    <div id="step-login">
       <div class="input-group">
-        <label>Validus email address</label>
+        <label>Email address</label>
         <input type="email" id="login-email" placeholder="you@validusfintech.com" autocomplete="email">
       </div>
-      <div class="error-msg" id="email-error"></div>
-      <button class="btn btn-primary" onclick="generateCode()">Get verification code →</button>
+      <div class="input-group">
+        <label>Password</label>
+        <div class="pw-input-wrap">
+          <input type="password" id="login-password" placeholder="Enter your password" autocomplete="current-password">
+          <button class="pw-toggle" type="button" onclick="togglePw('login-password',this)" title="Show/hide password">👁</button>
+        </div>
+      </div>
+      <div class="error-msg" id="login-error"></div>
+      <button class="btn btn-primary" id="btn-login" onclick="doLogin()">Sign in →</button>
+      <div style="text-align:center;margin-top:14px">
+        <button class="link-btn" onclick="showForgotStep()">Forgot password?</button>
+      </div>
     </div>
 
-    <!-- Step 2: Show code + verify -->
-    <div id="step-otp" style="display:none">
-      <p style="font-size:14px;color:var(--text2);line-height:1.6;margin-bottom:4px">
-        Your verification code for <strong id="otp-email-display"></strong>:
-      </p>
-      <div class="otp-display">
-        <div class="otp-display-label">Your one-time code</div>
-        <div class="otp-display-code" id="otp-shown"></div>
-        <div class="otp-display-expiry">Valid for <span class="otp-display-timer" id="otp-timer">10:00</span></div>
+    <!-- Forgot / change password -->
+    <div id="step-forgot" style="display:none">
+      <div style="text-align:left;margin-bottom:20px">
+        <div style="font-size:15px;font-weight:600;margin-bottom:4px">Change your password</div>
+        <div style="font-size:13px;color:var(--text3)">Enter your email and current password, then choose a new one.</div>
       </div>
-      <p style="font-size:13px;color:var(--text2);margin-bottom:16px">Enter the code above to sign in:</p>
-      <div class="otp-inputs">
-        <input type="text" maxlength="1" id="otp0" oninput="otpInput(0)" onkeydown="otpKey(event,0)">
-        <input type="text" maxlength="1" id="otp1" oninput="otpInput(1)" onkeydown="otpKey(event,1)">
-        <input type="text" maxlength="1" id="otp2" oninput="otpInput(2)" onkeydown="otpKey(event,2)">
-        <input type="text" maxlength="1" id="otp3" oninput="otpInput(3)" onkeydown="otpKey(event,3)">
-        <input type="text" maxlength="1" id="otp4" oninput="otpInput(4)" onkeydown="otpKey(event,4)">
-        <input type="text" maxlength="1" id="otp5" oninput="otpInput(5)" onkeydown="otpKey(event,5)">
+      <div class="input-group">
+        <label>Email address</label>
+        <input type="email" id="cp-email" placeholder="you@validusfintech.com">
       </div>
-      <div class="error-msg" id="otp-error">Incorrect code. Please try again.</div>
-      <button class="btn btn-primary" onclick="verifyOTP()">Sign in</button>
-      <button class="btn btn-ghost" onclick="backToEmail()">← Change email</button>
+      <div class="input-group">
+        <label>Current password</label>
+        <div class="pw-input-wrap">
+          <input type="password" id="cp-old" placeholder="Current password">
+          <button class="pw-toggle" type="button" onclick="togglePw('cp-old',this)">👁</button>
+        </div>
+      </div>
+      <div class="input-group">
+        <label>New password</label>
+        <div class="pw-input-wrap">
+          <input type="password" id="cp-new" placeholder="Min 8 chars" oninput="checkStrength(this.value)">
+          <button class="pw-toggle" type="button" onclick="togglePw('cp-new',this)">👁</button>
+        </div>
+        <div class="strength-bar"><div class="strength-fill" id="strength-fill" style="width:0%"></div></div>
+        <div class="strength-label" id="strength-label"></div>
+      </div>
+      <div class="input-group">
+        <label>Confirm new password</label>
+        <div class="pw-input-wrap">
+          <input type="password" id="cp-confirm" placeholder="Repeat new password">
+          <button class="pw-toggle" type="button" onclick="togglePw('cp-confirm',this)">👁</button>
+        </div>
+      </div>
+      <div class="error-msg" id="cp-error"></div>
+      <div class="success-msg" id="cp-success" style="color:var(--teal);font-size:13px;margin-top:8px;display:none"></div>
+      <button class="btn btn-primary" id="btn-change-pw" onclick="doChangePassword()">Update password</button>
+      <button class="btn btn-ghost" onclick="showLoginStep()">← Back to sign in</button>
     </div>
   </div>
 </div>
@@ -319,7 +344,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
       <input type="text" class="declaration-name" id="learner-name" placeholder="Type your full name to sign" oninput="onNameInput(this.value)">
     </div>
     <div class="modal-actions">
-      <button class="btn-submit" id="btn-confirm" onclick="confirmCompletion()" disabled>Continue to send certificate →</button>
+      <button class="btn-submit" id="btn-confirm" onclick="confirmCompletion()" disabled>Sign declaration &amp; get certificate →</button>
       <button class="btn-cancel" onclick="closeModal('modal-completion')">I'll do this later</button>
     </div>
   </div>
@@ -328,12 +353,22 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 <!-- ══ SUCCESS MODAL ═════════════════════════════════════════════════════ -->
 <div id="modal-success" class="modal-overlay">
   <div class="modal-card">
-    <div class="modal-icon">✅</div>
+    <div class="modal-icon">🎓</div>
     <div class="modal-title">Completion recorded!</div>
     <div class="modal-sub" id="success-sub"></div>
-    <div class="success-actions">
-      <a id="mailto-link" class="btn-mailto" href="#">📧 Open completion email in Outlook / Gmail</a>
-      <div class="mailto-note">This opens a pre-filled email in your mail app. Just click Send — no typing needed.</div>
+    <div class="cert-preview" id="cert-preview"></div>
+    <div class="success-actions" style="margin-top:16px">
+      <button class="btn-download" onclick="downloadCertificate()">
+        <span style="font-size:20px">⬇</span> Download Certificate (PDF)
+      </button>
+      <div style="background:var(--gold-bg);border:1px solid rgba(192,120,0,0.25);border-radius:10px;padding:14px 16px;text-align:left">
+        <div style="font-size:12px;font-weight:700;color:var(--gold);letter-spacing:.4px;text-transform:uppercase;margin-bottom:6px">📋 Next step — forward your certificate</div>
+        <div style="font-size:13px;color:var(--text2);line-height:1.7">
+          Once downloaded, please forward the PDF to your <strong>HR team</strong> and your <strong>reporting manager</strong>
+          so your training completion can be recorded in your learning profile.
+          <span id="hr-email-hint"></span>
+        </div>
+      </div>
       <button class="btn-cancel" onclick="closeSuccessModal()">Back to catalogue</button>
     </div>
   </div>
@@ -347,10 +382,10 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 // CONFIG
 // ════════════════════════════════════════════════════════════════════════════
 const CONFIG = {
-  allowed_domain:   'validusfintech.com',
-  otp_valid_mins:   10,
-  hr_email:         'purna.b@validusfintech.com',
-  hr_name:          'Purna B',
+  allowed_domain: 'validusfintech.com',
+  auth_url:       'PASTE_NEXUSAUTH_APPS_SCRIPT_URL_HERE',  // NexusAuth.gs deployment URL
+  hr_email:       'purna.b@validusfintech.com',
+  hr_name:        'Purna B',
 };
 
 // ════════════════════════════════════════════════════════════════════════════
@@ -381,9 +416,7 @@ const COMING_SOON = [
 // ════════════════════════════════════════════════════════════════════════════
 let state = {
   email: '',
-  otp: '',
-  otpExpiry: null,
-  timerInterval: null,
+  userName: '',
   currentModule: null,
   completions: {},
   dark: false,
@@ -392,109 +425,149 @@ let state = {
 try { state.completions = JSON.parse(localStorage.getItem('nexus_completions') || '{}'); } catch(e) {}
 
 // ════════════════════════════════════════════════════════════════════════════
-// OTP — generated in browser, shown on screen. No email needed.
-// Uses SubtleCrypto (built into all modern browsers) for a secure hash.
-// The OTP is tied to: email address + 10-minute time window.
-// Even if someone sees the page, they still need to enter the correct digits.
+// AUTH — email + password, verified against Google Sheet via Apps Script
 // ════════════════════════════════════════════════════════════════════════════
-async function generateOTP(email) {
-  const window_id = Math.floor(Date.now() / (CONFIG.otp_valid_mins * 60 * 1000));
-  const raw = email.toLowerCase().trim() + '|' + window_id + '|nexus-validus-2026';
-  const data = new TextEncoder().encode(raw);
-  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-  const hashArray = Array.from(new Uint8Array(hashBuffer));
-  // Take 6 digits from the hash
-  const num = (hashArray[0] * 16777216 + hashArray[1] * 65536 + hashArray[2] * 256 + hashArray[3]) % 1000000;
-  return num.toString().padStart(6, '0');
+
+async function callAuth(payload) {
+  const resp = await fetch(CONFIG.auth_url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain' },
+    body: JSON.stringify(payload),
+  });
+  try { return await resp.json(); }
+  catch(e) { return { ok: false, error: 'Server error — please try again' }; }
 }
 
-async function generateCode() {
-  const email = document.getElementById('login-email').value.trim().toLowerCase();
-  const errEl = document.getElementById('email-error');
+async function doLogin() {
+  const email    = (document.getElementById('login-email').value    || '').trim().toLowerCase();
+  const password = (document.getElementById('login-password').value || '').trim();
+  const errEl    = document.getElementById('login-error');
   errEl.style.display = 'none';
 
-  if (!email || !email.includes('@')) {
-    errEl.textContent = 'Please enter your email address.';
-    errEl.style.display = 'block'; return;
-  }
+  if (!email) { errEl.textContent = 'Please enter your email.'; errEl.style.display = 'block'; return; }
   if (!email.endsWith('@' + CONFIG.allowed_domain)) {
-    errEl.textContent = 'Only @' + CONFIG.allowed_domain + ' email addresses can access Nexus.';
+    errEl.textContent = 'Only @' + CONFIG.allowed_domain + ' email addresses can sign in.';
     errEl.style.display = 'block'; return;
   }
+  if (!password) { errEl.textContent = 'Please enter your password.'; errEl.style.display = 'block'; return; }
 
-  state.email = email;
-  state.otp = await generateOTP(email);
-  state.otpExpiry = Date.now() + CONFIG.otp_valid_mins * 60 * 1000;
+  const btn = document.getElementById('btn-login');
+  btn.disabled = true; btn.textContent = 'Signing in…';
 
-  // Show the code on screen
-  document.getElementById('otp-shown').textContent = state.otp;
-  document.getElementById('otp-email-display').textContent = email;
+  let result;
+  try {
+    result = await callAuth({ action: 'login', email, password });
+  } catch(e) {
+    result = { ok: false, error: 'Could not reach authentication server.' };
+  }
 
-  document.getElementById('step-email').style.display = 'none';
-  document.getElementById('step-otp').style.display = 'block';
-  document.getElementById('otp-error').style.display = 'none';
-  Array.from({length:6}, (_,i) => { document.getElementById('otp'+i).value = ''; });
-  document.getElementById('otp0').focus();
+  btn.disabled = false; btn.textContent = 'Sign in →';
 
-  startTimer();
-}
-
-function startTimer() {
-  clearInterval(state.timerInterval);
-  state.timerInterval = setInterval(async () => {
-    const remaining = state.otpExpiry - Date.now();
-    if (remaining <= 0) {
-      clearInterval(state.timerInterval);
-      document.getElementById('otp-timer').textContent = '0:00 — expired';
-      // Auto-regenerate
-      state.otp = await generateOTP(state.email);
-      state.otpExpiry = Date.now() + CONFIG.otp_valid_mins * 60 * 1000;
-      document.getElementById('otp-shown').textContent = state.otp;
-      document.getElementById('otp-timer').textContent = CONFIG.otp_valid_mins + ':00';
-      startTimer();
-      return;
-    }
-    const m = Math.floor(remaining / 60000);
-    const s = Math.floor((remaining % 60000) / 1000);
-    document.getElementById('otp-timer').textContent = m + ':' + s.toString().padStart(2,'0');
-  }, 1000);
-}
-
-function otpInput(idx) {
-  const val = document.getElementById('otp' + idx).value.replace(/\D/g,'');
-  document.getElementById('otp' + idx).value = val;
-  if (val && idx < 5) document.getElementById('otp' + (idx+1)).focus();
-  const code = Array.from({length:6}, (_,i) => document.getElementById('otp'+i).value).join('');
-  if (code.length === 6) setTimeout(verifyOTP, 80);
-}
-
-function otpKey(e, idx) {
-  if (e.key === 'Backspace' && !document.getElementById('otp'+idx).value && idx > 0)
-    document.getElementById('otp'+(idx-1)).focus();
-}
-
-async function verifyOTP() {
-  // Re-generate to handle time window edge cases
-  const fresh = await generateOTP(state.email);
-  const code = Array.from({length:6}, (_,i) => document.getElementById('otp'+i).value).join('');
-  const errEl = document.getElementById('otp-error');
-
-  if (code !== fresh && code !== state.otp) {
+  if (!result.ok) {
+    errEl.textContent = result.error || 'Invalid email or password.';
     errEl.style.display = 'block';
-    Array.from({length:6}, (_,i) => { document.getElementById('otp'+i).value = ''; });
-    document.getElementById('otp0').focus();
+    document.getElementById('login-password').value = '';
     return;
   }
 
-  clearInterval(state.timerInterval);
-  errEl.style.display = 'none';
+  state.email = email;
+  state.userName = result.name || email.split('@')[0];
   enterPlatform();
 }
 
-function backToEmail() {
-  clearInterval(state.timerInterval);
-  document.getElementById('step-otp').style.display = 'none';
-  document.getElementById('step-email').style.display = 'block';
+async function doChangePassword() {
+  const email   = (document.getElementById('cp-email').value   || '').trim().toLowerCase();
+  const oldPw   = (document.getElementById('cp-old').value     || '').trim();
+  const newPw   = (document.getElementById('cp-new').value     || '').trim();
+  const confirm = (document.getElementById('cp-confirm').value || '').trim();
+  const errEl   = document.getElementById('cp-error');
+  const sucEl   = document.getElementById('cp-success');
+  errEl.style.display = 'none'; sucEl.style.display = 'none';
+
+  if (!email || !oldPw || !newPw || !confirm) {
+    errEl.textContent = 'All fields are required.'; errEl.style.display = 'block'; return;
+  }
+  if (!email.endsWith('@' + CONFIG.allowed_domain)) {
+    errEl.textContent = 'Only @' + CONFIG.allowed_domain + ' accounts.'; errEl.style.display = 'block'; return;
+  }
+  if (newPw.length < 8) {
+    errEl.textContent = 'New password must be at least 8 characters.'; errEl.style.display = 'block'; return;
+  }
+  if (newPw !== confirm) {
+    errEl.textContent = 'New passwords do not match.'; errEl.style.display = 'block'; return;
+  }
+  if (newPw === oldPw) {
+    errEl.textContent = 'New password must be different from the current password.'; errEl.style.display = 'block'; return;
+  }
+
+  const btn = document.getElementById('btn-change-pw');
+  btn.disabled = true; btn.textContent = 'Updating…';
+
+  let result;
+  try {
+    result = await callAuth({ action: 'changePassword', email, oldPassword: oldPw, newPassword: newPw });
+  } catch(e) {
+    result = { ok: false, error: 'Could not reach server.' };
+  }
+
+  btn.disabled = false; btn.textContent = 'Update password';
+
+  if (!result.ok) {
+    errEl.textContent = result.error || 'Could not update password.'; errEl.style.display = 'block'; return;
+  }
+
+  sucEl.textContent = '✓ Password updated successfully. You can now sign in with your new password.';
+  sucEl.style.display = 'block';
+  document.getElementById('cp-old').value = '';
+  document.getElementById('cp-new').value = '';
+  document.getElementById('cp-confirm').value = '';
+  document.getElementById('strength-fill').style.width = '0%';
+  document.getElementById('strength-label').textContent = '';
+  setTimeout(showLoginStep, 2000);
+}
+
+function showLoginStep() {
+  document.getElementById('step-forgot').style.display = 'none';
+  document.getElementById('step-login').style.display = 'block';
+  document.getElementById('login-error').style.display = 'none';
+  // Pre-fill email if change-password email was set
+  const cpEmail = document.getElementById('cp-email').value;
+  if (cpEmail) document.getElementById('login-email').value = cpEmail;
+}
+
+function showForgotStep() {
+  document.getElementById('step-login').style.display = 'none';
+  document.getElementById('step-forgot').style.display = 'block';
+  // Pre-fill email from login field
+  const loginEmail = document.getElementById('login-email').value;
+  if (loginEmail) document.getElementById('cp-email').value = loginEmail;
+  document.getElementById('cp-error').style.display = 'none';
+  document.getElementById('cp-success').style.display = 'none';
+}
+
+function togglePw(inputId, btn) {
+  const inp = document.getElementById(inputId);
+  if (inp.type === 'password') { inp.type = 'text';     btn.textContent = '🙈'; }
+  else                         { inp.type = 'password'; btn.textContent = '👁';  }
+}
+
+function checkStrength(pw) {
+  let score = 0;
+  if (pw.length >= 8)               score++;
+  if (pw.length >= 12)              score++;
+  if (/[A-Z]/.test(pw))            score++;
+  if (/[0-9]/.test(pw))            score++;
+  if (/[^A-Za-z0-9]/.test(pw))    score++;
+
+  const fill  = document.getElementById('strength-fill');
+  const label = document.getElementById('strength-label');
+  const pcts  = ['0%','20%','40%','70%','90%','100%'];
+  const colors = ['','#B93030','#C07800','#C07800','#0D8A65','#0D8A65'];
+  const labels = ['','Weak','Fair','Good','Strong','Very strong'];
+  fill.style.width      = pcts[score];
+  fill.style.background = colors[score];
+  label.textContent     = pw.length > 0 ? labels[score] : '';
+  label.style.color     = colors[score];
 }
 
 // ════════════════════════════════════════════════════════════════════════════
@@ -503,7 +576,7 @@ function backToEmail() {
 function enterPlatform() {
   document.getElementById('screen-login').classList.remove('active');
   document.getElementById('screen-platform').classList.add('active');
-  const name = state.email.split('@')[0].replace(/[._]/g,' ').replace(/\b\w/g,c=>c.toUpperCase());
+  const name = state.userName || state.email.split('@')[0].replace(/[._]/g,' ').replace(/\b\w/g,c=>c.toUpperCase());
   document.getElementById('welcome-name').textContent = name;
   document.getElementById('topbar-user').textContent = state.email;
   renderCatalogue();
@@ -511,13 +584,16 @@ function enterPlatform() {
 }
 
 function logout() {
-  clearInterval(state.timerInterval);
-  state.email = ''; state.otp = ''; state.currentModule = null;
+  state.email = ''; state.userName = ''; state.currentModule = null;
   document.getElementById('screen-platform').classList.remove('active');
   document.getElementById('screen-login').classList.add('active');
   document.getElementById('step-email').style.display = 'block';
-  document.getElementById('step-otp').style.display = 'none';
+  document.getElementById('step-forgot').style.display = 'none';
   document.getElementById('login-email').value = '';
+  document.getElementById('step-login').style.display = 'block';
+  document.getElementById('step-forgot').style.display = 'none';
+  document.getElementById('login-email').value = '';
+  document.getElementById('login-password').value = '';
   document.getElementById('module-iframe').src = '';
 }
 
@@ -587,6 +663,10 @@ function openModule(mod) {
 function showCatalogue() {
   document.getElementById('view-catalogue').style.display = 'block';
   document.getElementById('view-module').style.display = 'none';
+  document.getElementById('step-login').style.display = 'block';
+  document.getElementById('step-forgot').style.display = 'none';
+  document.getElementById('login-email').value = '';
+  document.getElementById('login-password').value = '';
   document.getElementById('module-iframe').src = '';
   state.currentModule = null;
   renderCatalogue();
@@ -614,12 +694,24 @@ function onNameInput(val) {
 }
 
 function confirmCompletion() {
-  const learnerName  = document.getElementById('learner-name').value.trim();
+  const learnerName = document.getElementById('learner-name').value.trim();
   if (!learnerName || learnerName.length < 2) return;
-  const mod          = state.currentModule;
-  const today        = new Date().toLocaleDateString('en-IN',{day:'numeric',month:'long',year:'numeric'});
-  const todayShort   = new Date().toLocaleDateString('en-IN');
-  const declaration  = 'I, ' + learnerName + ', declare that I have completed the training module "' + mod.title + '" on ' + today + ' on the Validus Nexus Learning Platform.';
+
+  const mod       = state.currentModule;
+  const today     = new Date().toLocaleDateString('en-IN', { day:'numeric', month:'long', year:'numeric' });
+  const todayShort = new Date().toLocaleDateString('en-IN');
+
+  // Store completion context for PDF generation
+  state.certData = {
+    learnerName,
+    email:      state.email,
+    moduleName: mod.title,
+    moduleDesc: mod.description,
+    date:       today,
+    declaration: 'I, ' + learnerName + ', declare that I have completed the training module "' +
+                 mod.title + '" on ' + today + ' on the Validus Nexus Learning Platform. ' +
+                 'I confirm that I have reviewed all sections of the module to the best of my ability.',
+  };
 
   // Save locally
   state.completions[mod.id] = { date: todayShort, name: learnerName };
@@ -627,39 +719,168 @@ function confirmCompletion() {
 
   closeModal('modal-completion');
 
-  // Build mailto: link — opens Outlook/Gmail pre-filled
-  const subject = encodeURIComponent('Training Completion Certificate — ' + learnerName + ' — ' + mod.title);
-  const body    = encodeURIComponent([
-    'Dear ' + CONFIG.hr_name + ',',
-    '',
-    'This is to inform you that the following training module has been completed on the Nexus Learning Platform.',
-    '',
-    'Learner name:   ' + learnerName,
-    'Learner email:  ' + state.email,
-    'Module:         ' + mod.title,
-    'Platform:       Nexus — Validus Learning Platform',
-    'Completed on:   ' + today,
-    '',
-    'Declaration signed by learner:',
-    '"' + declaration + '"',
-    '',
-    'This email was prepared automatically by the Nexus Learning Platform.',
-    '',
-    'Regards,',
-    learnerName,
-  ].join('\n'));
+  // Populate preview
+  document.getElementById('cert-preview').innerHTML =
+    '<strong>Certificate details</strong><br>' +
+    'Learner: ' + learnerName + '<br>' +
+    'Module: ' + mod.title + '<br>' +
+    'Date: ' + today + '<br>' +
+    'Issued by: Nexus — Validus Learning Platform';
 
-  const mailtoHref = 'mailto:' + CONFIG.hr_email +
-    '?cc=' + encodeURIComponent(state.email) +
-    '&subject=' + subject +
-    '&body=' + body;
-
-  document.getElementById('mailto-link').href = mailtoHref;
   document.getElementById('success-sub').innerHTML =
     'Your completion of <strong>' + mod.title + '</strong> has been recorded. ' +
-    'Click the button below to open a pre-filled email in your Outlook or Gmail. Just click Send — everything is already filled in.';
+    'Download your certificate below.';
+
+  // Show HR email in the forwarding hint
+  const hint = document.getElementById('hr-email-hint');
+  if (hint) hint.innerHTML = ' Send it to <strong>' + CONFIG.hr_email + '</strong> or share it with your manager directly.';
 
   document.getElementById('modal-success').classList.add('show');
+}
+
+// ── PDF CERTIFICATE GENERATOR ──────────────────────────────────────────────
+function downloadCertificate() {
+  const d = state.certData;
+  if (!d) return;
+
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+  const W = 297, H = 210;  // A4 landscape dimensions in mm
+
+  // ── Background ────────────────────────────────────────────────────────────
+  // Outer border fill (deep blue)
+  doc.setFillColor(20, 60, 120);
+  doc.rect(0, 0, W, H, 'F');
+
+  // Inner white area
+  doc.setFillColor(255, 255, 255);
+  doc.roundedRect(10, 10, W-20, H-20, 4, 4, 'F');
+
+  // Top accent bar (gradient approximation — two rects)
+  doc.setFillColor(26, 107, 200);
+  doc.rect(10, 10, (W-20)/2, 18, 'F');
+  doc.setFillColor(13, 138, 101);
+  doc.rect(10 + (W-20)/2, 10, (W-20)/2, 18, 'F');
+
+  // Bottom thin bar
+  doc.setFillColor(20, 60, 120);
+  doc.rect(10, H-22, W-20, 12, 'F');
+
+  // Decorative corner marks
+  const cm = (x, y, flip) => {
+    doc.setDrawColor(26, 107, 200);
+    doc.setLineWidth(0.8);
+    const s = flip ? -1 : 1;
+    doc.line(x, y, x + s*12, y);
+    doc.line(x, y, x, y + 10);
+  };
+  cm(18, 34, false);   // top-left
+  cm(W-18, 34, true);  // top-right
+  cm(18, H-24, false); // bottom-left (adjusted)
+  cm(W-18, H-24, true);// bottom-right
+
+  // ── Header text in top bar ─────────────────────────────────────────────────
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(11);
+  doc.setTextColor(255, 255, 255);
+  doc.text('VALIDUS FINTECH SERVICES PVT. LTD.', W/2, 17, { align:'center' });
+  doc.setFontSize(8.5);
+  doc.setFont('helvetica', 'normal');
+  doc.text('SEBI-Registered Registrar and Transfer Agent  ·  Nexus Learning Platform', W/2, 23, { align:'center' });
+
+  // ── Certificate heading ────────────────────────────────────────────────────
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(11);
+  doc.setTextColor(100, 120, 150);
+  doc.text('C E R T I F I C A T E   O F   C O M P L E T I O N', W/2, 44, { align:'center' });
+
+  // ── "This certifies that" ──────────────────────────────────────────────────
+  doc.setFont('helvetica', 'italic');
+  doc.setFontSize(12);
+  doc.setTextColor(80, 90, 110);
+  doc.text('This is to certify that', W/2, 58, { align:'center' });
+
+  // ── Learner name (large) ───────────────────────────────────────────────────
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(32);
+  doc.setTextColor(20, 60, 120);
+  doc.text(d.learnerName, W/2, 76, { align:'center' });
+
+  // Underline below name
+  const nameWidth = doc.getTextWidth(d.learnerName);
+  doc.setDrawColor(13, 138, 101);
+  doc.setLineWidth(0.6);
+  doc.line(W/2 - nameWidth/2, 79, W/2 + nameWidth/2, 79);
+
+  // ── "has successfully completed" ──────────────────────────────────────────
+  doc.setFont('helvetica', 'italic');
+  doc.setFontSize(12);
+  doc.setTextColor(80, 90, 110);
+  doc.text('has successfully completed the training module', W/2, 91, { align:'center' });
+
+  // ── Module name ────────────────────────────────────────────────────────────
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(18);
+  doc.setTextColor(26, 107, 200);
+  // Wrap long module names
+  const moduleLines = doc.splitTextToSize(d.moduleName, 200);
+  doc.text(moduleLines, W/2, 103, { align:'center' });
+
+  // ── Divider ────────────────────────────────────────────────────────────────
+  const divY = moduleLines.length > 1 ? 117 : 113;
+  doc.setDrawColor(220, 228, 240);
+  doc.setLineWidth(0.3);
+  doc.line(30, divY, W-30, divY);
+
+  // ── Details row ────────────────────────────────────────────────────────────
+  const detY = divY + 11;
+  // Three columns: date | email | platform
+  const cols = [
+    { label:'Completed on', value: d.date },
+    { label:'Learner email', value: d.email },
+    { label:'Platform', value: 'Nexus — Validus Learning Platform' },
+  ];
+  const colW = (W - 60) / 3;
+  cols.forEach((col, i) => {
+    const cx = 30 + i * colW + colW / 2;
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8);
+    doc.setTextColor(130, 145, 165);
+    doc.text(col.label.toUpperCase(), cx, detY, { align:'center' });
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(10);
+    doc.setTextColor(30, 45, 80);
+    const wrapped = doc.splitTextToSize(col.value, colW - 4);
+    doc.text(wrapped, cx, detY + 6, { align:'center' });
+  });
+
+  // ── Declaration box ────────────────────────────────────────────────────────
+  const declY = detY + 22;
+  doc.setFillColor(247, 249, 252);
+  doc.setDrawColor(210, 220, 235);
+  doc.setLineWidth(0.3);
+  doc.roundedRect(30, declY, W-60, 18, 2, 2, 'FD');
+  doc.setFont('helvetica', 'italic');
+  doc.setFontSize(7.5);
+  doc.setTextColor(100, 115, 135);
+  const declLines = doc.splitTextToSize('"' + d.declaration + '"', W - 70);
+  doc.text(declLines.slice(0, 2), W/2, declY + 5, { align:'center' });
+
+  // ── Bottom bar ─────────────────────────────────────────────────────────────
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(8);
+  doc.setTextColor(255, 255, 255);
+  doc.text('Validus Fintech Services Pvt. Ltd.  ·  Hyderabad, India  ·  nexus.validusfintech.com', W/2, H-14, { align:'center' });
+
+  // ── Certificate ID (bottom right) ─────────────────────────────────────────
+  const certId = 'CERT-' + Date.now().toString(36).toUpperCase();
+  doc.setFontSize(7);
+  doc.setTextColor(180, 195, 215);
+  doc.text('Certificate ID: ' + certId, W-15, H-14, { align:'right' });
+
+  // ── Save ───────────────────────────────────────────────────────────────────
+  const filename = 'Nexus_Certificate_' + d.learnerName.replace(/\s+/g,'_') + '_' + d.moduleName.replace(/[^a-zA-Z0-9]+/g,'_').slice(0,30) + '.pdf';
+  doc.save(filename);
 }
 
 function closeModal(id)    { document.getElementById(id).classList.remove('show'); }
@@ -683,7 +904,10 @@ function toggleTheme() {
 }
 
 document.getElementById('login-email').addEventListener('keydown', e => {
-  if (e.key === 'Enter') generateCode();
+  if (e.key === 'Enter') document.getElementById('login-password').focus();
+});
+document.getElementById('login-password').addEventListener('keydown', e => {
+  if (e.key === 'Enter') doLogin();
 });
 </script>
 </body>
