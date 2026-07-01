@@ -87,7 +87,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 .topbar-logo-sub{font-size:11px;color:var(--text3)}
 .topbar-spacer{flex:1}
 .topbar-user{font-size:13px;color:var(--text2)}
-.theme-btn,.logout-btn{padding:6px 14px;border:1px solid var(--border);border-radius:8px;background:transparent;color:var(--text2);font-size:13px;cursor:pointer;transition:all .15s}
+.theme-btn,.logout-btn,.tb-sm-btn{padding:6px 14px;border:1px solid var(--border);border-radius:8px;background:transparent;color:var(--text2);font-size:13px;cursor:pointer;transition:all .15s}
 .logout-btn:hover{background:var(--red-bg);color:var(--red);border-color:var(--red)}
 
 /* ── CATALOGUE ── */
@@ -381,8 +381,8 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
     <div class="topbar-spacer"></div>
     <span class="topbar-user" id="topbar-user"></span>
     <button class="admin-topbar-btn" id="btn-admin-panel" style="display:none" onclick="showAdmin()">⚙ Users</button>
-    <button class="theme-btn" onclick="openChangePwModal()">🔑 Password</button>
-    <button class="theme-btn" onclick="toggleTheme()">☀ Light</button>
+    <button class="tb-sm-btn" onclick="openChangePwModal()">🔑 Password</button>
+    <button class="theme-btn" id="btn-theme" onclick="toggleTheme()">☀ Light</button>
     <button class="logout-btn" onclick="logout()">Sign out</button>
   </div>
 
@@ -1212,7 +1212,7 @@ function toggleTheme() {
 function applyTheme() {
   const themeName = state.dark ? 'dark' : 'light';
   document.documentElement.setAttribute('data-theme', themeName);
-  const btn = document.querySelector('.theme-btn');
+  const btn = document.getElementById('btn-theme');
   if (btn) btn.textContent = state.dark ? '☾ Dark' : '☀ Light';
 
   // Propagate theme into the loaded module iframe (same-origin, so direct DOM access works)
