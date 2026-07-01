@@ -222,6 +222,19 @@ nav::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
   .home-modules{grid-template-columns:1fr 1fr}
 }
 </style>
+<script>
+(function(){
+  document.addEventListener('contextmenu', function(e){ e.preventDefault(); });
+  document.addEventListener('keydown', function(e){
+    if (
+      (e.ctrlKey && e.key === 'u') ||
+      (e.ctrlKey && e.shiftKey && ['i','I','j','J','c','C'].includes(e.key)) ||
+      (e.ctrlKey && e.key === 's') ||
+      e.key === 'F12'
+    ) { e.preventDefault(); e.stopPropagation(); return false; }
+  });
+})();
+</script>
 </head>
 <body>
 <!-- TOPBAR — always visible above sidebar + content -->
