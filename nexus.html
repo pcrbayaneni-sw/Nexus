@@ -275,6 +275,19 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 }
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+(function(){
+  document.addEventListener('contextmenu', function(e){ e.preventDefault(); });
+  document.addEventListener('keydown', function(e){
+    if (
+      (e.ctrlKey && e.key === 'u') ||
+      (e.ctrlKey && e.shiftKey && ['i','I','j','J','c','C'].includes(e.key)) ||
+      (e.ctrlKey && e.key === 's') ||
+      e.key === 'F12'
+    ) { e.preventDefault(); e.stopPropagation(); return false; }
+  });
+})();
+</script>
 </head>
 <body>
 
