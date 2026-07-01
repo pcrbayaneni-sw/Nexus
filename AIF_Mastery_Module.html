@@ -80,8 +80,6 @@ nav::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
 .search-result-title{font-weight:500;color:var(--text)}
 .search-result-sub{font-size:11px;color:var(--text3);margin-top:1px}
 .topbar-right{margin-left:auto;display:flex;align-items:center;gap:8px}
-#theme-toggle{background:none;border:1px solid var(--border2);border-radius:6px;padding:5px 10px;cursor:pointer;font-size:12px;color:var(--text2);display:flex;align-items:center;gap:5px;transition:background .12s;white-space:nowrap}
-#theme-toggle:hover{background:var(--card2)}
 .topbar-logo{font-family:'Sora',sans-serif;font-size:12px;font-weight:700;color:var(--accent);white-space:nowrap;margin-left:4px}
 
 /* ── MAIN ── */
@@ -235,9 +233,6 @@ nav::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
       <input type="text" id="global-search" placeholder="Jump to any topic…" oninput="doSearch(this.value)" onblur="hideSearch()" onfocus="if(this.value)doSearch(this.value)">
       <div id="search-results"></div>
     </div>
-    <div class="topbar-right">
-      <button id="theme-toggle" onclick="toggleTheme()">☀ Light</button>
-    </div>
   </div>
 
 <div id="app">
@@ -322,34 +317,15 @@ const QURIOUS_CONFIG = {
   visibility: 'client',
 };
 // ── THEME ──────────────────────────────────────────────────
-let dark = false;
-function toggleTheme(){
-  dark = !dark;
-  document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
-  document.getElementById('theme-toggle').textContent = dark ? '☾ Dark' : '☀ Light';
-
-  // Propagate theme up to the parent Nexus window, if embedded in one (same-origin)
-  try {
-    if (window.parent && window.parent !== window && window.parent.state) {
-      window.parent.state.dark = dark;
-      window.parent.document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
-      const parentBtn = window.parent.document.querySelector('.theme-btn');
-      if (parentBtn) parentBtn.textContent = dark ? '☾ Dark' : '☀ Light';
-      try { window.parent.localStorage.setItem('nexus_theme', dark ? 'dark' : 'light'); } catch(e) {}
-    }
-  } catch(e) { /* not embedded, or cross-origin — ignore */ }
-}
-
-// On load, if embedded in Nexus, inherit its current theme
+// Theme is controlled entirely by the parent Nexus window — no toggle here.
+// On load, inherit whatever theme Nexus is currently on.
 (function(){
   try {
     if (window.parent && window.parent !== window && window.parent.state) {
-      dark = !!window.parent.state.dark;
-      document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
-      const btn = document.getElementById('theme-toggle');
-      if (btn) btn.textContent = dark ? '☾ Dark' : '☀ Light';
+      const isDark = !!window.parent.state.dark;
+      document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
     }
-  } catch(e) {}
+  } catch(e) { /* not embedded, or cross-origin — default to light */ }
 })();
 
 // ── SIDEBAR ────────────────────────────────────────────────
@@ -2022,7 +1998,7 @@ render(26, modHTML(26, MODULES[26].eyebrow, MODULES[26].title,
 
 // ── MODULE 28 — AIF QUICK QUIZ ────────────────────────────────────────────
 render(27, modHTML(27, MODULES[27].eyebrow, MODULES[27].title,
-`Test your knowledge before a client meeting. 12 questions covering core AIF concepts, Validus operations, compliance obligations, and fee mechanics. Results show immediately with links to the relevant module for any question you miss.`,
+`Test your knowledge before a client meeting. 12 questions randomly drawn from a bank of 31, covering core AIF concepts, Validus operations, compliance obligations, and fee mechanics — a different set each time you take it. Results show immediately with links to the relevant module for any question you miss.`,
 `<div class="section"><div class="section-title">AIF knowledge quiz</div>
 <div id="quiz-wrap">
   <div id="quiz-progress-bar" style="height:4px;background:var(--border2,rgba(0,0,0,0.1));border-radius:2px;margin-bottom:16px"><div id="quiz-pbar" style="height:100%;width:0%;background:var(--accent,#1A6BC8);border-radius:2px;transition:width .3s"></div></div>
@@ -2055,7 +2031,7 @@ setTimeout(function(){
 }, 100);
 
 // ── QUIZ ──────────────────────────────────────────────────────────────────
-var quizData = [
+var quizBank = [
   {q:"What is the minimum investment amount for an individual investor in an AIF?",opts:["₹50 lakh","₹1 crore","₹25 lakh","₹5 crore"],ans:1,exp:"₹1 crore per investor per scheme is the statutory minimum under SEBI AIF Regulations 2012. The ₹25 lakh exception applies only to employees/directors of the AIF or its manager, and to angel fund investors.",mod:5},
   {q:"Under PMLA 2002, what is the threshold for identifying a UBO in a non-individual investor?",opts:["10% ownership","25% ownership or control","51% ownership","Any beneficial interest"],ans:1,exp:"Any individual directly or indirectly holding 25% or more of shares, capital, profits, or exercising control through voting rights or board majority is classified as the UBO. The 25% threshold is the SEBI/PMLA standard.",mod:9},
   {q:"How frequently does Validus re-screen all active investors for AML/PMLA watchlist changes?",opts:["Annually","Quarterly","Monthly","At each drawdown only"],ans:2,exp:"All active investors are re-screened every month against updated OFAC, UN sanctions, PEP registries, and Indian enforcement agency watchlists via AuthBridge — not just at initial onboarding.",mod:16},
@@ -2068,13 +2044,47 @@ var quizData = [
   {q:"What is the maximum leverage permitted for a Category III AIF?",opts:["No leverage permitted","1× NAV","2× NAV","5× NAV"],ans:2,exp:"SEBI permits Category III AIFs to create leverage up to 2 times their NAV. This is one of the key features that distinguishes Cat III from Cat I and Cat II, both of which do not permit leverage (except for hedging purposes in Cat II).",mod:8},
   {q:"In equalization, what does an investor joining at a second close pay?",opts:["Only the standard drawdown amount for the new tranche","A catch-up amount equal to returns already earned by first-close investors on drawn capital","A penalty fee for late joining","Nothing extra — they join at the same NAV"],ans:1,exp:"Late-joining investors pay an equalization payment — a catch-up amount equal to the returns already earned by earlier investors on the capital they have already contributed. This aligns the effective economic start date of all investors, regardless of which close they joined at.",mod:11},
   {q:"Which of these is a Validus-owned compliance obligation (not the AIF's)?",opts:["Filing the PPM with SEBI","Filing quarterly TDS returns","STR (Suspicious Transaction Report) filing with FIU-IND","Obtaining SEBI AIF registration"],ans:2,exp:"As a reporting entity under PMLA 2002, Validus has an independent obligation to file STRs with the Financial Intelligence Unit of India (FIU-IND) if suspicious transactions are identified — this cannot be delegated to or dependent on the AIF's instruction. PPM filing, TDS returns, and SEBI registration are the AIF/IM's obligations.",mod:16},
+  {q:"What is a blind pool fund?",opts:["A fund with no disclosed investment strategy","A fund where investors commit capital without knowing specific investments in advance","A fund that only invests in unlisted securities","A fund with no minimum investment threshold"],ans:1,exp:"In a blind pool fund — the standard institutional PE/VC model — investors commit capital without knowing which specific investments will be made. The IM has full discretion to deploy capital into deals meeting the PPM's criteria, as opposed to a deal-by-deal fund where investors see and approve each opportunity.",mod:7},
+  {q:"What does the J-curve describe in a close-ended AIF?",opts:["A fund's leverage ratio over time","The typical pattern of negative early returns followed by later gains","A chart of investor complaints over the fund's life","The relationship between NAV and unit price"],ans:1,exp:"The J-curve describes how a close-ended PE/VC fund's returns are typically negative in the early years (due to fees being charged before returns materialize) and improve later as investments mature and exits occur — tracing a J-shape on a return graph.",mod:12},
+  {q:"How is a Category III AIF taxed, compared to Category I and II?",opts:["Identically — all AIFs get pass-through status","Category III does NOT get pass-through status; tax is paid at the fund level","Category III is fully tax-exempt","Category III investors pay double tax"],ans:1,exp:"Unlike Cat I and Cat II (which get pass-through status under Section 115UB), Category III AIFs are taxed at the fund level — the fund itself pays tax on STCG (30%) and LTCG (20% with indexation) before distributing post-tax amounts to investors.",mod:17},
+  {q:"What is the standard notice period an AMC must serve to migrate away from Validus?",opts:["30 days","60 days","90 days","No notice required"],ans:2,exp:"90 days' notice is standard for terminating the RTA agreement, allowing sufficient time for Validus to prepare a complete data export and support an orderly, parallel-run transition to the new provider.",mod:19},
+  {q:"Who owns investor data collected during onboarding — the AMC/AIF, or Validus?",opts:["Validus, as the data processor","The AIF — Validus is only a data processor, not a data owner","Whoever paid for onboarding costs","SEBI, as the regulator"],ans:1,exp:"All investor data — KYC documents, unit ledgers, transaction records — belongs to the AIF. Validus is a data processor, not a data owner, and this is explicit in the tripartite agreement. The AIF can request a full data export at any time, not only at termination.",mod:19},
+  {q:"What is a Qualified Institutional Buyer (QIB)?",opts:["Any investor with more than ₹1 crore invested","A SEBI-defined category of sophisticated institutional investors, including mutual funds and insurance companies","A retail investor who has passed a SEBI exam","An investor who qualifies for tax exemption"],ans:1,exp:"QIB is a SEBI-defined category primarily used for QIP purposes, encompassing mutual funds, FIIs/FPIs, insurance companies, pension funds, and scheduled banks. QIBs are presumed sophisticated and are common anchor investors in Cat I and Cat II AIFs.",mod:6},
+  {q:"What is the reduced minimum investment ticket size for a SEBI-Accredited Investor?",opts:["₹10 lakh","₹25 lakh","₹50 lakh","No reduction available"],ans:1,exp:"SEBI's Accredited Investor (AI) framework (introduced 2021) allows AIs — who meet higher income/net worth thresholds — to invest in AIFs at a reduced minimum ticket size of ₹25 lakh, versus the standard ₹1 crore minimum.",mod:6},
+  {q:"Are InvITs and REITs regulated as AIFs under SEBI's AIF Regulations?",opts:["Yes, they are a sub-category of Category I AIFs","No — they are separately regulated under their own SEBI regulations","Yes, but only if unlisted","No, they are regulated by RBI instead"],ans:1,exp:"InvITs and REITs are NOT AIFs. They are regulated under their own separate SEBI regulations (SEBI InvIT Regulations 2014, SEBI REIT Regulations 2014) despite serving a similar capital-pooling purpose for infrastructure and real estate assets respectively.",mod:7},
+  {q:"What is the risk-based approach (RBA) in AML/PMLA compliance?",opts:["A framework requiring identical due diligence for every investor","A FATF-mandated framework to allocate AML resources proportionate to investor risk","A method for calculating AIF investment risk","A SEBI stress-testing requirement"],ans:1,exp:"The risk-based approach is the FATF-mandated framework underpinning all AML decisions — it means allocating due diligence effort proportionate to risk. Lower-risk investors get Simplified Due Diligence (SDD), standard investors get CDD, and higher-risk investors (PEPs, high-risk jurisdictions) get Enhanced Due Diligence (EDD).",mod:16},
+  {q:"What does Section 13 of PMLA prohibit?",opts:["Filing an STR without investor consent","Disclosing to any person that an STR has been or may be filed ('tipping off')","Onboarding foreign investors","Charging management fees above 2%"],ans:1,exp:"Section 13 makes it a criminal offence to disclose to any person — including the investor, AMC, or IM — that an STR has been or may be filed, or that an investigation is underway. If an investor asks why their account is under review, staff must escalate to the Compliance Officer, not explain.",mod:16},
+  {q:"What is a High Value Transaction (HVT) report, and when is it filed?",opts:["A monthly summary of all fund transactions","A report for cross-border wire transfers of ₹5 lakh or more, filed with FIU-IND","An investor complaint above ₹10 lakh","A quarterly SEBI filing for large AIFs"],ans:1,exp:"An HVT report is filed with FIU-IND for cross-border wire transfers of ₹5 lakh or more in a single transaction — distinct from an STR because it's threshold-based, not suspicion-based. It's especially relevant for NRI and FPI investors making drawdown payments from overseas accounts.",mod:16},
+  {q:"What is Simplified Due Diligence (SDD), and when does it apply?",opts:["A lighter KYC process available to all retail investors","Lower-intensity verification for inherently low-risk investors like SEBI-regulated entities and listed companies","A digital-only onboarding shortcut","An expedited process for NRI investors"],ans:1,exp:"SDD applies to investors presumed lower-risk due to their own regulatory oversight — SEBI-regulated entities, listed companies, government bodies, and public financial institutions. It doesn't mean zero verification, just proportionate verification based on demonstrated lower risk.",mod:16},
+  {q:"What is the standard SLA for physical mode investor onboarding at Validus?",opts:["Same day","2 business days from complete, NIGO-free documentation","5 business days","15 business days"],ans:1,exp:"Physical onboarding — where the investor submits hard copies and the ops team performs express data entry — has a 2 business day SLA from receipt of complete, NIGO-free documentation.",mod:3},
+  {q:"Why can fully digital onboarding sometimes take longer than physical onboarding?",opts:["Digital signatures are less secure","E-stamp procurement varies by state and can take 3–7 days","Digital onboarding requires SEBI pre-approval","There is no difference in timeline"],ans:1,exp:"Digital onboarding's 15-day SLA accounts for e-stamp procurement, which varies significantly by state government portal (3–7 days), plus the Leegality signing workflow and KYC verification — this surprises clients who assume digital is inherently faster than physical.",mod:3},
+  {q:"What is the UBO identification threshold under PMLA for non-individual investors?",opts:["10% ownership or control","25% ownership or control","51% ownership or control","Any ownership stake, however small"],ans:1,exp:"Any individual directly or indirectly holding 25% or more of shares, capital, profits, or exercising control through voting rights or board majority is classified as the Ultimate Beneficial Owner (UBO) — this is the SEBI/PMLA standard threshold.",mod:9},
+  {q:"What happens to an investor's units if they default on a drawdown payment?",opts:["Nothing — the fund waits indefinitely","Future allotments and distributions are suspended pending IM/Trustee decision","Units are automatically cancelled","Validus independently initiates legal action"],ans:1,exp:"A defaulting investor's future allotments and distributions are suspended pending IM/Trustee decision. The specific consequences (penalty interest, forced sale, legal action) are defined in the PPM and Contribution Agreement — Validus implements whichever outcome the IM/Trustee directs, but does not independently decide.",mod:8},
+  {q:"What is deal-by-deal fund structure, as distinct from a blind pool?",opts:["A fund that only makes one investment ever","A structure where investors see and approve specific opportunities before committing capital to each deal","A fund with no PPM","A fund exclusively for real estate"],ans:1,exp:"In a deal-by-deal structure — more common in real estate AIFs and family office arrangements — investors are shown specific opportunities before committing capital to each deal, giving them more control but reducing the IM's ability to act quickly compared to a blind pool.",mod:7},
+  {q:"What is the maximum number of joint holders permitted on an AIF investor account?",opts:["1 (sole holder only)","2","3","No limit"],ans:1,exp:"Up to 2 joint holders are permitted per investor account. Digital signing for joint holders is sequential — the first holder signs, then the joint holder — and for demat accounts, the holding sequence must exactly match the AIF application.",mod:3},
+  {q:"What is the annual FATCA/CRS reporting deadline that Validus prepares data for?",opts:["31 March","30 April, for the AMC/IM to file Form 61B by 31 May","31 December","There is no fixed annual deadline"],ans:1,exp:"Validus prepares the annual FATCA/CRS reportable account extract by 30 April each year covering the preceding financial year. The AMC/IM then files Form 61B with the Income Tax Department by 31 May.",mod:16},
 ];
 
 var quizState = {current:0, score:0, answers:[], started:false};
 
+// Fisher-Yates shuffle — returns a new shuffled array, does not mutate original
+function shuffleArray(arr){
+  var a = arr.slice();
+  for(var i = a.length - 1; i > 0; i--){
+    var j = Math.floor(Math.random() * (i + 1));
+    var tmp = a[i]; a[i] = a[j]; a[j] = tmp;
+  }
+  return a;
+}
+
+var quizData = [];  // the active 12-question set for this session, drawn from quizBank
+
 function initQuiz(){
   var wrap = document.getElementById('quiz-body');
   if(!wrap) return;
+  // Draw a fresh random set of 12 questions from the full bank each time the quiz starts
+  var QUIZ_LENGTH = 12;
+  quizData = shuffleArray(quizBank).slice(0, Math.min(QUIZ_LENGTH, quizBank.length));
   quizState = {current:0, score:0, answers:[], started:true};
   showQuestion(0);
 }
