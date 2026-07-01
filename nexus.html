@@ -555,6 +555,12 @@ let state = {
   dark: false,
 };
 
+// Restore saved theme preference
+try {
+  const savedTheme = localStorage.getItem('nexus_theme');
+  if (savedTheme === 'dark') state.dark = true;
+} catch(e) {}
+
 // Completions loaded from Google Sheet on login (see enterPlatform)
 
 // ============================================================================
@@ -827,6 +833,7 @@ function checkStrength(pw, prefix) {
 // ============================================================================
 async function enterPlatform() {
   showScreen('screen-platform');
+  applyTheme();
   const name = state.userName || state.email.split('@')[0].replace(/[._]/g,' ').replace(/\b\w/g,c=>c.toUpperCase());
   document.getElementById('welcome-name').textContent = name;
   document.getElementById('topbar-user').textContent  = state.email;
@@ -908,7 +915,10 @@ function openModule(mod) {
   document.getElementById('view-catalogue').style.display = 'none';
   document.getElementById('view-module').style.display = 'flex';
   document.getElementById('module-topbar-title').textContent = mod.title;
-  document.getElementById('module-iframe').src = mod.url;
+  const iframe = document.getElementById('module-iframe');
+  iframe.src = mod.url;
+  // Re-apply current theme once the module finishes loading
+  iframe.onload = function() { applyTheme(); };
   const done = !!state.completions[mod.id];
   const btn  = document.getElementById('btn-mark-complete');
   btn.textContent = done ? '✓ Completed' : '✓ Mark as complete';
@@ -1161,8 +1171,26 @@ function showToast(msg) {
 
 function toggleTheme() {
   state.dark = !state.dark;
-  document.documentElement.setAttribute('data-theme', state.dark ? 'dark' : 'light');
-  document.querySelector('.theme-btn').textContent = state.dark ? '☾ Dark' : '☀ Light';
+  applyTheme();
+}
+
+function applyTheme() {
+  const themeName = state.dark ? 'dark' : 'light';
+  document.documentElement.setAttribute('data-theme', themeName);
+  const btn = document.querySelector('.theme-btn');
+  if (btn) btn.textContent = state.dark ? '☾ Dark' : '☀ Light';
+
+  // Propagate theme into the loaded module iframe (same-origin, so direct DOM access works)
+  const iframe = document.getElementById('module-iframe');
+  if (iframe && iframe.contentDocument && iframe.contentDocument.documentElement) {
+    try {
+      iframe.contentDocument.documentElement.setAttribute('data-theme', themeName);
+      const iframeBtn = iframe.contentDocument.getElementById('theme-toggle');
+      if (iframeBtn) iframeBtn.textContent = state.dark ? '☾ Dark' : '☀ Light';
+    } catch(e) { /* cross-origin fallback — silently ignore */ }
+  }
+
+  try { localStorage.setItem('nexus_theme', themeName); } catch(e) {}
 }
 
 document.getElementById('login-email').addEventListener('keydown', e => {
