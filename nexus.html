@@ -281,6 +281,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
   document.addEventListener('keydown', function(e){
     if (
       (e.ctrlKey && e.key === 'u') ||
+      (e.ctrlKey && e.key === 'a') ||
       (e.ctrlKey && e.shiftKey && ['i','I','j','J','c','C'].includes(e.key)) ||
       (e.ctrlKey && e.key === 's') ||
       e.key === 'F12'
@@ -609,6 +610,25 @@ try {
   if (savedTheme === 'dark') state.dark = true;
 } catch(e) {}
 
+// Restore session from sessionStorage (survives F5, clears on tab close)
+(function(){
+  try {
+    const saved = sessionStorage.getItem('nexus_session');
+    if (saved) {
+      const s = JSON.parse(saved);
+      if (s.email && s.role) {
+        state.email    = s.email;
+        state.userName = s.userName || '';
+        state.role     = s.role;
+        // Re-enter platform once DOM is ready
+        window.addEventListener('DOMContentLoaded', function() {
+          enterPlatform();
+        });
+      }
+    }
+  } catch(e) {}
+})();
+
 // Completions loaded from Google Sheet on login (see enterPlatform)
 
 // ============================================================================
@@ -658,6 +678,15 @@ async function doLogin() {
   state.email    = email;
   state.userName = result.name || email.split('@')[0];
   state.role     = result.role || 'learner';
+
+  // Persist session so F5 refresh doesn't log the user out
+  try {
+    sessionStorage.setItem('nexus_session', JSON.stringify({
+      email:    state.email,
+      userName: state.userName,
+      role:     state.role,
+    }));
+  } catch(e) {}
 
   if (result.mustChangePassword) {
     // Force password change before entering the platform
@@ -897,6 +926,7 @@ async function enterPlatform() {
 }
 
 function logout() {
+  try { sessionStorage.removeItem('nexus_session'); } catch(e) {}
   state.email = ''; state.userName = ''; state.role = ''; state.currentModule = null; state.certData = null;
   showScreen('screen-login');
   document.getElementById('step-login').style.display  = 'block';
