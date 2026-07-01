@@ -381,6 +381,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
     <div class="topbar-spacer"></div>
     <span class="topbar-user" id="topbar-user"></span>
     <button class="admin-topbar-btn" id="btn-admin-panel" style="display:none" onclick="showAdmin()">⚙ Users</button>
+    <button class="theme-btn" onclick="openChangePwModal()">🔑 Password</button>
     <button class="theme-btn" onclick="toggleTheme()">☀ Light</button>
     <button class="logout-btn" onclick="logout()">Sign out</button>
   </div>
@@ -505,6 +506,40 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
   </div>
 </div>
 
+<!-- ══ CHANGE PASSWORD MODAL ═══════════════════════════════════════════════ -->
+<div id="modal-change-pw" class="modal-overlay">
+  <div style="background:var(--surface);border-radius:20px;padding:40px;width:100%;max-width:420px;box-shadow:0 20px 60px rgba(0,0,0,0.2);position:relative">
+    <button style="position:absolute;top:14px;right:16px;background:none;border:none;font-size:20px;cursor:pointer;color:var(--text3)" onclick="closeChangePwModal()">✕</button>
+    <div style="font-size:18px;font-weight:700;margin-bottom:20px">Change password</div>
+    <div class="input-group">
+      <label>Current password</label>
+      <div class="pw-input-wrap">
+        <input type="password" id="cpw-old" placeholder="Current password">
+        <button class="pw-toggle" type="button" onclick="togglePw('cpw-old',this)">👁</button>
+      </div>
+    </div>
+    <div class="input-group">
+      <label>New password</label>
+      <div class="pw-input-wrap">
+        <input type="password" id="cpw-new" placeholder="Min 8 characters" oninput="checkStrength(this.value,'cpw')">
+        <button class="pw-toggle" type="button" onclick="togglePw('cpw-new',this)">👁</button>
+      </div>
+      <div class="strength-bar"><div class="strength-fill" id="cpw-strength-fill" style="width:0%"></div></div>
+      <div class="strength-label" id="cpw-strength-label"></div>
+    </div>
+    <div class="input-group">
+      <label>Confirm new password</label>
+      <div class="pw-input-wrap">
+        <input type="password" id="cpw-confirm" placeholder="Repeat new password">
+        <button class="pw-toggle" type="button" onclick="togglePw('cpw-confirm',this)">👁</button>
+      </div>
+    </div>
+    <div class="error-msg" id="cpw-err"></div>
+    <div style="color:var(--teal);font-size:13px;margin-top:8px;display:none" id="cpw-suc"></div>
+    <button class="btn btn-primary" id="btn-cpw" onclick="doChangePw()" style="margin-top:12px">Update password</button>
+  </div>
+</div>
+
 <!-- ══ TOAST ═════════════════════════════════════════════════════════════ -->
 <div class="toast" id="toast"></div>
 
@@ -525,8 +560,8 @@ const CONFIG = {
 const MODULES = [
   {
     id: 'aif-mastery',
-    title: 'AIF Mastery',
-    subtitle: 'Alternative Investment Fund — Complete RTA Operations',
+    title: 'AIF RTA Operations',
+    subtitle: 'Alternative Investment Fund RTA — End-to-End Operations Guide',
     description: '29 modules covering the full AIF lifecycle — regulatory framework, investor onboarding, drawdown management, NAV, compliance, taxation, commercials, and client preparation.',
     track: 'aif', tag: 'tag-aif', tagLabel: 'AIF Operations',
     duration: '4–6 hours', modules: 29,
@@ -1181,16 +1216,72 @@ function applyTheme() {
   if (btn) btn.textContent = state.dark ? '☾ Dark' : '☀ Light';
 
   // Propagate theme into the loaded module iframe (same-origin, so direct DOM access works)
+  // The module has no theme toggle of its own — it purely inherits from Nexus.
   const iframe = document.getElementById('module-iframe');
   if (iframe && iframe.contentDocument && iframe.contentDocument.documentElement) {
     try {
       iframe.contentDocument.documentElement.setAttribute('data-theme', themeName);
-      const iframeBtn = iframe.contentDocument.getElementById('theme-toggle');
-      if (iframeBtn) iframeBtn.textContent = state.dark ? '☾ Dark' : '☀ Light';
     } catch(e) { /* cross-origin fallback — silently ignore */ }
   }
 
   try { localStorage.setItem('nexus_theme', themeName); } catch(e) {}
+}
+
+// ── CHANGE PASSWORD (logged-in user) ─────────────────────────────────────────
+function openChangePwModal() {
+  const el = id => document.getElementById(id);
+  el('cpw-old').value = ''; el('cpw-new').value = ''; el('cpw-confirm').value = '';
+  el('cpw-err').style.display = 'none'; el('cpw-suc').style.display = 'none';
+  el('cpw-strength-fill').style.width = '0%';
+  el('cpw-strength-label').textContent = '';
+  el('modal-change-pw').classList.add('show');
+}
+
+function closeChangePwModal() {
+  document.getElementById('modal-change-pw').classList.remove('show');
+}
+
+async function doChangePw() {
+  const g = id => document.getElementById(id).value.trim();
+  const errEl = document.getElementById('cpw-err');
+  const sucEl = document.getElementById('cpw-suc');
+  errEl.style.display = 'none'; sucEl.style.display = 'none';
+
+  const oldPw  = g('cpw-old');
+  const newPw  = g('cpw-new');
+  const confirm = g('cpw-confirm');
+
+  if (!oldPw)           { errEl.textContent = 'Enter your current password.'; errEl.style.display = 'block'; return; }
+  if (!newPw)           { errEl.textContent = 'Enter a new password.'; errEl.style.display = 'block'; return; }
+  if (newPw.length < 8) { errEl.textContent = 'Password must be at least 8 characters.'; errEl.style.display = 'block'; return; }
+  if (newPw !== confirm) { errEl.textContent = 'Passwords do not match.'; errEl.style.display = 'block'; return; }
+  if (oldPw === newPw)  { errEl.textContent = 'New password must be different from the current one.'; errEl.style.display = 'block'; return; }
+
+  const btn = document.getElementById('btn-cpw');
+  btn.disabled = true; btn.textContent = 'Updating…';
+
+  let result;
+  try {
+    result = await callAuth({ action: 'changePassword', email: state.email, oldPassword: oldPw, newPassword: newPw });
+  } catch(e) {
+    result = { ok: false, error: 'Could not reach server.' };
+  }
+
+  btn.disabled = false; btn.textContent = 'Update password';
+
+  if (!result.ok) {
+    errEl.textContent = result.error || 'Could not update password.';
+    errEl.style.display = 'block';
+    document.getElementById('cpw-old').value = '';
+    return;
+  }
+
+  sucEl.textContent = '✓ Password updated.';
+  sucEl.style.display = 'block';
+  document.getElementById('cpw-old').value = '';
+  document.getElementById('cpw-new').value = '';
+  document.getElementById('cpw-confirm').value = '';
+  setTimeout(closeChangePwModal, 1800);
 }
 
 document.getElementById('login-email').addEventListener('keydown', e => {
