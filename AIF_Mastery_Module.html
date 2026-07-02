@@ -2,6 +2,9 @@
 <html lang="en" data-theme="light">
 <head>
 <meta charset="UTF-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AIF RTA Operations — Validus Learning Module</title>
 <style>
@@ -40,7 +43,7 @@
 }
 
 *{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);font-size:15px;line-height:1.6}
+html,body{height:100%;font-family:'Poppins',system-ui,sans-serif;background:var(--bg);color:var(--text);font-size:15px;line-height:1.6}
 body{display:flex;flex-direction:column;overflow:hidden}
 #app{display:flex;flex:1;overflow:hidden;min-height:0}
 
@@ -49,7 +52,7 @@ body{display:flex;flex-direction:column;overflow:hidden}
 #sidebar.collapsed{width:0;border-right:none}
 .sidebar-head{padding:18px 16px 14px;border-bottom:1px solid var(--border);flex-shrink:0}
 .sidebar-brand{font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--accent);margin-bottom:3px}
-.sidebar-title{font-family:'Sora',sans-serif;font-size:15px;font-weight:700;color:var(--text);white-space:nowrap}
+.sidebar-title{font-family:'Poppins',system-ui,sans-serif;font-size:15px;font-weight:700;color:var(--text);white-space:nowrap}
 .sidebar-sub{font-size:11px;color:var(--text3);margin-top:2px;white-space:nowrap}
 .progress-bar{height:2px;background:var(--border2);margin:12px 16px 0;border-radius:2px;overflow:hidden}
 .progress-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--teal));border-radius:2px;transition:width .4s}
@@ -80,7 +83,7 @@ nav::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
 .search-result-title{font-weight:500;color:var(--text)}
 .search-result-sub{font-size:11px;color:var(--text3);margin-top:1px}
 .topbar-right{margin-left:auto;display:flex;align-items:center;gap:8px}
-.topbar-logo{font-family:'Sora',sans-serif;font-size:12px;font-weight:700;color:var(--accent);white-space:nowrap;margin-left:4px}
+.topbar-logo{font-family:'Poppins',system-ui,sans-serif;font-size:12px;font-weight:700;color:var(--accent);white-space:nowrap;margin-left:4px}
 
 /* ── MAIN ── */
 #main{flex:1;overflow-y:auto;height:100%;min-width:0}
@@ -94,11 +97,11 @@ nav::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
 /* ── OPENING SCREEN ── */
 #screen-home.active{min-height:100%;display:flex;flex-direction:column;justify-content:center;padding:48px 64px;background:var(--hero-bg)}
 .home-eyebrow{font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.6);margin-bottom:14px}
-.home-title{font-family:'Sora',sans-serif;font-size:40px;font-weight:700;line-height:1.2;color:#fff;margin-bottom:14px}
+.home-title{font-family:'Poppins',system-ui,sans-serif;font-size:40px;font-weight:700;line-height:1.2;color:#fff;margin-bottom:14px}
 .home-title span{color:#7AB8F5}
 .home-desc{font-size:15px;color:rgba(255,255,255,0.72);max-width:560px;line-height:1.75;margin-bottom:36px}
 .home-stats{display:flex;gap:36px;flex-wrap:wrap;margin-bottom:48px}
-.stat-val{font-family:'Sora',sans-serif;font-size:26px;font-weight:700;color:#fff}
+.stat-val{font-family:'Poppins',system-ui,sans-serif;font-size:26px;font-weight:700;color:#fff}
 .stat-label{font-size:11px;color:rgba(255,255,255,0.55);margin-top:2px}
 .home-modules{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;max-width:900px}
 .home-mod-card{background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:12px 16px;cursor:pointer;transition:background .15s,border-color .15s}
@@ -109,7 +112,7 @@ nav::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
 /* ── MODULE PAGES ── */
 .mod-page{padding:36px 56px 48px;max-width:960px}
 .mod-eyebrow{font-size:10px;font-weight:600;letter-spacing:1.2px;text-transform:uppercase;color:var(--text3);margin-bottom:6px}
-.mod-title{font-family:'Sora',sans-serif;font-size:26px;font-weight:700;color:var(--text);line-height:1.3;margin-bottom:8px}
+.mod-title{font-family:'Poppins',system-ui,sans-serif;font-size:26px;font-weight:700;color:var(--text);line-height:1.3;margin-bottom:8px}
 .mod-desc{font-size:14px;color:var(--text2);line-height:1.75;max-width:720px;margin-bottom:32px}
 .section{margin-bottom:32px}
 .section-title{font-size:11px;font-weight:700;letter-spacing:.9px;text-transform:uppercase;color:var(--text3);margin-bottom:14px;padding-bottom:7px;border-bottom:1px solid var(--border)}
@@ -154,7 +157,7 @@ nav::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
 .info-box.red{border-left:3px solid var(--red)}
 .info-box-title{font-size:13px;font-weight:600;color:var(--text);margin-bottom:5px}
 .info-box-body{font-size:13px;color:var(--text2);line-height:1.6}
-.info-box-val{font-family:'Sora',sans-serif;font-size:20px;font-weight:700;color:var(--text);margin-bottom:2px}
+.info-box-val{font-family:'Poppins',system-ui,sans-serif;font-size:20px;font-weight:700;color:var(--text);margin-bottom:2px}
 
 /* ── CALLOUTS ── */
 .callout{border-radius:10px;padding:13px 16px;margin-bottom:14px;font-size:13px;line-height:1.7}
@@ -209,7 +212,7 @@ nav::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
 /* ── STAT GRID (module 1) ── */
 .stat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px}
 .stat-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px 16px;text-align:center}
-.stat-card-val{font-family:'Sora',sans-serif;font-size:22px;font-weight:700;color:var(--accent);margin-bottom:3px}
+.stat-card-val{font-family:'Poppins',system-ui,sans-serif;font-size:22px;font-weight:700;color:var(--accent);margin-bottom:3px}
 .stat-card-label{font-size:12px;color:var(--text2);line-height:1.4}
 
 /* ── RESPONSIVE ── */
