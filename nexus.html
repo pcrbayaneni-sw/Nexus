@@ -141,11 +141,6 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 .back-btn:hover{background:var(--surface2)}
 .module-topbar-title{font-size:14px;font-weight:600}
 .module-topbar-spacer{flex:1}
-.complete-btn{
-  padding:8px 18px;border:none;border-radius:8px;font-size:13px;font-weight:600;
-  cursor:pointer;color:#fff;background:var(--teal);transition:all .15s
-}
-.complete-btn:hover{filter:brightness(1.1)}
 .module-iframe-wrap{flex:1;overflow:hidden}
 .module-iframe-wrap iframe{width:100%;height:100%;border:none;background:var(--bg)}
 
@@ -463,6 +458,24 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
       </tbody>
     </table>
     <div class="admin-msg" id="admin-remove-msg"></div>
+
+    <div style="margin-top:40px">
+      <div class="admin-header" style="margin-bottom:16px">
+        <div>
+          <h2 style="font-size:18px">Training Completions</h2>
+          <p style="font-size:13px;color:var(--text3);margin-top:4px">All module completions across the team. Click the PDF button to download a learner's certificate.</p>
+        </div>
+        <button class="btn-ghost" style="width:auto;padding:8px 18px" onclick="downloadAllCsv()">⬇ Export CSV</button>
+      </div>
+      <table class="users-table">
+        <thead>
+          <tr><th>Learner</th><th>Email</th><th>Module</th><th>Score</th><th>Completed on</th><th></th></tr>
+        </thead>
+        <tbody id="completions-tbody">
+          <tr><td colspan="6" style="text-align:center;padding:24px;color:var(--text3)">Loading...</td></tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 
   <!-- Module viewer -->
@@ -471,7 +484,6 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
       <button class="back-btn" onclick="showCatalogue()">← Back to catalogue</button>
       <span class="module-topbar-title" id="module-topbar-title"></span>
       <div class="module-topbar-spacer"></div>
-      <button class="complete-btn" id="btn-mark-complete" onclick="triggerCompletion()">✓ Mark as complete</button>
     </div>
     <div class="module-iframe-wrap">
       <iframe id="module-iframe" src="" title="Training module" sandbox="allow-scripts allow-same-origin allow-forms"></iframe>
@@ -563,7 +575,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 // ============================================================================
 const CONFIG = {
   allowed_domain: 'validusfintech.com',
-  auth_url:       'https://script.google.com/macros/s/AKfycbyE_gb952XBXqnBAP3Cl45VbbloBC1TXnQqZn9CLiFdCW35sxj8Ky_5ZGFxm45tH2sG/exec',  // NexusAuth.gs deployment URL
+  auth_url:       'https://script.google.com/macros/s/AKfycbz_2ApfcTl0FtZB6Ad6R6jJ7KLJqI-RcfM9PSurB84ZiReHkTrAKkWgqrcKWOm0B3vGMA/exec',  // NexusAuth.gs deployment URL
   hr_email:       'purna.b@validusfintech.com',
   hr_name:        'Purna B',
 };
@@ -601,6 +613,7 @@ let state = {
   currentModule: null,
   certData: null,
   completions: {},
+  quizCompleted: {},   // tracks which modules have had the quiz completed this session
   dark: false,
 };
 
@@ -844,6 +857,75 @@ function showAdmin() {
   document.getElementById('view-module').style.display    = 'none';
   document.getElementById('view-admin').style.display     = 'block';
   loadUsers();
+  loadAdminCompletions();
+}
+
+async function loadAdminCompletions() {
+  const tbody = document.getElementById('completions-tbody');
+  if (!tbody) return;
+  tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:20px;color:var(--text3)">Loading...</td></tr>';
+
+  let result;
+  try { result = await callAuth({ action: 'getAllCompletions', requestedBy: state.email }); }
+  catch(e) { result = { ok: false, error: 'Could not reach server.' }; }
+
+  if (!result.ok || !result.completions || !result.completions.length) {
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:24px;color:var(--text3)">' +
+      (result.ok ? 'No completions recorded yet.' : (result.error || 'Error loading completions.')) + '</td></tr>';
+    return;
+  }
+
+  const rows = result.completions.slice().sort(function(a,b) {
+    return (b.completedOn || '').localeCompare(a.completedOn || '');
+  });
+
+  tbody.innerHTML = rows.map(function(c) {
+    const scoreHtml = c.score
+      ? '<span style="font-weight:600;color:var(--teal)">' + c.score + '</span>'
+      : '<span style="color:var(--text3)">—</span>';
+    const enc = JSON.stringify(c).split('"').join('&quot;');
+    return '<tr>' +
+      '<td style="font-weight:600">' + (c.learnerName || '—') + '</td>' +
+      '<td style="font-size:12px;color:var(--text3)">' + c.email + '</td>' +
+      '<td>' + (c.moduleTitle || c.moduleId) + '</td>' +
+      '<td>' + scoreHtml + '</td>' +
+      '<td style="font-size:12px;color:var(--text3)">' + (c.completedOn || '—') + '</td>' +
+      '<td><button class="tb-btn" style="font-size:11px;padding:4px 10px" onclick="adminDownloadCert(' + enc + ')">⬇ PDF</button></td>' +
+      '</tr>';
+  }).join('');
+}
+
+function adminDownloadCert(c) {
+  state.certData = {
+    learnerName: c.learnerName || c.email,
+    email:       c.email,
+    moduleName:  c.moduleTitle || c.moduleId,
+    date:        c.completedOn,
+    score:       c.score || '',
+    declaration: 'I, ' + (c.learnerName || c.email) + ', declare that I have completed the training module "' +
+                 (c.moduleTitle || c.moduleId) + '" on ' + c.completedOn + ' on the Validus Nexus Learning Platform.' +
+                 (c.score ? ' I scored ' + c.score + ' in the module assessment.' : ''),
+  };
+  downloadCertificate();
+}
+
+function downloadAllCsv() {
+  const tbody = document.getElementById('completions-tbody');
+  if (!tbody) return;
+  const rows  = tbody.querySelectorAll('tr');
+  const lines = [['Learner Name','Email','Module','Score','Completed On'].join(',')];
+  rows.forEach(function(row) {
+    const cells = row.querySelectorAll('td');
+    if (cells.length < 5) return;
+    lines.push([0,1,2,3,4].map(function(i) {
+      return '"' + cells[i].textContent.trim().replace(/"/g,'""') + '"';
+    }).join(','));
+  });
+  const blob = new Blob([lines.join('\r\n')], { type: 'text/csv' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href = url; a.download = 'Nexus_Completions_' + new Date().toLocaleDateString('en-IN').replace(/\//g,'-') + '.csv';
+  a.click(); URL.revokeObjectURL(url);
 }
 
 function showAdminMsg(id, msg, ok) {
@@ -963,7 +1045,7 @@ function renderCatalogue() {
         <span class="module-card-tag ${m.tag}">${m.tagLabel}</span>
         <span class="module-card-status">
           <span class="status-dot ${done?'dot-done':'dot-open'}"></span>
-          ${done ? 'Completed '+state.completions[m.id].date : m.duration+' · '+m.modules+' modules'}
+          ${done ? 'Completed ' + state.completions[m.id].date + (state.completions[m.id].score ? ' · ' + state.completions[m.id].score : '') : m.duration + ' · ' + m.modules + ' modules'}
         </span>
       </div>
       <div class="progress-bar-thin"><div class="progress-bar-fill" style="width:${done?100:0}%"></div></div>`;
@@ -997,11 +1079,7 @@ function openModule(mod) {
   iframe.src = mod.url;
   // Re-apply current theme once the module finishes loading
   iframe.onload = function() { applyTheme(); };
-  const done = !!state.completions[mod.id];
-  const btn  = document.getElementById('btn-mark-complete');
-  btn.textContent = done ? '✓ Completed' : '✓ Mark as complete';
-  btn.style.opacity = done ? '0.6' : '1';
-  btn.onclick = done ? null : triggerCompletion;
+  // No topbar complete button — completion is triggered from the quiz result
 }
 
 function showCatalogue() {
@@ -1016,14 +1094,20 @@ function showCatalogue() {
 // ============================================================================
 // COMPLETION = declaration + mailto: link (opens Outlook/Gmail pre-filled)
 // ============================================================================
-function triggerCompletion() {
+function triggerCompletion(score, total) {
   if (!state.currentModule) return;
-  const today = new Date().toLocaleDateString('en-IN',{day:'numeric',month:'long',year:'numeric'});
+  const today     = new Date().toLocaleDateString('en-IN',{day:'numeric',month:'long',year:'numeric'});
+  const scoreText = (score !== undefined && total !== undefined)
+    ? ' I scored <strong>' + score + ' out of ' + total + '</strong> in the module assessment.'
+    : '';
   document.getElementById('decl-text').innerHTML =
     'I, <strong id="decl-name-live">[your name]</strong>, declare that I have completed the training module ' +
-    '<strong>"' + state.currentModule.title + '"</strong> on <strong>' + today + '</strong> on the Validus Nexus Learning Platform.';
+    '<strong>"' + state.currentModule.title + '"</strong> on <strong>' + today + '</strong> on the Validus Nexus Learning Platform.' +
+    scoreText;
   document.getElementById('learner-name').value = '';
   document.getElementById('btn-confirm').disabled = true;
+  // Store score for certificate
+  state.pendingScore = score !== undefined ? score + '/' + total : null;
   document.getElementById('modal-completion').classList.add('show');
 }
 
@@ -1043,15 +1127,17 @@ async function confirmCompletion() {
   const todayShort = new Date().toLocaleDateString('en-IN');
 
   // Store completion context for PDF generation
+  const scoreNote = state.pendingScore ? ' I scored ' + state.pendingScore + ' in the module assessment.' : '';
   state.certData = {
     learnerName,
     email:      state.email,
     moduleName: mod.title,
     moduleDesc: mod.description,
     date:       today,
+    score:      state.pendingScore || '',
     declaration: 'I, ' + learnerName + ', declare that I have completed the training module "' +
                  mod.title + '" on ' + today + ' on the Validus Nexus Learning Platform. ' +
-                 'I confirm that I have reviewed all sections of the module to the best of my ability.',
+                 'I confirm that I have reviewed all sections of the module to the best of my ability.' + scoreNote,
   };
 
   // Save to Google Sheet
@@ -1166,7 +1252,17 @@ function downloadCertificate() {
   doc.setFont('helvetica', 'italic');
   doc.setFontSize(12);
   doc.setTextColor(80, 90, 110);
-  doc.text('has successfully completed the training module', W/2, 91, { align:'center' });
+  // Score badge (if available)
+  if (d.score) {
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(10);
+    doc.setTextColor(13, 138, 101);
+    doc.text('Assessment score: ' + d.score, W/2, 86, { align:'center' });
+  }
+  doc.setFont('helvetica', 'italic');
+  doc.setFontSize(12);
+  doc.setTextColor(80, 90, 110);
+  doc.text('has successfully completed the training module', W/2, d.score ? 94 : 91, { align:'center' });
 
   // -- Module name ------------------------------------------------------------
   doc.setFont('helvetica', 'bold');
@@ -1329,6 +1425,45 @@ async function doChangePw() {
 
 document.getElementById('login-email').addEventListener('keydown', e => {
   if (e.key === 'Enter') document.getElementById('login-password').focus();
+});
+
+// Listen for messages from the module iframe
+window.addEventListener('message', function(event) {
+  if (!event.data || !event.data.type) return;
+
+  if (event.data.type === 'completeTraining') {
+    const moduleId = event.data.moduleId;
+    const score    = event.data.score;
+    const total    = event.data.total;
+    if (!moduleId) return;
+
+    // If already completed, just re-show the success/download modal
+    if (state.completions[moduleId]) {
+      const prev = state.completions[moduleId];
+      state.certData = {
+        learnerName: prev.name,
+        email:       state.email,
+        moduleName:  state.currentModule ? state.currentModule.title : moduleId,
+        date:        prev.date,
+        score:       score + '/' + total,
+        declaration: 'I, ' + prev.name + ', declare that I have completed the training module on the Validus Nexus Learning Platform.',
+      };
+      document.getElementById('success-sub').innerHTML =
+        'You have already completed this module. Download your certificate again below.';
+      const hint = document.getElementById('hr-email-hint');
+      if (hint) hint.innerHTML = '';
+      document.getElementById('cert-preview').innerHTML =
+        '<strong>Certificate details</strong><br>Learner: ' + prev.name + '<br>Date completed: ' + prev.date;
+      document.getElementById('modal-success').classList.add('show');
+      return;
+    }
+
+    // First completion — open declaration modal
+    const mod = MODULES.find(m => m.id === moduleId);
+    if (!mod) return;
+    state.currentModule = mod;
+    triggerCompletion(score, total);
+  }
 });
 document.getElementById('login-password').addEventListener('keydown', e => {
   if (e.key === 'Enter') doLogin();
