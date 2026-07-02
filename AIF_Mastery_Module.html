@@ -228,6 +228,7 @@ nav::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
   document.addEventListener('keydown', function(e){
     if (
       (e.ctrlKey && e.key === 'u') ||
+      (e.ctrlKey && e.key === 'a') ||
       (e.ctrlKey && e.shiftKey && ['i','I','j','J','c','C'].includes(e.key)) ||
       (e.ctrlKey && e.key === 's') ||
       e.key === 'F12'
@@ -2176,7 +2177,32 @@ function showQuizResult(){
     +'<div style="font-size:14px;color:var(--text,#1a2233);margin-top:4px">'+msg+'</div>'
     +'</div>'
     +(wrongItems ? '<div style="font-size:11px;font-weight:600;letter-spacing:.7px;text-transform:uppercase;color:var(--text3,#6b7a8d);margin-bottom:8px">Review these</div>'+wrongItems : '')
-    +'<button onclick="initQuiz()" style="margin-top:16px;padding:9px 20px;border-radius:8px;background:var(--accent,#1A6BC8);color:#fff;border:none;font-size:13.5px;cursor:pointer;font-weight:500">Retake quiz</button>';
+    +'<button onclick="initQuiz()" style="margin-top:16px;padding:9px 20px;border-radius:8px;background:var(--accent,#1A6BC8);color:#fff;border:none;font-size:13.5px;cursor:pointer;font-weight:500">Retake quiz</button>'
+    +(pct >= 67 ? '<div id="complete-training-wrap" style="margin-top:20px;padding:16px;border-radius:10px;background:rgba(13,138,101,0.08);border:1px solid rgba(13,138,101,0.25);text-align:center">'
+      +'<div style="font-size:13px;font-weight:600;color:var(--teal,#0D8A65);margin-bottom:4px">🎓 Training requirement met</div>'
+      +'<div style="font-size:12px;color:var(--text2,#4a5568);margin-bottom:12px">You scored '+quizState.score+'/'+quizData.length+' — you can now claim your completion certificate.</div>'
+      +'<button onclick="requestCompletion()" style="padding:11px 28px;border-radius:8px;background:#0D8A65;color:#fff;border:none;font-size:14px;cursor:pointer;font-weight:600">Complete Training &amp; Get Certificate →</button>'
+      +'</div>'
+      : '<div style="margin-top:16px;font-size:12px;color:var(--text3,#6b7a8d)">Score at least 8/12 to unlock the completion certificate.</div>');
+
+  // Notify parent Nexus that quiz was attempted (informational only)
+  try {
+    window.parent.postMessage({ type: 'quizAttempted', moduleId: 'aif-mastery', score: quizState.score, total: quizData.length }, '*');
+  } catch(e) {}
+}
+
+function requestCompletion() {
+  // Send completeTraining message to parent Nexus window
+  try {
+    window.parent.postMessage({
+      type: 'completeTraining',
+      moduleId: 'aif-mastery',
+      score:    quizState.score,
+      total:    quizData.length,
+    }, '*');
+  } catch(e) {
+    alert('Please open this module inside Nexus to claim your certificate.');
+  }
 }
 
 // ── TOOL INIT HOOKS ────────────────────────────────────────────────────────
