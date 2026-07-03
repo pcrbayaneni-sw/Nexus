@@ -72,7 +72,7 @@ nav::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
 #topbar{display:flex;align-items:center;gap:8px;padding:0 16px;height:44px;flex-shrink:0;background:var(--bg2);border-bottom:1px solid var(--border);z-index:20;box-shadow:var(--shadow)}
 #toggle-sidebar{background:none;border:1px solid var(--border2);border-radius:6px;padding:5px 8px;cursor:pointer;color:var(--text2);font-size:13px;display:flex;align-items:center;gap:5px;transition:background .12s}
 #toggle-sidebar:hover{background:var(--card2)}
-#search-box{flex:1;max-width:320px;position:relative;margin-left:4px}
+#search-box{max-width:300px;position:relative;margin-left:auto}
 #search-box input{width:100%;padding:5px 10px 5px 30px;border-radius:7px;border:1px solid var(--border2);background:var(--bg3);color:var(--text);font-size:12.5px;outline:none}
 #search-box input:focus{border-color:var(--accent)}
 #search-box .search-icon{position:absolute;left:9px;top:50%;transform:translateY(-50%);font-size:12px;color:var(--text3);pointer-events:none}
@@ -365,6 +365,7 @@ nav::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
 </main>
 </div><!-- #app -->
 <script>
+// Qu
 // Qurious knowledge base — live FAQ source
 const QURIOUS_CONFIG = {
   db_url: 'https://script.google.com/macros/s/AKfycby1wFAL_7NVoVstInD9lTVTS-BjQfMp1Ui2y1VMA_z1_mMknQH9LUD25Ktyme-BhbUzFg/exec',
@@ -461,8 +462,9 @@ function buildSearchIndex(modules){
 function doSearch(val){
   const box = document.getElementById('search-results');
   if(!val.trim()){ box.style.display='none'; return; }
-  const q = val.toLowerCase();
-  const hits = searchIndex.filter(s => s.title.toLowerCase().includes(q) || s.sub.toLowerCase().includes(q)).slice(0,8);
+  const q = val.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const re = new RegExp('\\b' + q + '\\b', 'i');
+  const hits = searchIndex.filter(s => re.test(s.title) || re.test(s.sub)).slice(0,8);
   if(!hits.length){ box.style.display='none'; return; }
   box.innerHTML = hits.map(h =>
     `<div class="search-result" onmousedown="goTo(${h.idx})">
@@ -1299,7 +1301,7 @@ function renderFAQ(data){
     html += `<div style="margin-bottom:18px"><div class="faq-section-label" style="border-color:${section.color}20">${section.topic}</div>`;
     vqs.forEach((qa, qi) => {
       html += `<div class="faq-item">
-        <div class="faq-q" style="background:${section.bg}" onclick="this.nextElementSibling.classList.toggle('open');this.querySelector('.faq-chevron').style.transform=this.nextElementSibling.classList.contains('open')?'rotate(90deg)':''">
+        <div class="faq-q" style="background:${section.bg}" onclick="toggleFAQItem(this)">
           <span class="faq-q-text"><span style="color:${section.color};font-weight:700;font-size:11px;margin-right:6px">Q</span>${qa.q}</span>
           <span class="faq-chevron">▶</span>
         </div>
@@ -1313,15 +1315,33 @@ function renderFAQ(data){
   if(countEl) countEl.textContent = total + ' question' + (total===1?'':'s') + ' shown';
 }
 
+function toggleFAQItem(qEl) {
+  const ansEl = qEl.nextElementSibling;
+  const isOpen = ansEl.classList.contains('open');
+  // Close all open FAQ items
+  document.querySelectorAll('.faq-a.open').forEach(function(a) {
+    a.classList.remove('open');
+    const ch = a.previousElementSibling.querySelector('.faq-chevron');
+    if(ch) ch.style.transform = '';
+  });
+  // Open the clicked one if it was closed
+  if(!isOpen) {
+    ansEl.classList.add('open');
+    const ch = qEl.querySelector('.faq-chevron');
+    if(ch) ch.style.transform = 'rotate(90deg)';
+  }
+}
+
 function filterFAQ(){
   const qEl = document.getElementById('faq-search');
   const fEl = document.getElementById('faq-filter');
   if(!qEl || !fEl) return;
-  const q = qEl.value.toLowerCase();
+  const rawQ = qEl.value.trim();
   const f = fEl.value;
   const filtered = faqData.map((section, si) => {
     if(f !== '' && parseInt(f) !== si) return Object.assign({}, section, {visible_qas:[]});
-    const vqs = section.qas.filter(qa => q==='' || qa.q.toLowerCase().includes(q) || qa.a.toLowerCase().includes(q));
+    const reQ = rawQ ? new RegExp('\\b' + rawQ.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b', 'i') : null;
+    const vqs = section.qas.filter(qa => !reQ || reQ.test(qa.q) || reQ.test(qa.a));
     return Object.assign({}, section, {visible_qas: vqs});
   });
   renderFAQ(filtered);
