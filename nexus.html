@@ -494,11 +494,11 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
       </div>
     </div>
     <div class="track-section">
-      <div class="track-label">AIF Operations Track</div>
+      <div class="track-label">Learning Tracks</div>
       <div class="module-grid" id="grid-aif"></div>
     </div>
     <div class="track-section">
-      <div class="track-label">Coming Soon</div>
+      <div class="track-label">In Development — Launching Soon</div>
       <div class="module-grid" id="grid-coming"></div>
     </div>
   </div>
@@ -676,7 +676,7 @@ const MODULES = [
     title: 'AIF RTA Operations',
     subtitle: 'Alternative Investment Fund RTA — End-to-End Operations Guide',
     description: '29 modules covering the full AIF lifecycle — regulatory framework, investor onboarding, drawdown management, NAV, compliance, taxation, commercials, and client preparation.',
-    track: 'aif', tag: 'tag-aif', tagLabel: 'AIF Operations',
+    track: 'aif', tag: 'tag-aif', tagLabel: 'AIF RTA',
     duration: '4–6 hours', modules: 29,
     url: 'AIF_Mastery_Module.html',
     status: 'available', isNew: true,
@@ -684,10 +684,10 @@ const MODULES = [
 ];
 
 const COMING_SOON = [
-  { id: 'mf-rta',           title: 'Mutual Fund RTA Operations',        description: 'Investor servicing, transaction processing, NAV-based allotments, and SEBI compliance for MF RTA operations.',                         tag: 'tag-coming', tagLabel: 'Coming soon' },
-  { id: 'compliance-deep',  title: 'Compliance & Regulatory Framework', description: 'Deep-dive into PMLA, AML, FATCA/CRS, SEBI inspection readiness, and the Digital Personal Data Protection Act 2023.',               tag: 'tag-compliance', tagLabel: 'Coming soon' },
-  { id: 'client-engage',    title: 'Client Engagement & Delivery',      description: 'Sales process, delivery management, SLA governance, objection handling, and client escalation frameworks.',                          tag: 'tag-ops', tagLabel: 'Coming soon' },
-  { id: 'platform-ops',     title: 'Validus Platform Operations',       description: 'Hands-on training for the Front Office App, Investment Manager App, Investor App, and Communication Command Center.',               tag: 'tag-aif', tagLabel: 'Coming soon' },
+  { id: 'mf-rta',           title: 'Mutual Fund RTA Operations',        description: 'Investor servicing, transaction processing, NAV-based allotments, and SEBI compliance for MF RTA operations.',                         tag: 'tag-coming', tagLabel: 'In Development' },
+  { id: 'compliance-deep',  title: 'Compliance & Regulatory Framework', description: 'Deep-dive into PMLA, AML, FATCA/CRS, SEBI inspection readiness, and the Digital Personal Data Protection Act 2023.',               tag: 'tag-compliance', tagLabel: 'In Development' },
+  { id: 'client-engage',    title: 'Client Engagement & Delivery',      description: 'Sales process, delivery management, SLA governance, objection handling, and client escalation frameworks.',                          tag: 'tag-ops', tagLabel: 'In Development' },
+  { id: 'platform-ops',     title: 'Validus Platform Operations',       description: 'Hands-on training for the Front Office App, Investment Manager App, Investor App, and Communication Command Center.',               tag: 'tag-aif', tagLabel: 'In Development' },
 ];
 
 // ============================================================================
@@ -1176,6 +1176,17 @@ function openModule(mod) {
   document.getElementById('module-topbar-title').textContent = mod.title;
   const iframe = document.getElementById('module-iframe');
   iframe.src = mod.url;
+  // Send admin session to AIF module for content editing
+  iframe.onload = function() {
+    try {
+      iframe.contentWindow.postMessage({
+        type:  'nexusSession',
+        email: state.email,
+        role:  state.role,
+        name:  state.userName,
+      }, '*');
+    } catch(e) {}
+  };
   // Re-apply current theme once the module finishes loading
   iframe.onload = function() { applyTheme(); };
   // No topbar complete button — completion is triggered from the quiz result
