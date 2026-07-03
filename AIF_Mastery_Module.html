@@ -224,6 +224,37 @@ nav::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
   .two-col{grid-template-columns:1fr}
   .home-modules{grid-template-columns:1fr 1fr}
 }
+
+/* ── CONTENT EDITOR ─────────────────────────────────────────────────────── */
+#editor-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9000;align-items:center;justify-content:center}
+#editor-modal.open{display:flex}
+.editor-panel{background:var(--surface);border-radius:16px;width:min(900px,95vw);max-height:90vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 24px 64px rgba(0,0,0,.25)}
+.editor-hdr{display:flex;align-items:center;justify-content:space-between;padding:16px 22px;border-bottom:1px solid var(--border);flex-shrink:0;flex-wrap:wrap;gap:8px}
+.editor-hdr-title{font-size:14px;font-weight:700;color:var(--text)}
+.editor-tabs{display:flex;gap:6px}
+.editor-tab{padding:5px 12px;border-radius:7px;border:1px solid var(--border);background:transparent;font-size:12.5px;cursor:pointer;color:var(--text3);font-family:var(--font)}
+.editor-tab.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.editor-body{padding:18px 22px;overflow-y:auto;flex:1}
+.editor-label{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text3);margin-bottom:5px}
+.editor-input,.editor-textarea{width:100%;padding:9px 13px;border-radius:8px;border:1.5px solid var(--border);background:var(--surface2);color:var(--text);font-family:var(--font);font-size:13px;user-select:text!important;-webkit-user-select:text!important;margin-bottom:14px}
+.editor-input:focus,.editor-textarea:focus{outline:none;border-color:var(--accent)}
+.editor-textarea{min-height:300px;font-family:monospace;font-size:12px;resize:vertical}
+.editor-footer{display:flex;align-items:center;justify-content:space-between;padding:12px 22px;border-top:1px solid var(--border);flex-shrink:0}
+.editor-meta{font-size:11px;color:var(--text3)}
+.btn-save-content{padding:8px 22px;border-radius:8px;background:var(--accent);color:#fff;border:none;font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font)}
+.btn-save-content:disabled{opacity:.5;cursor:not-allowed}
+.history-row{display:flex;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)}
+.history-row:last-child{border-bottom:none}
+.history-ver{font-weight:700;color:var(--accent);font-size:13px;min-width:50px}
+.history-info{flex:1;margin:0 14px}
+.history-who{font-size:12px;color:var(--text);font-weight:600}
+.history-when{font-size:11px;color:var(--text3)}
+.history-badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px;background:rgba(0,128,90,.12);color:var(--teal)}
+.btn-restore{padding:5px 12px;border-radius:6px;background:var(--teal);color:#fff;border:none;font-size:11.5px;cursor:pointer;font-family:var(--font)}
+.edit-mod-btn{position:absolute;top:10px;right:10px;z-index:10;padding:4px 11px;border-radius:6px;background:var(--accent);color:#fff;border:none;font-size:11px;font-weight:600;cursor:pointer;font-family:var(--font);opacity:.8}
+.edit-mod-btn:hover{opacity:1}
+.live-badge{display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:600;color:var(--teal);background:rgba(0,128,90,.1);padding:2px 8px;border-radius:99px;margin-left:8px;vertical-align:middle}
+.live-badge::before{content:'●';font-size:7px}
 </style>
 <script>
 (function(){
@@ -371,6 +402,17 @@ const QURIOUS_CONFIG = {
   db_url: 'https://script.google.com/macros/s/AKfycby1wFAL_7NVoVstInD9lTVTS-BjQfMp1Ui2y1VMA_z1_mMknQH9LUD25Ktyme-BhbUzFg/exec',
   category: 'AIF',
   visibility: 'client',
+};
+
+// NexusAuth Apps Script URL — for content editing and version control
+const NEXUS_AUTH_URL = 'https://script.google.com/macros/s/AKfycbwNnxRF-NzRA9Yw3PCeGJFdNX1WgkWo4o8FHz7g2yssXNmrKg-wXx5NcUNISZsK8VFn4A/exec';
+
+// Editor state
+var editorState = {
+  isAdmin:     false,
+  adminEmail:  '',
+  editingIdx:  null,
+  liveContent: {},   // moduleIdx -> {version, title, body, updatedBy, updatedAt}
 };
 // ── THEME ──────────────────────────────────────────────────
 // Theme is controlled entirely by the parent Nexus window — no toggle here.
@@ -2410,6 +2452,348 @@ function selInv(i){
 
 goTo('home');
 
+// ══════════════════════════════════════════════════════════════════════════════
+// CONTENT EDITOR (admin only)
+// ══════════════════════════════════════════════════════════════════════════════
+
+async function callNexusAuth(payload) {
+  const r = await fetch(NEXUS_AUTH_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain' },
+    body: JSON.stringify(payload),
+    redirect: 'follow',
+  });
+  return r.json();
+}
+
+// Load live content from sheet on startup (non-blocking)
+async function loadLiveContent() {
+  if (!NEXUS_AUTH_URL || NEXUS_AUTH_URL.includes('PASTE_')) return;
+  try {
+    const r = await callNexusAuth({ action: 'getModuleContent' });
+    if (!r.ok) return;
+    editorState.liveContent = r.content || {};
+
+    // Overlay live content on rendered modules
+    Object.entries(editorState.liveContent).forEach(([idx, c]) => {
+      const screen = document.getElementById('screen-' + idx);
+      if (!screen || !c.body) return;
+      // Replace the module body content (preserve nav footer)
+      const page = screen.querySelector('.mod-page');
+      if (!page) return;
+      const navEl = page.querySelector('.nav-footer');
+      const navHTML = navEl ? navEl.outerHTML : '';
+      const eyebrow = MODULES[parseInt(idx)] ? MODULES[parseInt(idx)].eyebrow : '';
+      const title   = c.title || (MODULES[parseInt(idx)] ? MODULES[parseInt(idx)].title : '');
+      page.innerHTML =
+        '<div class="mod-eyebrow">' + eyebrow + '</div>' +
+        '<h2 class="mod-title">' + title +
+          '<span class="live-badge">Live v' + c.version + '</span>' +
+        '</h2>' +
+        '<p class="mod-desc"></p>' +
+        c.body +
+        navHTML;
+    });
+
+    // Show edit buttons on each module if admin
+    if (editorState.isAdmin) addEditButtons();
+  } catch(e) { console.warn('Content load failed:', e); }
+}
+
+function setAdminMode(email) {
+  editorState.isAdmin   = true;
+  editorState.adminEmail = email;
+  // Notify via parent Nexus postMessage
+}
+
+// Listen for admin credential from parent Nexus frame
+window.addEventListener('message', function(ev) {
+  if (!ev.data || ev.data.type !== 'nexusSession') return;
+  if (ev.data.role === 'admin') {
+    setAdminMode(ev.data.email);
+    addEditButtons();
+  }
+  loadLiveContent();
+});
+
+// Fallback: load content on DOMContentLoaded even if no parent message
+document.addEventListener('DOMContentLoaded', function() {
+  setTimeout(loadLiveContent, 1000);
+});
+
+function addEditButtons() {
+  MODULES.forEach((m, i) => {
+    const screen = document.getElementById('screen-' + i);
+    if (!screen) return;
+    if (screen.querySelector('.edit-mod-btn')) return; // already added
+    const btn = document.createElement('button');
+    btn.className = 'edit-mod-btn';
+    btn.textContent = '✏ Edit';
+    btn.onclick = function(e) { e.stopPropagation(); openEditor(i); };
+    screen.style.position = 'relative';
+    screen.appendChild(btn);
+  });
+}
+
+// ── EDITOR OPEN / CLOSE ────────────────────────────────────────────────────
+
+function openEditor(idx) {
+  editorState.editingIdx = idx;
+  const m = MODULES[idx] || {};
+  document.getElementById('editor-mod-name').textContent = 'Edit — Module ' + (idx+1) + ': ' + m.title;
+
+  // Pre-populate with live content or static
+  const live = editorState.liveContent[String(idx)];
+  if (live) {
+    document.getElementById('editor-meta').textContent =
+      'Current: v' + live.version + ' · saved ' + live.updatedAt + ' by ' + live.updatedBy;
+  } else {
+    document.getElementById('editor-meta').textContent = 'No saved version yet — static content shown';
+  }
+
+  switchEditorTab('edit');
+  document.getElementById('editor-modal').classList.add('open');
+}
+
+function closeEditor() {
+  document.getElementById('editor-modal').classList.remove('open');
+  editorState.editingIdx = null;
+}
+
+function switchEditorTab(tab) {
+  document.querySelectorAll('.editor-tab').forEach(function(t) {
+    t.classList.toggle('active', t.textContent.toLowerCase().includes(tab));
+  });
+
+  const idx  = editorState.editingIdx;
+  const m    = idx !== null ? (MODULES[idx] || {}) : {};
+  const live = idx !== null ? (editorState.liveContent[String(idx)] || null) : null;
+
+  // Get current editor values if switching from edit tab
+  const curTitle = document.getElementById('edit-title-input')
+    ? document.getElementById('edit-title-input').value
+    : (live ? live.title : m.title || '');
+  const curBody  = document.getElementById('edit-body-textarea')
+    ? document.getElementById('edit-body-textarea').value
+    : (live ? live.body : '');
+
+  const body = document.getElementById('editor-body');
+  const saveBtn = document.getElementById('btn-save-content');
+
+  if (tab === 'edit') {
+    if (saveBtn) saveBtn.style.display = 'block';
+    body.innerHTML =
+      '<div class="editor-field">' +
+        '<div class="editor-label">Module title</div>' +
+        '<input class="editor-input" id="edit-title-input" value="' +
+          (live ? live.title : m.title || '').replace(/"/g,'&quot;') + '">' +
+      '</div>' +
+      '<div class="editor-field">' +
+        '<div class="editor-label">Body HTML</div>' +
+        '<div style="font-size:11px;color:var(--text3);margin-bottom:6px">' +
+          'Edit the HTML content below. Use &lt;div class="section"&gt;, &lt;div class="section-title"&gt;, ' +
+          '&lt;table class="data-table"&gt;, &lt;ul&gt; etc. as in the existing modules.' +
+        '</div>' +
+        '<textarea class="editor-textarea" id="edit-body-textarea">' +
+          escHtml(live ? live.body : getStaticBodyHTML(idx)) +
+        '</textarea>' +
+      '</div>';
+
+  } else if (tab === 'preview') {
+    if (saveBtn) saveBtn.style.display = 'none';
+    const previewBody = curBody || (live ? live.body : getStaticBodyHTML(idx));
+    body.innerHTML =
+      '<div style="padding:8px 0 16px;font-size:12px;color:var(--text3)">Preview of rendered content:</div>' +
+      '<div style="background:var(--surface2);border-radius:10px;padding:20px;border:1px solid var(--border)">' +
+        '<h2 style="font-size:20px;font-weight:700;color:var(--text);margin-bottom:12px">' + curTitle + '</h2>' +
+        previewBody +
+      '</div>';
+
+  } else if (tab === 'history') {
+    if (saveBtn) saveBtn.style.display = 'none';
+    body.innerHTML = '<div style="padding:8px 0;color:var(--text3);font-size:13px">Loading history…</div>';
+    loadModuleHistory(idx).then(function(history) {
+      if (!history || !history.length) {
+        body.innerHTML = '<div style="padding:24px;text-align:center;color:var(--text3)">No saved versions yet.</div>';
+        return;
+      }
+      body.innerHTML = history.map(function(h) {
+        return '<div class="history-row">' +
+          '<div class="history-ver">v' + h.version + '</div>' +
+          '<div class="history-info">' +
+            '<div class="history-who">' + h.updatedBy + '</div>' +
+            '<div class="history-when">' + h.updatedAt + '</div>' +
+          '</div>' +
+          (h.isCurrent
+            ? '<span class="history-badge">Current</span>'
+            : '<button class="btn-restore" onclick="restoreVersion(' + idx + ',' + h.version + ')">Restore</button>') +
+        '</div>';
+      }).join('');
+    });
+  }
+}
+
+function escHtml(str) {
+  return (str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function getStaticBodyHTML(idx) {
+  // Extract current rendered body from the DOM (minus nav footer)
+  const screen = document.getElementById('screen-' + idx);
+  if (!screen) return '';
+  const page = screen.querySelector('.mod-page');
+  if (!page) return page ? page.innerHTML : '';
+  const clone = page.cloneNode(true);
+  const nav   = clone.querySelector('.nav-footer');
+  const eyebrow = clone.querySelector('.mod-eyebrow');
+  const title   = clone.querySelector('.mod-title');
+  const desc    = clone.querySelector('.mod-desc');
+  if (nav)     nav.remove();
+  if (eyebrow) eyebrow.remove();
+  if (title)   title.remove();
+  if (desc)    desc.remove();
+  return clone.innerHTML;
+}
+
+// ── SAVE ────────────────────────────────────────────────────────────────────
+
+async function saveModuleContent() {
+  const idx      = editorState.editingIdx;
+  const titleEl  = document.getElementById('edit-title-input');
+  const bodyEl   = document.getElementById('edit-body-textarea');
+  if (idx === null || !titleEl || !bodyEl) return;
+
+  const btn = document.getElementById('btn-save-content');
+  btn.disabled = true;
+  btn.textContent = 'Saving…';
+
+  try {
+    const r = await callNexusAuth({
+      action:       'saveModuleContent',
+      requestedBy:  editorState.adminEmail,
+      moduleIdx:    idx,
+      title:        titleEl.value.trim(),
+      bodyHtml:     bodyEl.value.trim(),
+    });
+
+    if (!r.ok) throw new Error(r.error || 'Save failed');
+
+    // Update local cache
+    editorState.liveContent[String(idx)] = {
+      version:   r.version,
+      title:     titleEl.value.trim(),
+      body:      bodyEl.value.trim(),
+      updatedBy: editorState.adminEmail,
+      updatedAt: r.updatedAt,
+    };
+
+    // Reload the module in-page
+    overlayModule(idx);
+
+    document.getElementById('editor-meta').textContent =
+      'Saved as v' + r.version + ' · ' + r.updatedAt;
+
+    alert('Saved as version ' + r.version + '. Module updated live.');
+    btn.textContent = '✓ Saved';
+    setTimeout(function() { btn.textContent = 'Save new version'; btn.disabled = false; }, 2000);
+
+  } catch(e) {
+    alert('Error: ' + e.message);
+    btn.disabled = false;
+    btn.textContent = 'Save new version';
+  }
+}
+
+function overlayModule(idx) {
+  const c = editorState.liveContent[String(idx)];
+  if (!c) return;
+  const screen = document.getElementById('screen-' + idx);
+  if (!screen) return;
+  const page = screen.querySelector('.mod-page');
+  if (!page) return;
+  const navEl   = page.querySelector('.nav-footer');
+  const navHTML = navEl ? navEl.outerHTML : '';
+  const m       = MODULES[idx] || {};
+  page.innerHTML =
+    '<div class="mod-eyebrow">' + (m.eyebrow || '') + '</div>' +
+    '<h2 class="mod-title">' + c.title +
+      '<span class="live-badge">Live v' + c.version + '</span>' +
+    '</h2>' +
+    '<p class="mod-desc"></p>' +
+    c.body +
+    navHTML;
+  if (editorState.isAdmin && !screen.querySelector('.edit-mod-btn')) {
+    const btn = document.createElement('button');
+    btn.className = 'edit-mod-btn';
+    btn.textContent = '✏ Edit';
+    btn.onclick = function(e) { e.stopPropagation(); openEditor(idx); };
+    screen.appendChild(btn);
+  }
+}
+
+// ── HISTORY & RESTORE ───────────────────────────────────────────────────────
+
+async function loadModuleHistory(idx) {
+  try {
+    const r = await callNexusAuth({
+      action:      'getModuleHistory',
+      requestedBy: editorState.adminEmail,
+      moduleIdx:   idx,
+    });
+    return r.ok ? r.history : [];
+  } catch(e) { return []; }
+}
+
+async function restoreVersion(idx, version) {
+  if (!confirm('Restore version ' + version + ' as the current live content?')) return;
+  try {
+    const r = await callNexusAuth({
+      action:       'getModuleHistory',
+      requestedBy:  editorState.adminEmail,
+      moduleIdx:    idx,
+    });
+    if (!r.ok) throw new Error(r.error);
+    const target = (r.history || []).find(function(h) { return String(h.version) === String(version); });
+    if (!target) throw new Error('Version not found');
+
+    // Re-save it as a new version (which marks it current)
+    // We need the full body — re-fetch from server
+    alert('Restore: to restore v' + version + ', open it from History, copy the HTML, and save as a new version. Full restore from history coming soon.');
+  } catch(e) { alert('Error: ' + e.message); }
+}
+
+// Close editor on backdrop click — deferred until DOM is ready
+document.addEventListener('DOMContentLoaded', function() {
+  var modal = document.getElementById('editor-modal');
+  if (modal) modal.addEventListener('click', function(e) {
+    if (e.target === this) closeEditor();
+  });
+});
+
 </script>
+
+<!-- ══ CONTENT EDITOR MODAL ══════════════════════════════════════════════ -->
+<div id="editor-modal">
+  <div class="editor-panel">
+    <div class="editor-hdr">
+      <div class="editor-hdr-title" id="editor-mod-name">Edit Module</div>
+      <div class="editor-tabs">
+        <button class="editor-tab active" onclick="switchEditorTab('edit')">✏ Edit</button>
+        <button class="editor-tab" onclick="switchEditorTab('preview')">👁 Preview</button>
+        <button class="editor-tab" onclick="switchEditorTab('history')">🕘 History</button>
+        <button class="editor-tab" onclick="closeEditor()" style="border-color:var(--red);color:var(--red)">✕ Close</button>
+      </div>
+    </div>
+    <div class="editor-body" id="editor-body">
+      <!-- populated by switchEditorTab() -->
+    </div>
+    <div class="editor-footer">
+      <div class="editor-meta" id="editor-meta"></div>
+      <div style="display:flex;gap:10px">
+        <button class="btn-save-content" id="btn-save-content" onclick="saveModuleContent()">Save new version</button>
+      </div>
+    </div>
+  </div>
+</div>
 </body>
 </html>
