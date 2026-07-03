@@ -452,6 +452,15 @@ function goTo(idx){
     const screen = document.getElementById('screen-' + idx);
     if(screen){
       screen.classList.add('active');
+      // Add edit button if admin and not already present
+      if (editorState.isAdmin && !screen.querySelector('.edit-mod-btn')) {
+        const eb = document.createElement('button');
+        eb.className = 'edit-mod-btn';
+        eb.textContent = '✏ Edit';
+        eb.onclick = function(e) { e.stopPropagation(); openEditor(idx); };
+        screen.style.position = 'relative';
+        screen.appendChild(eb);
+      }
       // scroll to top of main, then to heading
       const main = document.getElementById('main');
       main.scrollTo({top: 0, behavior: 'smooth'});
@@ -2510,40 +2519,58 @@ async function loadLiveContent() {
 }
 
 function setAdminMode(email) {
-  editorState.isAdmin   = true;
+  editorState.isAdmin    = true;
   editorState.adminEmail = email;
-  // Notify via parent Nexus postMessage
 }
 
-// Listen for admin credential from parent Nexus frame
+// Listen for admin credential from parent Nexus frame (postMessage)
 window.addEventListener('message', function(ev) {
   if (!ev.data || ev.data.type !== 'nexusSession') return;
   if (ev.data.role === 'admin') {
     setAdminMode(ev.data.email);
-    addEditButtons();
+    // Retry addEditButtons with delay — screens may not be rendered yet
+    setTimeout(addEditButtons, 500);
+    setTimeout(addEditButtons, 1500);
   }
   loadLiveContent();
 });
 
-// Only auto-load live content when embedded inside Nexus iframe
-// Standalone access skips content overlay (static content is authoritative)
 document.addEventListener('DOMContentLoaded', function() {
   const inIframe = window.self !== window.top;
+
+  // Load live content only when inside Nexus
   if (inIframe) setTimeout(loadLiveContent, 1500);
+
+  // URL param fallback: ?admin=email for cases where postMessage doesn't fire
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const adminParam = params.get('admin');
+    if (adminParam && adminParam.endsWith('@validusfintech.com')) {
+      setAdminMode(adminParam);
+      // Screens render asynchronously — retry a few times
+      setTimeout(addEditButtons, 800);
+      setTimeout(addEditButtons, 2000);
+      setTimeout(addEditButtons, 4000);
+    }
+  } catch(e) {}
 });
 
 function addEditButtons() {
-  MODULES.forEach((m, i) => {
+  if (!editorState.isAdmin) return;
+  var added = 0;
+  MODULES.forEach(function(m, i) {
     const screen = document.getElementById('screen-' + i);
     if (!screen) return;
-    if (screen.querySelector('.edit-mod-btn')) return; // already added
+    if (screen.querySelector('.edit-mod-btn')) return;
     const btn = document.createElement('button');
     btn.className = 'edit-mod-btn';
     btn.textContent = '✏ Edit';
     btn.onclick = function(e) { e.stopPropagation(); openEditor(i); };
     screen.style.position = 'relative';
     screen.appendChild(btn);
+    added++;
   });
+  return added;
 }
 
 // ── EDITOR OPEN / CLOSE ────────────────────────────────────────────────────
