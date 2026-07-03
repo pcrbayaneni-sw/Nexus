@@ -405,7 +405,7 @@ const QURIOUS_CONFIG = {
 };
 
 // NexusAuth Apps Script URL — for content editing and version control
-const NEXUS_AUTH_URL = 'https://script.google.com/macros/s/AKfycbzJDHJoIZdtzwda-Ogxuybi8mguYv9ikU6flEXFDRwgdNpRj17U4NJMRw0JWnIqX8S0yw/exec';
+const NEXUS_AUTH_URL = 'https://script.google.com/macros/s/AKfycbxZSbTjL8eEmhfO5cSIst6zLnN--iOB8ajSVO-bMSKXLB0IDvonrvpBMxsa3BzpyhR33A/exec';
 
 // Editor state
 var editorState = {
@@ -2457,13 +2457,22 @@ goTo('home');
 // ══════════════════════════════════════════════════════════════════════════════
 
 async function callNexusAuth(payload) {
-  const r = await fetch(NEXUS_AUTH_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'text/plain' },
-    body: JSON.stringify(payload),
-    redirect: 'follow',
-  });
-  return r.json();
+  const controller = new AbortController();
+  const timer = setTimeout(function() { controller.abort(); }, 8000);
+  try {
+    const r = await fetch(NEXUS_AUTH_URL, {
+      method:   'POST',
+      headers:  { 'Content-Type': 'text/plain' },
+      body:     JSON.stringify(payload),
+      redirect: 'follow',
+      signal:   controller.signal,
+    });
+    clearTimeout(timer);
+    return r.json();
+  } catch(e) {
+    clearTimeout(timer);
+    throw e;
+  }
 }
 
 // Load live content from sheet on startup (non-blocking)
@@ -2497,7 +2506,7 @@ async function loadLiveContent() {
 
     // Show edit buttons on each module if admin
     if (editorState.isAdmin) addEditButtons();
-  } catch(e) { console.warn('Content load failed:', e); }
+  } catch(e) { /* silent — content load is best-effort; static content remains */ }
 }
 
 function setAdminMode(email) {
@@ -2516,9 +2525,11 @@ window.addEventListener('message', function(ev) {
   loadLiveContent();
 });
 
-// Fallback: load content on DOMContentLoaded even if no parent message
+// Only auto-load live content when embedded inside Nexus iframe
+// Standalone access skips content overlay (static content is authoritative)
 document.addEventListener('DOMContentLoaded', function() {
-  setTimeout(loadLiveContent, 1000);
+  const inIframe = window.self !== window.top;
+  if (inIframe) setTimeout(loadLiveContent, 1500);
 });
 
 function addEditButtons() {
