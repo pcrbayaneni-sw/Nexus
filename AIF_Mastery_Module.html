@@ -226,34 +226,112 @@ nav::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
 }
 
 /* ── CONTENT EDITOR ─────────────────────────────────────────────────────── */
-#editor-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9000;align-items:center;justify-content:center}
+#editor-modal{
+  display:none;position:fixed;inset:0;
+  background:rgba(10,15,30,0.7);
+  z-index:9000;align-items:flex-start;justify-content:center;
+  padding:24px 16px;overflow-y:auto
+}
 #editor-modal.open{display:flex}
-.editor-panel{background:var(--surface);border-radius:16px;width:min(900px,95vw);max-height:90vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 24px 64px rgba(0,0,0,.25)}
-.editor-hdr{display:flex;align-items:center;justify-content:space-between;padding:16px 22px;border-bottom:1px solid var(--border);flex-shrink:0;flex-wrap:wrap;gap:8px}
-.editor-hdr-title{font-size:14px;font-weight:700;color:var(--text)}
-.editor-tabs{display:flex;gap:6px}
-.editor-tab{padding:5px 12px;border-radius:7px;border:1px solid var(--border);background:transparent;font-size:12.5px;cursor:pointer;color:var(--text3);font-family:var(--font)}
-.editor-tab.active{background:var(--accent);color:#fff;border-color:var(--accent)}
-.editor-body{padding:18px 22px;overflow-y:auto;flex:1}
-.editor-label{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text3);margin-bottom:5px}
-.editor-input,.editor-textarea{width:100%;padding:9px 13px;border-radius:8px;border:1.5px solid var(--border);background:var(--surface2);color:var(--text);font-family:var(--font);font-size:13px;user-select:text!important;-webkit-user-select:text!important;margin-bottom:14px}
-.editor-input:focus,.editor-textarea:focus{outline:none;border-color:var(--accent)}
-.editor-textarea{min-height:300px;font-family:monospace;font-size:12px;resize:vertical}
-.editor-footer{display:flex;align-items:center;justify-content:space-between;padding:12px 22px;border-top:1px solid var(--border);flex-shrink:0}
-.editor-meta{font-size:11px;color:var(--text3)}
-.btn-save-content{padding:8px 22px;border-radius:8px;background:var(--accent);color:#fff;border:none;font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font)}
+.editor-panel{
+  background:#ffffff;
+  border-radius:14px;width:min(860px,98vw);
+  display:flex;flex-direction:column;
+  box-shadow:0 32px 80px rgba(0,0,0,0.35);
+  flex-shrink:0;margin:auto
+}
+.editor-hdr{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:16px 22px;border-bottom:2px solid #e8eaf0;
+  flex-wrap:wrap;gap:8px;background:#f7f8fc;
+  border-radius:14px 14px 0 0
+}
+.editor-hdr-title{font-size:14px;font-weight:700;color:#1a2233;max-width:400px}
+.editor-tabs{display:flex;gap:6px;flex-wrap:wrap}
+.editor-tab{
+  padding:5px 14px;border-radius:7px;
+  border:1.5px solid #d0d5e0;background:#ffffff;
+  font-size:12.5px;cursor:pointer;color:#4a5568;
+  font-family:var(--font);font-weight:500
+}
+.editor-tab.active{background:#1A6BC8;color:#fff;border-color:#1A6BC8}
+.editor-tab.close-tab{border-color:#e0d0d0;color:#c0392b}
+.editor-body{padding:18px 22px;overflow-y:auto;max-height:60vh}
+.editor-label{
+  font-size:10.5px;font-weight:700;text-transform:uppercase;
+  letter-spacing:.6px;color:#8a95a8;margin-bottom:6px
+}
+.editor-input{
+  width:100%;padding:9px 13px;border-radius:8px;
+  border:1.5px solid #d0d5e0;background:#ffffff;
+  color:#1a2233;font-family:var(--font);font-size:13.5px;
+  user-select:text!important;-webkit-user-select:text!important;
+  margin-bottom:16px;box-sizing:border-box
+}
+.editor-input:focus{outline:none;border-color:#1A6BC8;box-shadow:0 0 0 3px rgba(26,107,200,0.1)}
+/* Rich text editor */
+.rte-toolbar{
+  display:flex;gap:4px;padding:8px 10px;
+  background:#f0f2f7;border:1.5px solid #d0d5e0;
+  border-bottom:none;border-radius:8px 8px 0 0;flex-wrap:wrap
+}
+.rte-btn{
+  padding:4px 9px;border-radius:5px;border:1px solid #d0d5e0;
+  background:#ffffff;font-size:12px;cursor:pointer;color:#1a2233;
+  font-family:var(--font);line-height:1.4;min-width:28px;text-align:center
+}
+.rte-btn:hover{background:#e8eaf0}
+.rte-btn.active{background:#1A6BC8;color:#fff;border-color:#1A6BC8}
+.rte-sep{width:1px;background:#d0d5e0;margin:2px 4px}
+.rte-body{
+  min-height:340px;padding:14px 16px;
+  border:1.5px solid #d0d5e0;border-radius:0 0 8px 8px;
+  background:#ffffff;color:#1a2233;
+  font-family:var(--font);font-size:14px;line-height:1.7;
+  user-select:text!important;-webkit-user-select:text!important;
+  overflow-y:auto;outline:none;margin-bottom:14px
+}
+.rte-body:focus{border-color:#1A6BC8;box-shadow:0 0 0 3px rgba(26,107,200,0.1)}
+.rte-body h3{font-size:15px;font-weight:700;color:#1a2233;margin:14px 0 6px}
+.rte-body ul,.rte-body ol{padding-left:22px;margin:6px 0}
+.rte-body li{margin:3px 0}
+.rte-body table{border-collapse:collapse;width:100%;margin:10px 0;font-size:13px}
+.rte-body th{background:#f0f2f7;padding:7px 10px;border:1px solid #d0d5e0;text-align:left;font-weight:600}
+.rte-body td{padding:7px 10px;border:1px solid #d0d5e0}
+.rte-body blockquote{border-left:3px solid #1A6BC8;padding:8px 14px;background:#f4f7fb;margin:10px 0;border-radius:0 6px 6px 0;font-style:italic}
+.editor-footer{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:12px 22px;border-top:2px solid #e8eaf0;flex-shrink:0;
+  background:#f7f8fc;border-radius:0 0 14px 14px
+}
+.editor-meta{font-size:11px;color:#8a95a8}
+.btn-save-content{
+  padding:9px 26px;border-radius:8px;background:#1A6BC8;
+  color:#fff;border:none;font-size:13px;font-weight:700;
+  cursor:pointer;font-family:var(--font)
+}
+.btn-save-content:hover{background:#1558A8}
 .btn-save-content:disabled{opacity:.5;cursor:not-allowed}
-.history-row{display:flex;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)}
+.history-row{display:flex;align-items:center;padding:10px 0;border-bottom:1px solid #e8eaf0}
 .history-row:last-child{border-bottom:none}
-.history-ver{font-weight:700;color:var(--accent);font-size:13px;min-width:50px}
+.history-ver{font-weight:700;color:#1A6BC8;font-size:13px;min-width:50px}
 .history-info{flex:1;margin:0 14px}
-.history-who{font-size:12px;color:var(--text);font-weight:600}
-.history-when{font-size:11px;color:var(--text3)}
-.history-badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px;background:rgba(0,128,90,.12);color:var(--teal)}
-.btn-restore{padding:5px 12px;border-radius:6px;background:var(--teal);color:#fff;border:none;font-size:11.5px;cursor:pointer;font-family:var(--font)}
-.edit-mod-btn{position:absolute;top:10px;right:10px;z-index:10;padding:4px 11px;border-radius:6px;background:var(--accent);color:#fff;border:none;font-size:11px;font-weight:600;cursor:pointer;font-family:var(--font);opacity:.8}
-.edit-mod-btn:hover{opacity:1}
-.live-badge{display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:600;color:var(--teal);background:rgba(0,128,90,.1);padding:2px 8px;border-radius:99px;margin-left:8px;vertical-align:middle}
+.history-who{font-size:12px;color:#1a2233;font-weight:600}
+.history-when{font-size:11px;color:#8a95a8}
+.history-badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px;background:rgba(0,160,100,.12);color:#008060}
+.btn-restore{padding:5px 12px;border-radius:6px;background:#0D8A65;color:#fff;border:none;font-size:11.5px;cursor:pointer;font-family:var(--font)}
+.edit-mod-btn{
+  position:absolute;top:10px;right:10px;z-index:10;
+  padding:4px 12px;border-radius:6px;background:#1A6BC8;
+  color:#fff;border:none;font-size:11px;font-weight:600;
+  cursor:pointer;font-family:var(--font);opacity:.9
+}
+.edit-mod-btn:hover{opacity:1;background:#1558A8}
+.live-badge{
+  display:inline-flex;align-items:center;gap:3px;font-size:10px;
+  font-weight:600;color:#008060;background:rgba(0,128,90,.1);
+  padding:2px 8px;border-radius:99px;margin-left:8px;vertical-align:middle
+}
 .live-badge::before{content:'●';font-size:7px}
 </style>
 <script>
@@ -2524,15 +2602,24 @@ function setAdminMode(email) {
 }
 
 // Listen for admin credential from parent Nexus frame (postMessage)
+// Guard so repeated messages (3 retries from Nexus) only act once
+var _sessionReceived = false;
 window.addEventListener('message', function(ev) {
   if (!ev.data || ev.data.type !== 'nexusSession') return;
-  if (ev.data.role === 'admin') {
+  if (ev.data.role === 'admin' && !editorState.isAdmin) {
     setAdminMode(ev.data.email);
-    // Retry addEditButtons with delay — screens may not be rendered yet
-    setTimeout(addEditButtons, 500);
-    setTimeout(addEditButtons, 1500);
+    // Poll until all screens are rendered, then add buttons
+    var attempts = 0;
+    var poll = setInterval(function() {
+      var added = addEditButtons();
+      attempts++;
+      if (added > 0 || attempts > 20) clearInterval(poll);
+    }, 300);
   }
-  loadLiveContent();
+  if (!_sessionReceived) {
+    _sessionReceived = true;
+    loadLiveContent();
+  }
 });
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -2589,6 +2676,7 @@ function openEditor(idx) {
     document.getElementById('editor-meta').textContent = 'No saved version yet — static content shown';
   }
 
+  editorState._curBody = undefined; // reset on new open
   switchEditorTab('edit');
   document.getElementById('editor-modal').classList.add('open');
 }
@@ -2598,61 +2686,133 @@ function closeEditor() {
   editorState.editingIdx = null;
 }
 
+// ── Rich text editor helpers ──────────────────────────────────────────────
+function rteCmd(cmd, val) {
+  document.getElementById('rte-editor').focus();
+  document.execCommand(cmd, false, val || null);
+}
+function rteInsertTable() {
+  const rows = parseInt(prompt('Number of rows (including header):', '3')) || 3;
+  const cols = parseInt(prompt('Number of columns:', '3')) || 3;
+  let html = '<table><thead><tr>';
+  for (var c = 0; c < cols; c++) html += '<th>Header ' + (c+1) + '</th>';
+  html += '</tr></thead><tbody>';
+  for (var r = 0; r < rows - 1; r++) {
+    html += '<tr>';
+    for (var c2 = 0; c2 < cols; c2++) html += '<td>Cell</td>';
+    html += '</tr>';
+  }
+  html += '</tbody></table>';
+  document.execCommand('insertHTML', false, html);
+}
+function getRTEContent() {
+  const el = document.getElementById('rte-editor');
+  return el ? el.innerHTML : '';
+}
+function setRTEContent(html) {
+  const el = document.getElementById('rte-editor');
+  if (el) el.innerHTML = html || '';
+}
+function rteToolbar() {
+  var btns = [
+    {label:'<b>B</b>',    tip:'Bold',           cmd:'bold'},
+    {label:'<i>I</i>',    tip:'Italic',          cmd:'italic'},
+    {label:'<u>U</u>',    tip:'Underline',       cmd:'underline'},
+    {label:'sep'},
+    {label:'H3',          tip:'Heading 3',       cmd:'formatBlock', val:'h3'},
+    {label:'¶',           tip:'Paragraph',       cmd:'formatBlock', val:'p'},
+    {label:'sep'},
+    {label:'• List',      tip:'Bullet list',     cmd:'insertUnorderedList'},
+    {label:'1. List',     tip:'Numbered list',   cmd:'insertOrderedList'},
+    {label:'sep'},
+    {label:'⊞ Table',    tip:'Insert table',    cmd:'table'},
+    {label:'❝ Quote',    tip:'Block quote',      cmd:'formatBlock', val:'blockquote'},
+    {label:'sep'},
+    {label:'🖊 Mark',    tip:'Highlight',        cmd:'hiliteColor', val:'#fff3cd'},
+    {label:'✕ Clear',    tip:'Clear formatting', cmd:'removeFormat'},
+  ];
+  var html = '<div class="rte-toolbar">';
+  btns.forEach(function(b) {
+    if (b.label === 'sep') { html += '<div class="rte-sep"></div>'; return; }
+    var enc = JSON.stringify({cmd: b.cmd, val: b.val || ''});
+    html += '<button class="rte-btn" title="' + b.tip + '" onclick="rteExec(' + enc.replace(/"/g,"'") + ')">' + b.label + '</button>';
+  });
+  html += '</div>';
+  return html;
+}
+
+function rteExec(opts) {
+  if (opts.cmd === 'table') { rteInsertTable(); return; }
+  document.getElementById('rte-editor').focus();
+  document.execCommand(opts.cmd, false, opts.val || null);
+}
+
 function switchEditorTab(tab) {
   document.querySelectorAll('.editor-tab').forEach(function(t) {
-    t.classList.toggle('active', t.textContent.toLowerCase().includes(tab));
+    t.classList.remove('active');
+    if (t.dataset.tab === tab) t.classList.add('active');
   });
 
   const idx  = editorState.editingIdx;
   const m    = idx !== null ? (MODULES[idx] || {}) : {};
   const live = idx !== null ? (editorState.liveContent[String(idx)] || null) : null;
 
-  // Get current editor values if switching from edit tab
+  // Snapshot current editor state before switching tabs
   const curTitle = document.getElementById('edit-title-input')
     ? document.getElementById('edit-title-input').value
     : (live ? live.title : m.title || '');
-  const curBody  = document.getElementById('edit-body-textarea')
-    ? document.getElementById('edit-body-textarea').value
-    : (live ? live.body : '');
+  const curBody = editorState._curBody !== undefined
+    ? editorState._curBody
+    : (live ? live.body : getStaticBodyHTML(idx));
 
-  const body = document.getElementById('editor-body');
+  // Persist current RTE content when switching tabs
+  if (document.getElementById('rte-editor')) {
+    editorState._curBody = getRTEContent();
+  }
+
+  const body    = document.getElementById('editor-body');
   const saveBtn = document.getElementById('btn-save-content');
 
   if (tab === 'edit') {
-    if (saveBtn) saveBtn.style.display = 'block';
+    if (saveBtn) saveBtn.style.display = '';
+    const initialContent = editorState._curBody !== undefined
+      ? editorState._curBody
+      : (live ? live.body : getStaticBodyHTML(idx));
+
     body.innerHTML =
-      '<div class="editor-field">' +
-        '<div class="editor-label">Module title</div>' +
-        '<input class="editor-input" id="edit-title-input" value="' +
-          (live ? live.title : m.title || '').replace(/"/g,'&quot;') + '">' +
+      '<div class="editor-label">Module title</div>' +
+      '<input class="editor-input" id="edit-title-input" value="' +
+        curTitle.replace(/"/g,'&quot;').replace(/</g,'&lt;') + '">' +
+      '<div class="editor-label" style="margin-top:4px">Content</div>' +
+      rteToolbar() +
+      '<div class="rte-body" id="rte-editor" contenteditable="true">' +
+        initialContent +
       '</div>' +
-      '<div class="editor-field">' +
-        '<div class="editor-label">Body HTML</div>' +
-        '<div style="font-size:11px;color:var(--text3);margin-bottom:6px">' +
-          'Edit the HTML content below. Use &lt;div class="section"&gt;, &lt;div class="section-title"&gt;, ' +
-          '&lt;table class="data-table"&gt;, &lt;ul&gt; etc. as in the existing modules.' +
-        '</div>' +
-        '<textarea class="editor-textarea" id="edit-body-textarea">' +
-          escHtml(live ? live.body : getStaticBodyHTML(idx)) +
-        '</textarea>' +
+      '<div style="font-size:11px;color:#8a95a8;margin-top:6px">' +
+        'Tip: Use <b>H3</b> for section headings, <b>• List</b> for bullet points, <b>⊞ Table</b> to insert a table.' +
       '</div>';
+
+    // Prevent copy-protection from blocking RTE editing
+    document.getElementById('rte-editor').addEventListener('keydown', function(e) {
+      e.stopPropagation();
+    }, true);
 
   } else if (tab === 'preview') {
     if (saveBtn) saveBtn.style.display = 'none';
-    const previewBody = curBody || (live ? live.body : getStaticBodyHTML(idx));
+    const previewBody = editorState._curBody !== undefined ? editorState._curBody : (live ? live.body : getStaticBodyHTML(idx));
     body.innerHTML =
-      '<div style="padding:8px 0 16px;font-size:12px;color:var(--text3)">Preview of rendered content:</div>' +
-      '<div style="background:var(--surface2);border-radius:10px;padding:20px;border:1px solid var(--border)">' +
-        '<h2 style="font-size:20px;font-weight:700;color:var(--text);margin-bottom:12px">' + curTitle + '</h2>' +
+      '<div style="font-size:12px;color:#8a95a8;margin-bottom:12px">Preview — how this will appear to learners:</div>' +
+      '<div style="background:#f7f8fc;border-radius:10px;padding:20px 24px;border:1px solid #e0e4ee">' +
+        '<h2 style="font-size:19px;font-weight:700;color:#1a2233;margin-bottom:14px">' + curTitle + '</h2>' +
         previewBody +
       '</div>';
 
   } else if (tab === 'history') {
     if (saveBtn) saveBtn.style.display = 'none';
-    body.innerHTML = '<div style="padding:8px 0;color:var(--text3);font-size:13px">Loading history…</div>';
+    body.innerHTML = '<div style="padding:8px 0;color:#8a95a8;font-size:13px">Loading history…</div>';
     loadModuleHistory(idx).then(function(history) {
       if (!history || !history.length) {
-        body.innerHTML = '<div style="padding:24px;text-align:center;color:var(--text3)">No saved versions yet.</div>';
+        body.innerHTML = '<div style="padding:24px;text-align:center;color:#8a95a8">No saved versions yet.</div>';
         return;
       }
       body.innerHTML = history.map(function(h) {
@@ -2663,7 +2823,7 @@ function switchEditorTab(tab) {
             '<div class="history-when">' + h.updatedAt + '</div>' +
           '</div>' +
           (h.isCurrent
-            ? '<span class="history-badge">Current</span>'
+            ? '<span class="history-badge">✓ Current</span>'
             : '<button class="btn-restore" onclick="restoreVersion(' + idx + ',' + h.version + ')">Restore</button>') +
         '</div>';
       }).join('');
@@ -2698,8 +2858,11 @@ function getStaticBodyHTML(idx) {
 async function saveModuleContent() {
   const idx      = editorState.editingIdx;
   const titleEl  = document.getElementById('edit-title-input');
-  const bodyEl   = document.getElementById('edit-body-textarea');
-  if (idx === null || !titleEl || !bodyEl) return;
+  if (idx === null || !titleEl) return;
+  // Save current RTE content
+  if (document.getElementById('rte-editor')) {
+    editorState._curBody = getRTEContent();
+  }
 
   const btn = document.getElementById('btn-save-content');
   btn.disabled = true;
@@ -2711,7 +2874,7 @@ async function saveModuleContent() {
       requestedBy:  editorState.adminEmail,
       moduleIdx:    idx,
       title:        titleEl.value.trim(),
-      bodyHtml:     bodyEl.value.trim(),
+      bodyHtml:     editorState._curBody || '',
     });
 
     if (!r.ok) throw new Error(r.error || 'Save failed');
@@ -2720,7 +2883,7 @@ async function saveModuleContent() {
     editorState.liveContent[String(idx)] = {
       version:   r.version,
       title:     titleEl.value.trim(),
-      body:      bodyEl.value.trim(),
+      body:      editorState._curBody || '',
       updatedBy: editorState.adminEmail,
       updatedAt: r.updatedAt,
     };
@@ -2816,10 +2979,10 @@ document.addEventListener('DOMContentLoaded', function() {
     <div class="editor-hdr">
       <div class="editor-hdr-title" id="editor-mod-name">Edit Module</div>
       <div class="editor-tabs">
-        <button class="editor-tab active" onclick="switchEditorTab('edit')">✏ Edit</button>
-        <button class="editor-tab" onclick="switchEditorTab('preview')">👁 Preview</button>
-        <button class="editor-tab" onclick="switchEditorTab('history')">🕘 History</button>
-        <button class="editor-tab" onclick="closeEditor()" style="border-color:var(--red);color:var(--red)">✕ Close</button>
+        <button class="editor-tab active" data-tab="edit" onclick="switchEditorTab('edit')">✏ Edit</button>
+        <button class="editor-tab" data-tab="preview" onclick="switchEditorTab('preview')">👁 Preview</button>
+        <button class="editor-tab" data-tab="history" onclick="switchEditorTab('history')">🕘 History</button>
+        <button class="editor-tab close-tab" onclick="closeEditor()">✕ Close</button>
       </div>
     </div>
     <div class="editor-body" id="editor-body">
