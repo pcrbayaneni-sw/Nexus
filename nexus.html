@@ -1178,14 +1178,20 @@ function openModule(mod) {
   iframe.src = mod.url;
   // Send admin session to AIF module for content editing
   iframe.onload = function() {
-    try {
-      iframe.contentWindow.postMessage({
-        type:  'nexusSession',
-        email: state.email,
-        role:  state.role,
-        name:  state.userName,
-      }, '*');
-    } catch(e) {}
+    // Send immediately, then retry at 1s and 3s to cover slow render() calls
+    function sendSession() {
+      try {
+        iframe.contentWindow.postMessage({
+          type:  'nexusSession',
+          email: state.email,
+          role:  state.role,
+          name:  state.userName,
+        }, '*');
+      } catch(e) {}
+    }
+    sendSession();
+    setTimeout(sendSession, 1000);
+    setTimeout(sendSession, 3000);
   };
   // Re-apply current theme once the module finishes loading
   iframe.onload = function() { applyTheme(); };
