@@ -1103,10 +1103,13 @@ async function enterPlatform() {
 }
 
 function openModuleEditor() {
-  // Tell the AIF iframe to open its editor for the current module screen
   const iframe = document.getElementById('module-iframe');
   if (!iframe || !iframe.contentWindow) return;
-  iframe.contentWindow.postMessage({ type: 'openEditor' }, '*');
+  iframe.contentWindow.postMessage({
+    type:  'openEditor',
+    email: state.email,
+    role:  state.role,
+  }, '*');
 }
 
 function toggleUserMenu() {
