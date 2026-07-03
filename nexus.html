@@ -571,6 +571,10 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
       <button class="back-btn" onclick="showCatalogue()">← Back to catalogue</button>
       <span class="module-topbar-title" id="module-topbar-title"></span>
       <div class="module-topbar-spacer"></div>
+      <button id="btn-edit-module" onclick="openModuleEditor()"
+        style="display:none;padding:6px 16px;border-radius:8px;background:#1A6BC8;
+               color:#fff;border:none;font-size:13px;font-weight:600;cursor:pointer;
+               font-family:var(--font)">✏ Edit module</button>
     </div>
     <div class="module-iframe-wrap">
       <iframe id="module-iframe" src="" title="Training module" sandbox="allow-scripts allow-same-origin allow-forms"></iframe>
@@ -1098,6 +1102,13 @@ async function enterPlatform() {
   showCatalogue();
 }
 
+function openModuleEditor() {
+  // Tell the AIF iframe to open its editor for the current module screen
+  const iframe = document.getElementById('module-iframe');
+  if (!iframe || !iframe.contentWindow) return;
+  iframe.contentWindow.postMessage({ type: 'openEditor' }, '*');
+}
+
 function toggleUserMenu() {
   const d = document.getElementById('user-dropdown'); if(d) d.classList.toggle('open');
 }
@@ -1174,6 +1185,9 @@ function openModule(mod) {
   document.getElementById('view-catalogue').style.display = 'none';
   document.getElementById('view-module').style.display = 'flex';
   document.getElementById('module-topbar-title').textContent = mod.title;
+  // Show Edit button for admin
+  const editBtn = document.getElementById('btn-edit-module');
+  if (editBtn) editBtn.style.display = (state.role === 'admin') ? 'block' : 'none';
   const iframe = document.getElementById('module-iframe');
   iframe.src = mod.url;
   // Send admin session to AIF module for content editing
