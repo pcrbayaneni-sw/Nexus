@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<script>
+// Early message listener — placed before copy protection so it isn't blocked
+window.__editorReady = false;
+window.addEventListener('message', function(ev) {
+  if (!ev.data || ev.data.type !== 'openEditor') return;
+  // Store the request; will be picked up once main script is ready
+  window.__pendingEditorOpen = ev.data;
+});
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MF RTA Operations — Validus Learning Module</title>
+<style>@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Sora:wght@400;600;700&display=swap');[data-theme="light"]{--bg:#F4F6FA;--bg2:#FFFFFF;--bg3:#EEF1F7;--bg4:#E4E8F0;--text:#1A2233;--text2:#4A5568;--text3:#8A95A8;--border:rgba(0,0,0,0.08);--border2:rgba(0,0,0,0.13);--card:rgba(0,0,0,0.03);--card2:rgba(0,0,0,0.06);--sidebar:#FFFFFF;--sidebar-border:rgba(0,0,0,0.09);--accent:#1A6BC8;--accent2:#1558A8;--accent-bg:rgba(26,107,200,0.08);--accent-text:#1558A8;--gold:#C07800;--gold-bg:rgba(192,120,0,0.08);--teal:#0D8A65;--teal-bg:rgba(13,138,101,0.08);--red:#B93030;--red-bg:rgba(185,48,48,0.08);--nav-active-bg:#EEF4FF;--nav-done:#0D8A65;--shadow:0 1px 4px rgba(0,0,0,0.10);--hero-bg:linear-gradient(135deg,#1A3A6A 0%,#1E4D8C 100%);--hero-text:#FFFFFF;--hero-sub:rgba(255,255,255,0.75)}[data-theme="dark"]{--bg:#0D1B2A;--bg2:#152336;--bg3:#1E3250;--bg4:#243A58;--text:#E8EBF0;--text2:#9AA5B4;--text3:#6B7A8D;--border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.13);--card:rgba(255,255,255,0.04);--card2:rgba(255,255,255,0.08);--sidebar:#152336;--sidebar-border:rgba(255,255,255,0.07);--accent:#2A7FE8;--accent2:#1A6BC8;--accent-bg:rgba(42,127,232,0.15);--accent-text:#7AB8F5;--gold:#E8A020;--gold-bg:rgba(232,160,32,0.12);--teal:#1A9E78;--teal-bg:rgba(26,158,120,0.12);--red:#D44040;--red-bg:rgba(212,64,64,0.12);--nav-active-bg:rgba(42,127,232,0.12);--nav-done:#1A9E78;--shadow:0 1px 4px rgba(0,0,0,0.4);--hero-bg:linear-gradient(135deg,#152336 0%,#1E3250 100%);--hero-text:#FFFFFF;--hero-sub:rgba(255,255,255,0.65)}*{box-sizing:border-box;margin:0;padding:0}html,body{height:100%;font-family:'Poppins',system-ui,sans-serif;background:var(--bg);color:var(--text);font-size:15px;line-height:1.6}body{display:flex;flex-direction:column;overflow:hidden}#app{display:flex;flex:1;overflow:hidden;min-height:0}#sidebar{width:260px;flex-shrink:0;background:var(--sidebar);border-right:1px solid var(--sidebar-border);display:flex;flex-direction:column;height:100%;transition:width .25s;overflow:hidden;z-index:10}#sidebar.collapsed{width:0;border-right:none}.sidebar-head{padding:18px 16px 14px;border-bottom:1px solid var(--border);flex-shrink:0}.sidebar-brand{font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--accent);margin-bottom:3px}.sidebar-title{font-family:'Poppins',system-ui,sans-serif;font-size:15px;font-weight:700;color:var(--text);white-space:nowrap}.sidebar-sub{font-size:11px;color:var(--text3);margin-top:2px;white-space:nowrap}.progress-bar{height:2px;background:var(--border2);margin:12px 16px 0;border-radius:2px;overflow:hidden}.progress-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--teal));border-radius:2px;transition:width .4s}.progress-label{font-size:10px;color:var(--text3);padding:4px 16px 10px;display:flex;justify-content:space-between;white-space:nowrap}nav{flex:1;overflow-y:auto;padding:6px 0 20px}nav::-webkit-scrollbar{width:4px}nav::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}.nav-section{font-size:9px;font-weight:600;letter-spacing:1.2px;text-transform:uppercase;color:var(--text3);padding:14px 16px 5px;white-space:nowrap}.nav-item{display:flex;align-items:center;gap:9px;padding:7px 16px;cursor:pointer;border-left:2px solid transparent;font-size:12.5px;color:var(--text2);transition:background .12s,color .12s;white-space:nowrap;overflow:hidden}.nav-item:hover{background:var(--card2);color:var(--text)}.nav-item.active{background:var(--nav-active-bg);border-left-color:var(--accent);color:var(--text);font-weight:500}.nav-item.done .nav-num{background:var(--nav-done)!important;color:#fff!important}.nav-num{width:18px;height:18px;border-radius:50%;background:var(--bg4);font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--text3)}.nav-item.active .nav-num{background:var(--accent);color:#fff}#topbar{display:flex;align-items:center;gap:8px;padding:0 16px;height:44px;flex-shrink:0;background:var(--bg2);border-bottom:1px solid var(--border);z-index:20;box-shadow:var(--shadow)}#toggle-sidebar{background:none;border:1px solid var(--border2);border-radius:6px;padding:5px 8px;cursor:pointer;color:var(--text2);font-size:13px;display:flex;align-items:center;gap:5px;transition:background .12s}#toggle-sidebar:hover{background:var(--card2)}#search-box{max-width:300px;position:relative;margin-left:auto}#search-box input{width:100%;padding:5px 10px 5px 30px;border-radius:7px;border:1px solid var(--border2);background:var(--bg3);color:var(--text);font-size:12.5px;outline:none}#search-box input:focus{border-color:var(--accent)}#search-box .search-icon{position:absolute;left:9px;top:50%;transform:translateY(-50%);font-size:12px;color:var(--text3);pointer-events:none}#search-results{position:absolute;top:calc(100% + 4px);left:0;right:0;background:var(--bg2);border:1px solid var(--border2);border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,0.15);max-height:280px;overflow-y:auto;z-index:100;display:none}.search-result{padding:8px 12px;cursor:pointer;font-size:12.5px;border-bottom:1px solid var(--border)}.search-result:last-child{border-bottom:none}.search-result:hover{background:var(--card2)}.search-result-title{font-weight:500;color:var(--text)}.search-result-sub{font-size:11px;color:var(--text3);margin-top:1px}.topbar-right{margin-left:auto;display:flex;align-items:center;gap:8px}.topbar-logo{font-family:'Poppins',system-ui,sans-serif;font-size:12px;font-weight:700;color:var(--accent);white-space:nowrap;margin-left:4px}#main{flex:1;overflow-y:auto;height:100%;min-width:0}#main::-webkit-scrollbar{width:6px}#main::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}.screen{display:none}.screen.active{display:block}#screen-home.active{min-height:100%;display:flex;flex-direction:column;justify-content:center;padding:48px 64px;background:var(--hero-bg)}.home-eyebrow{font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.6);margin-bottom:14px}.home-title{font-family:'Poppins',system-ui,sans-serif;font-size:40px;font-weight:700;line-height:1.2;color:#fff;margin-bottom:14px}.home-title span{color:#7AB8F5}.home-desc{font-size:15px;color:rgba(255,255,255,0.72);max-width:560px;line-height:1.75;margin-bottom:36px}.home-stats{display:flex;gap:36px;flex-wrap:wrap;margin-bottom:48px}.stat-val{font-family:'Poppins',system-ui,sans-serif;font-size:26px;font-weight:700;color:#fff}.stat-label{font-size:11px;color:rgba(255,255,255,0.55);margin-top:2px}.home-modules{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;max-width:900px}.home-mod-card{background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:12px 16px;cursor:pointer;transition:background .15s,border-color .15s}.home-mod-card:hover{background:rgba(255,255,255,0.14);border-color:rgba(255,255,255,0.22)}.home-mod-num{font-size:10px;font-weight:600;color:rgba(255,255,255,0.45);margin-bottom:3px}.home-mod-title{font-size:13px;font-weight:500;color:rgba(255,255,255,0.9);line-height:1.4}.mod-page{padding:36px 56px 48px;max-width:960px}.mod-eyebrow{font-size:10px;font-weight:600;letter-spacing:1.2px;text-transform:uppercase;color:var(--text3);margin-bottom:6px}.mod-title{font-family:'Poppins',system-ui,sans-serif;font-size:26px;font-weight:700;color:var(--text);line-height:1.3;margin-bottom:8px}.mod-desc{font-size:14px;color:var(--text2);line-height:1.75;max-width:720px;margin-bottom:32px}.section{margin-bottom:32px}.section-title{font-size:11px;font-weight:700;letter-spacing:.9px;text-transform:uppercase;color:var(--text3);margin-bottom:14px;padding-bottom:7px;border-bottom:1px solid var(--border)}.terms-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px}.term-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px 16px;transition:border-color .15s,box-shadow .15s}.term-card:hover{border-color:var(--border2);box-shadow:var(--shadow)}.term-name{font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px}.term-def{font-size:13px;color:var(--text2);line-height:1.6}.term-tag{display:inline-block;font-size:10px;font-weight:600;padding:2px 8px;border-radius:99px;background:var(--accent-bg);color:var(--accent-text);margin-bottom:7px}.comp-table{width:100%;border-collapse:collapse;font-size:13px;border-radius:10px;overflow:hidden;border:1px solid var(--border)}.comp-table th{background:var(--bg3);color:var(--text2);font-weight:600;font-size:11px;letter-spacing:.5px;text-transform:uppercase;padding:9px 13px;text-align:left;border-bottom:1px solid var(--border2)}.comp-table td{padding:10px 13px;border-bottom:1px solid var(--border);color:var(--text2);vertical-align:top;line-height:1.5}.comp-table tr:last-child td{border-bottom:none}.comp-table tr:hover td{background:var(--card);color:var(--text)}.comp-table td:first-child{font-weight:500;color:var(--text)}.hl-gold{color:var(--gold)!important;font-weight:600}.hl-teal{color:var(--teal)!important;font-weight:600}.hl-red{color:var(--red)!important}.hl-acc{color:var(--accent)!important;font-weight:600}.flow{display:flex;flex-direction:column}.flow-step{display:flex;gap:14px;align-items:flex-start}.flow-line{display:flex;flex-direction:column;align-items:center;flex-shrink:0}.flow-dot{width:30px;height:30px;border-radius:50%;background:var(--bg3);border:1.5px solid var(--accent);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--accent);flex-shrink:0;z-index:1}.flow-connector{width:1.5px;height:24px;background:var(--border2);margin:0 auto}.flow-body{padding-bottom:20px;flex:1}.flow-title{font-size:13.5px;font-weight:600;color:var(--text);margin-bottom:3px}.flow-desc{font-size:13px;color:var(--text2);line-height:1.6}.flow-meta{display:inline-block;font-size:11px;background:var(--accent-bg);color:var(--accent-text);padding:2px 8px;border-radius:99px;margin-top:5px}.info-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px;margin-bottom:10px}.info-box{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px 16px}.info-box.accent{border-left:3px solid var(--accent)}.info-box.gold{border-left:3px solid var(--gold)}.info-box.teal{border-left:3px solid var(--teal)}.info-box.red{border-left:3px solid var(--red)}.info-box-title{font-size:13px;font-weight:600;color:var(--text);margin-bottom:5px}.info-box-body{font-size:13px;color:var(--text2);line-height:1.6}.info-box-val{font-family:'Poppins',system-ui,sans-serif;font-size:20px;font-weight:700;color:var(--text);margin-bottom:2px}.callout{border-radius:10px;padding:13px 16px;margin-bottom:14px;font-size:13px;line-height:1.7}.callout.tip{background:var(--teal-bg);border:1px solid rgba(26,158,120,0.2);color:var(--teal)}.callout.warn{background:var(--gold-bg);border:1px solid rgba(232,160,32,0.2);color:var(--gold)}.callout.info{background:var(--accent-bg);border:1px solid rgba(42,127,232,0.2);color:var(--accent)}.callout.red{background:var(--red-bg);border:1px solid rgba(212,64,64,0.2);color:var(--red)}.callout strong{font-weight:600}.two-col{display:grid;grid-template-columns:1fr 1fr;gap:18px}.pill-list{display:flex;flex-wrap:wrap;gap:7px;margin-top:8px}.pill{font-size:12px;padding:4px 11px;border-radius:99px;border:1px solid var(--border2);color:var(--text2);background:var(--bg2)}.waterfall{display:flex;flex-direction:column;gap:2px}.wf-item{display:flex;align-items:center;gap:10px;padding:9px 14px;border-radius:8px;font-size:13px}.wf-num{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0}.wf-label{flex:1;font-weight:500;color:var(--text)}.wf-note{font-size:11.5px;color:var(--text3)}.wf-1{background:var(--accent-bg)}.wf-1 .wf-num{background:rgba(42,127,232,0.25);color:var(--accent)}.wf-2{background:var(--accent-bg);opacity:.8}.wf-2 .wf-num{background:rgba(42,127,232,0.18);color:var(--accent)}.wf-3{background:var(--teal-bg)}.wf-3 .wf-num{background:rgba(26,158,120,0.25);color:var(--teal)}.wf-4{background:var(--gold-bg)}.wf-4 .wf-num{background:rgba(232,160,32,0.25);color:var(--gold)}.wf-5{background:var(--gold-bg);opacity:.8}.wf-5 .wf-num{background:rgba(232,160,32,0.18);color:var(--gold)}.wf-6{background:var(--red-bg)}.wf-6 .wf-num{background:rgba(212,64,64,0.2);color:var(--red)}.mod-nav{display:flex;justify-content:space-between;align-items:center;margin-top:40px;padding-top:20px;border-top:1px solid var(--border)}.nav-btn{display:flex;align-items:center;gap:7px;padding:9px 18px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;transition:all .12s;border:1px solid var(--border2);background:transparent;color:var(--text2)}.nav-btn:hover{background:var(--card2);color:var(--text)}.nav-btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}.nav-btn.primary:hover{background:var(--accent2)}.nav-btn:disabled{opacity:.3;cursor:default;pointer-events:none}.nav-btn.green{background:var(--teal);border-color:var(--teal);color:#fff}.mod-progress{font-size:12px;color:var(--text3)}.faq-search-bar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}.faq-search-bar input,.faq-search-bar select{padding:7px 12px;border-radius:8px;border:1px solid var(--border2);background:var(--bg2);color:var(--text);font-size:13px;outline:none}.faq-search-bar input{flex:1;min-width:180px}.faq-search-bar input:focus,.faq-search-bar select:focus{border-color:var(--accent)}.faq-section-label{font-size:10px;font-weight:700;letter-spacing:.9px;text-transform:uppercase;color:var(--text3);margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid var(--border)}.faq-item{border-radius:8px;margin-bottom:7px;overflow:hidden;border:1px solid var(--border)}.faq-q{padding:9px 13px;font-size:13px;font-weight:600;color:var(--text);line-height:1.5;cursor:pointer;transition:background .12s;display:flex;justify-content:space-between;align-items:flex-start;gap:8px}.faq-q:hover{background:var(--card2)}.faq-q-text{flex:1}.faq-chevron{flex-shrink:0;font-size:11px;color:var(--text3);transition:transform .2s;margin-top:2px}.faq-a{display:none;padding:9px 13px;font-size:13px;color:var(--text2);line-height:1.7;border-top:1px solid var(--border);background:var(--bg2)}.faq-a.open{display:block}.stat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px}.stat-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px 16px;text-align:center}.stat-card-val{font-family:'Poppins',system-ui,sans-serif;font-size:22px;font-weight:700;color:var(--accent);margin-bottom:3px}.stat-card-label{font-size:12px;color:var(--text2);line-height:1.4}@media(max-width:840px){#sidebar{position:fixed;z-index:20;height:100%}.mod-page{padding:24px 20px 36px}#screen-home{padding:36px 20px}.home-title{font-size:28px}.two-col{grid-template-columns:1fr}.home-modules{grid-template-columns:1fr 1fr}}#editor-modal{display:none;position:fixed;inset:0;background:rgba(10,15,30,0.7);z-index:9000;align-items:flex-start;justify-content:center;padding:24px 16px;overflow-y:auto}#editor-modal.open{display:flex}.editor-panel{background:#ffffff;border-radius:14px;width:min(860px,98vw);display:flex;flex-direction:column;box-shadow:0 32px 80px rgba(0,0,0,0.35);flex-shrink:0;margin:auto}.editor-hdr{display:flex;align-items:center;justify-content:space-between;padding:16px 22px;border-bottom:2px solid #e8eaf0;flex-wrap:wrap;gap:8px;background:#f7f8fc;border-radius:14px 14px 0 0}.editor-hdr-title{font-size:14px;font-weight:700;color:#1a2233;max-width:400px}.editor-tabs{display:flex;gap:6px;flex-wrap:wrap}.editor-tab{padding:5px 14px;border-radius:7px;border:1.5px solid #d0d5e0;background:#ffffff;font-size:12.5px;cursor:pointer;color:#4a5568;font-family:var(--font);font-weight:500}.editor-tab.active{background:#1A6BC8;color:#fff;border-color:#1A6BC8}.editor-tab.close-tab{border-color:#e0d0d0;color:#c0392b}.editor-body{padding:18px 22px;overflow-y:auto;max-height:60vh}.editor-label{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:#8a95a8;margin-bottom:6px}.editor-input{width:100%;padding:9px 13px;border-radius:8px;border:1.5px solid #d0d5e0;background:#ffffff;color:#1a2233;font-family:var(--font);font-size:13.5px;user-select:text!important;-webkit-user-select:text!important;margin-bottom:16px;box-sizing:border-box}.editor-input:focus{outline:none;border-color:#1A6BC8;box-shadow:0 0 0 3px rgba(26,107,200,0.1)}.rte-toolbar{display:flex;gap:4px;padding:8px 10px;background:#f0f2f7;border:1.5px solid #d0d5e0;border-bottom:none;border-radius:8px 8px 0 0;flex-wrap:wrap}.rte-btn{padding:4px 9px;border-radius:5px;border:1px solid #d0d5e0;background:#ffffff;font-size:12px;cursor:pointer;color:#1a2233;font-family:var(--font);line-height:1.4;min-width:28px;text-align:center}.rte-btn:hover{background:#e8eaf0}.rte-btn.active{background:#1A6BC8;color:#fff;border-color:#1A6BC8}.rte-sep{width:1px;background:#d0d5e0;margin:2px 4px}.rte-body{min-height:340px;padding:14px 16px;border:1.5px solid #d0d5e0;border-radius:0 0 8px 8px;background:#ffffff;color:#1a2233;font-family:var(--font);font-size:14px;line-height:1.7;user-select:text!important;-webkit-user-select:text!important;overflow-y:auto;outline:none;margin-bottom:14px}.rte-body:focus{border-color:#1A6BC8;box-shadow:0 0 0 3px rgba(26,107,200,0.1)}.rte-body h3{font-size:15px;font-weight:700;color:#1a2233;margin:14px 0 6px}.rte-body ul,.rte-body ol{padding-left:22px;margin:6px 0}.rte-body li{margin:3px 0}.rte-body table{border-collapse:collapse;width:100%;margin:10px 0;font-size:13px}.rte-body th{background:#f0f2f7;padding:7px 10px;border:1px solid #d0d5e0;text-align:left;font-weight:600}.rte-body td{padding:7px 10px;border:1px solid #d0d5e0}.rte-body blockquote{border-left:3px solid #1A6BC8;padding:8px 14px;background:#f4f7fb;margin:10px 0;border-radius:0 6px 6px 0;font-style:italic}.editor-footer{display:flex;align-items:center;justify-content:space-between;padding:12px 22px;border-top:2px solid #e8eaf0;flex-shrink:0;background:#f7f8fc;border-radius:0 0 14px 14px}.editor-meta{font-size:11px;color:#8a95a8}.btn-save-content{padding:9px 26px;border-radius:8px;background:#1A6BC8;color:#fff;border:none;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font)}.btn-save-content:hover{background:#1558A8}.btn-save-content:disabled{opacity:.5;cursor:not-allowed}.history-row{display:flex;align-items:center;padding:10px 0;border-bottom:1px solid #e8eaf0}.history-row:last-child{border-bottom:none}.history-ver{font-weight:700;color:#1A6BC8;font-size:13px;min-width:50px}.history-info{flex:1;margin:0 14px}.history-who{font-size:12px;color:#1a2233;font-weight:600}.history-when{font-size:11px;color:#8a95a8}.history-badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px;background:rgba(0,160,100,.12);color:#008060}.btn-restore{padding:5px 12px;border-radius:6px;background:#0D8A65;color:#fff;border:none;font-size:11.5px;cursor:pointer;font-family:var(--font)}.edit-mod-btn{position:absolute;top:10px;right:10px;z-index:10;padding:4px 12px;border-radius:6px;background:#1A6BC8;color:#fff;border:none;font-size:11px;font-weight:600;cursor:pointer;font-family:var(--font);opacity:.9}.edit-mod-btn:hover{opacity:1;background:#1558A8}.live-badge{display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:600;color:#008060;background:rgba(0,128,90,.1);padding:2px 8px;border-radius:99px;margin-left:8px;vertical-align:middle}.live-badge::before{content:'●';font-size:7px}</style>
+<script>
+(function(){
+  var ALLOWED = ['INPUT','TEXTAREA'];
+
+  function inEditor(el) {
+    // Allow all interactions inside the editor modal
+    while (el) {
+      if (el.id === 'editor-modal') return true;
+      if (el.contentEditable === 'true') return true;
+      el = el.parentElement;
+    }
+    return false;
+  }
+  function isInput(){ 
+    var ae = document.activeElement;
+    return ALLOWED.includes(ae && ae.tagName) || inEditor(ae);
+  }
+  function isInputTarget(e){ 
+    return ALLOWED.includes(e.target && e.target.tagName) || inEditor(e.target);
+  }
+
+  document.addEventListener('contextmenu', function(e){
+    if (inEditor(e.target)) return; // allow right-click in editor
+    e.preventDefault(); return false;
+  });
+
+  document.addEventListener('keydown', function(e){
+    if (inEditor(e.target)) return; // allow all keys in editor
+    var k = (e.key || '').toLowerCase();
+    if (
+      (e.ctrlKey && k === 'u') ||
+      (e.ctrlKey && k === 's') ||
+      (e.ctrlKey && !isInput() && k === 'a') ||
+      (e.ctrlKey && !isInput() && k === 'c') ||
+      (e.ctrlKey && !isInput() && k === 'x') ||
+      (e.ctrlKey && e.shiftKey && ['i','j','c'].includes(k)) ||
+      k === 'f12'
+    ) { e.preventDefault(); e.stopPropagation(); return false; }
+  }, true);
+
+  document.addEventListener('selectstart', function(e){
+    if (isInputTarget(e)) return;
+    e.preventDefault(); return false;
+  }, true);
+
+  document.addEventListener('copy', function(e){
+    if (isInput()) return; // allow copy in editor/inputs
+    e.preventDefault();
+    if (e.clipboardData){ e.clipboardData.setData('text/plain',''); }
+    if (navigator.clipboard && navigator.clipboard.writeText){
+      try { navigator.clipboard.writeText(''); } catch(err){}
+    }
+    return false;
+  }, true);
+
+  document.addEventListener('cut', function(e){
+    if (isInput()) return;
+    e.preventDefault(); return false;
+  }, true);
+
+  document.addEventListener('mouseup', function(e){
+    if (isInputTarget(e)) return;
+    var sel = window.getSelection ? window.getSelection() : document.selection;
+    if (sel){ try { sel.removeAllRanges ? sel.removeAllRanges() : sel.empty(); } catch(err){} }
+  });
+
+  document.addEventListener('dragstart', function(e){
+    if (isInputTarget(e)) return;
+    e.preventDefault(); return false;
+  });
+})();
+</script>
+</head>
+<body>
+
+<div id="topbar">
+    <button id="toggle-sidebar" onclick="toggleSidebar()" title="Toggle sidebar">☰</button>
+    <span class="topbar-logo">MF RTA Operations</span>
+    <div id="search-box">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="global-search" placeholder="Jump to any topic…" oninput="doSearch(this.value)" onblur="hideSearch()" onfocus="if(this.value)doSearch(this.value)">
+      <div id="search-results"></div>
+    </div>
+  </div>
+
+<div id="app">
+
+<aside id="sidebar">
+  <div class="sidebar-head">
+    <div class="sidebar-brand">Validus Learning</div>
+    <div class="sidebar-title">MF RTA Operations</div>
+    <div class="sidebar-sub">Client Engagement Playbook</div>
+  </div>
+  <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+  <div class="progress-label"><span id="progress-text">0 of 29 visited</span><span id="progress-pct">0%</span></div>
+  <nav id="sidebar-nav">
+    <div class="nav-item active" onclick="goTo('home')" id="nav-home"><div class="nav-num">⌂</div><div class="nav-label">Home</div></div>
+    <div class="nav-section">Overview</div>
+    <div class="nav-item" onclick="goTo(0)" id="nav-0"><div class="nav-num">1</div><div class="nav-label">MF Industry Overview</div></div>
+    <div class="nav-item" onclick="goTo(1)" id="nav-1"><div class="nav-num">2</div><div class="nav-label">The RTA Process</div></div>
+    <div class="nav-item" onclick="goTo(2)" id="nav-2"><div class="nav-num">3</div><div class="nav-label">Validus MF Process</div></div>
+    <div class="nav-section">Foundation</div>
+    <div class="nav-item" onclick="goTo(3)" id="nav-3"><div class="nav-num">4</div><div class="nav-label">What is a Mutual Fund?</div></div>
+    <div class="nav-item" onclick="goTo(4)" id="nav-4"><div class="nav-num">5</div><div class="nav-label">The MF Ecosystem</div></div>
+    <div class="nav-item" onclick="goTo(5)" id="nav-5"><div class="nav-num">6</div><div class="nav-label">Investor Categories</div></div>
+    <div class="nav-section">Scheme Categories</div>
+    <div class="nav-item" onclick="goTo(6)" id="nav-6"><div class="nav-num">7</div><div class="nav-label">Scheme Categories</div></div>
+    <div class="nav-item" onclick="goTo(7)" id="nav-7"><div class="nav-num">8</div><div class="nav-label">Open vs Close-ended</div></div>
+    <div class="nav-item" onclick="goTo(8)" id="nav-8"><div class="nav-num">9</div><div class="nav-label">Plans & Options</div></div>
+    <div class="nav-section">Operations</div>
+    <div class="nav-item" onclick="goTo(9)" id="nav-9"><div class="nav-num">10</div><div class="nav-label">Onboarding & KYC</div></div>
+    <div class="nav-item" onclick="goTo(10)" id="nav-10"><div class="nav-num">11</div><div class="nav-label">Folio Management</div></div>
+    <div class="nav-item" onclick="goTo(11)" id="nav-11"><div class="nav-num">12</div><div class="nav-label">Purchase Transactions</div></div>
+    <div class="nav-item" onclick="goTo(12)" id="nav-12"><div class="nav-num">13</div><div class="nav-label">Redemption & Switch</div></div>
+    <div class="nav-item" onclick="goTo(13)" id="nav-13"><div class="nav-num">14</div><div class="nav-label">Systematic Transactions</div></div>
+    <div class="nav-item" onclick="goTo(14)" id="nav-14"><div class="nav-num">15</div><div class="nav-label">NAV Cut-off Rules</div></div>
+    <div class="nav-item" onclick="goTo(15)" id="nav-15"><div class="nav-num">16</div><div class="nav-label">Industry Platforms</div></div>
+    <div class="nav-section">Validus</div>
+    <div class="nav-item" onclick="goTo(16)" id="nav-16"><div class="nav-num">17</div><div class="nav-label">Platform Deep-Dive</div></div>
+    <div class="nav-item" onclick="goTo(17)" id="nav-17"><div class="nav-num">18</div><div class="nav-label">RTA Compliance</div></div>
+    <div class="nav-section">Commercial</div>
+    <div class="nav-item" onclick="goTo(18)" id="nav-18"><div class="nav-num">19</div><div class="nav-label">Taxation</div></div>
+    <div class="nav-item" onclick="goTo(19)" id="nav-19"><div class="nav-num">20</div><div class="nav-label">Commercials</div></div>
+    <div class="nav-item" onclick="goTo(20)" id="nav-20"><div class="nav-num">21</div><div class="nav-label">Contracts & SLAs</div></div>
+    <div class="nav-section">Advanced Operations</div>
+    <div class="nav-item" onclick="goTo(21)" id="nav-21"><div class="nav-num">22</div><div class="nav-label">Nomination & Transmission</div></div>
+    <div class="nav-item" onclick="goTo(22)" id="nav-22"><div class="nav-num">23</div><div class="nav-label">Distributor Commission</div></div>
+    <div class="nav-item" onclick="goTo(23)" id="nav-23"><div class="nav-num">24</div><div class="nav-label">Corporate Actions</div></div>
+    <div class="nav-section">Strategy & Tools</div>
+    <div class="nav-item" onclick="goTo(24)" id="nav-24"><div class="nav-num">25</div><div class="nav-label">Competitive Positioning</div></div>
+    <div class="nav-item" onclick="goTo(25)" id="nav-25"><div class="nav-num">26</div><div class="nav-label">SIP Calculator</div></div>
+    <div class="nav-item" onclick="goTo(26)" id="nav-26"><div class="nav-num">27</div><div class="nav-label">Investor Type Selector</div></div>
+    <div class="nav-item" onclick="goTo(27)" id="nav-27"><div class="nav-num">28</div><div class="nav-label">Quick Quiz</div></div>
+  </nav>
+</aside>
+<main id="main">
+  <section class="screen active" id="screen-home">
+    <div class="home-eyebrow">Validus Fintech · Mutual Fund Transfer Agency</div>
+    <h1 class="home-title">Master <span>Mutual Fund RTA Operations</span><br>and engage like a pro.</h1>
+    <p class="home-desc">28 modules covering the full MF RTA lifecycle — SEBI &amp; AMFI regulations, investor onboarding, KYC, transaction processing, NAV and cut-off rules, distributor commission, compliance, taxation, and client-handling. Built on Validus's operational experience and modelled on the platforms serving India's ~₹65 lakh crore mutual fund industry. Complete the module and take the quiz before your next client meeting.</p>
+    <div class="home-stats">
+      <div><div class="stat-val">28</div><div class="stat-label">Modules</div></div>
+      <div><div class="stat-val">17+ Cr</div><div class="stat-label">Investor folios industry-wide</div></div>
+      <div><div class="stat-val">SEBI 1996</div><div class="stat-label">Regulatory grounding</div></div>
+      <div><div class="stat-val">CAMS/KFin</div><div class="stat-label">Incumbents we compete with</div></div>
+    </div>
+    <div class="home-modules" id="home-module-grid"></div>
+  </section>
+  <div id="module-screens"></div>
+</main>
+</div>
+<script>const NEXUS_AUTH_URL='https://script.google.com/macros/s/AKfycbwoEMLW5k5kXGrQiEBOErQVa3R0aTc4YcvYw7DcOwlM3G9Rx9q0eX586f0AXhaX_dB2/exec';var editorState={isAdmin:false,adminEmail:'',editingIdx:null,liveContent:{},};(function(){try{if(window.parent&&window.parent!==window&&window.parent.state){const isDark=!!window.parent.state.dark;document.documentElement.setAttribute('data-theme',isDark?'dark':'light');}}catch(e){}})();let sidebarOpen=true;function toggleSidebar(){sidebarOpen=!sidebarOpen;document.getElementById('sidebar').classList.toggle('collapsed',!sidebarOpen);}
+const TOTAL=29;const visited=new Set();let current='home';function goTo(idx){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));if(idx==='home'){document.getElementById('screen-home').classList.add('active');document.getElementById('nav-home').classList.add('active');current='home';}else{const screen=document.getElementById('screen-'+idx);if(screen){screen.classList.add('active');if(editorState.isAdmin&&!screen.querySelector('.edit-mod-btn')){const eb=document.createElement('button');eb.className='edit-mod-btn';eb.textContent='✏ Edit';eb.onclick=function(e){e.stopPropagation();openEditor(idx);};screen.style.position='relative';screen.appendChild(eb);}
+const main=document.getElementById('main');main.scrollTo({top:0,behavior:'smooth'});}
+const nav=document.getElementById('nav-'+idx);if(nav)nav.classList.add('active');for(let i=0;i<idx;i++){const n=document.getElementById('nav-'+i);if(n&&!n.classList.contains('active'))n.classList.add('done');}
+visited.add(idx);current=idx;updateProgress();}
+document.getElementById('global-search').value='';document.getElementById('search-results').style.display='none';if(idx===25)setTimeout(sipCalc,80);if(idx===26)setTimeout(initInvSelector,80);if(idx===27)setTimeout(initQuiz,80);}
+function updateProgress(){const pct=Math.round((visited.size/TOTAL)*100);const fill=document.getElementById('progress-fill');const txt=document.getElementById('progress-text');const pctEl=document.getElementById('progress-pct');if(fill)fill.style.width=pct+'%';if(txt)txt.textContent=visited.size+' of '+TOTAL+' visited';if(pctEl)pctEl.textContent=pct+'%';}
+function next(n){goTo(typeof current==='number'?current+n:0);}
+const searchIndex=[];function buildSearchIndex(modules){modules.forEach((mod,idx)=>{searchIndex.push({title:mod.title,sub:mod.eyebrow,idx});if(mod.searchTerms)mod.searchTerms.forEach(t=>{searchIndex.push({title:t,sub:mod.title,idx});});});}
+function doSearch(val){const box=document.getElementById('search-results');if(!val.trim()){box.style.display='none';return;}
+const q=val.trim().replace(/[.*+?^${}()|[\]\\]/g,'\\$&');const re=new RegExp('\\b'+q+'\\b','i');const hits=searchIndex.filter(s=>re.test(s.title)||re.test(s.sub)).slice(0,8);if(!hits.length){box.style.display='none';return;}
+box.innerHTML=hits.map(h=>`<div class="search-result" onmousedown="goTo(${h.idx})">
+      <div class="search-result-title">${h.title}</div>
+      <div class="search-result-sub">${h.sub}</div>
+    </div>`).join('');box.style.display='block';}
+function hideSearch(){setTimeout(()=>{document.getElementById('search-results').style.display='none';},200);}
+function render(idx,html){const div=document.createElement('div');div.className='screen';div.id='screen-'+idx;div.innerHTML=html;document.getElementById('module-screens').appendChild(div);}
+function prevBtn(idx){return idx>0?`<button class="nav-btn" onclick="goTo(${idx-1})">← ${MODULES[idx-1] ? MODULES[idx-1].shortTitle : 'Back'}</button>`:`<button class="nav-btn" onclick="goTo('home')">← Home</button>`;}
+function nextBtn(idx){return idx<MODULES.length-1?`<button class="nav-btn primary" onclick="goTo(${idx+1})">Next: ${MODULES[idx+1].shortTitle} →</button>`:`<button class="nav-btn green" onclick="goTo('home')">↺ Back to Home</button>`;}
+function navFooter(idx){return`<div class="mod-nav">${prevBtn(idx)}<span class="mod-progress">Module ${idx+1} of ${MODULES.length}</span>${nextBtn(idx)}</div>`;}
+function modHTML(idx,eyebrow,title,desc,body){return`<div class="mod-page"><div class="mod-eyebrow">${eyebrow}</div><h2 class="mod-title">${title}</h2><p class="mod-desc">${desc}</p>${body}${navFooter(idx)}</div>`;}
+const MODULES=[{title:'Overview of Mutual Funds in India',shortTitle:'MF Industry Overview',eyebrow:'Module 1 · Overview',searchTerms:['AUM','industry size','AMFI','SEBI mutual fund regulations 1996','folio count','SIP book','how big is the mutual fund industry']},{title:'The Mutual Fund RTA Process',shortTitle:'The RTA Process',eyebrow:'Module 2 · Overview',searchTerms:['registrar and transfer agent','how RTA works','MF operations flow','transaction processing lifecycle']},{title:'Validus MF RTA Process',shortTitle:'Validus MF Process',eyebrow:'Module 3 · Overview',searchTerms:['Validus process','Validus MF workflow','how Validus works for mutual funds','Validus onboarding MF']},{title:'What is a Mutual Fund?',shortTitle:'What is a Mutual Fund?',eyebrow:'Module 4 · Foundation',searchTerms:['mutual fund definition','trust structure','NAV basics','unit','SEBI MF Regulations 1996','MF vs AIF difference']},{title:'The Mutual Fund Ecosystem',shortTitle:'The MF Ecosystem',eyebrow:'Module 5 · Foundation',searchTerms:['custodian','depository','distributor','RIA','fund accountant','who are the players in a mutual fund']},{title:'Investor Categories',shortTitle:'Investor Categories',eyebrow:'Module 6 · Foundation',searchTerms:['resident individual','NRI','minor','HUF','institutional investor','FPI mutual fund','who can invest in mutual funds']},{title:'Equity, Debt & Hybrid Schemes',shortTitle:'Scheme Categories',eyebrow:'Module 7 · Scheme Categories',searchTerms:['SEBI scheme categorisation 2017','large cap mid cap small cap','liquid fund','hybrid fund','one scheme per category']},{title:'Open-ended, Close-ended & ELSS',shortTitle:'Open vs Close-ended',eyebrow:'Module 8 · Scheme Categories',searchTerms:['open ended fund','close ended fund','NFO','ELSS lock-in','tax saving fund 80C']},{title:'Direct vs Regular, Growth vs IDCW',shortTitle:'Plans & Options',eyebrow:'Module 9 · Scheme Categories',searchTerms:['direct plan','regular plan','growth option','IDCW','dividend option renamed','expense ratio difference']},{title:'Investor Onboarding & KYC',shortTitle:'Onboarding & KYC',eyebrow:'Module 10 · Operations',searchTerms:['KYC mutual fund','KRA','CKYC','Aadhaar eKYC','IPV','in person verification','common account number CAN']},{title:'Folio Management & Documents',shortTitle:'Folio Management',eyebrow:'Module 11 · Operations',searchTerms:['folio number','common application form','joint holding','anyone or survivor','multiple folios']},{title:'Purchase & Additional Purchase',shortTitle:'Purchase Transactions',eyebrow:'Module 12 · Operations',searchTerms:['minimum investment amount','lump sum purchase','additional purchase','payment modes mutual fund','UPI mutual fund']},{title:'Redemption & Switch',shortTitle:'Redemption & Switch',eyebrow:'Module 13 · Operations',searchTerms:['redemption processing','exit load','switch transaction','instant redemption liquid fund','redemption payout timeline']},{title:'SIP, STP & SWP',shortTitle:'Systematic Transactions',eyebrow:'Module 14 · Operations',searchTerms:['systematic investment plan','systematic transfer plan','systematic withdrawal plan','SIP registration','NACH mandate','UPI autopay']},{title:'NAV Application & Cut-off Rules',shortTitle:'NAV Cut-off Rules',eyebrow:'Module 15 · Operations',searchTerms:['cut off time','same day NAV','T+1 NAV','3pm rule','realisation of funds']},{title:'Platforms — BSE StAR MF, NSE NMF II & MFU',shortTitle:'Industry Platforms',eyebrow:'Module 16 · Operations',searchTerms:['BSE StAR MF','NSE NMF II','MF Utilities','MFCentral','order routing platform mutual fund']},{title:'Validus Platform Deep-Dive',shortTitle:'Platform Deep-Dive',eyebrow:'Module 17 · Validus',searchTerms:['Front Office App','Investor App','Communication Command Center','Solidus','Validus MF technology']},{title:'MF RTA Compliance Obligations',shortTitle:'RTA Compliance',eyebrow:'Module 18 · Validus',searchTerms:['SEBI mutual fund regulations 1996','AMFI guidelines','PMLA mutual fund','SCORES','unclaimed amounts','NISM certification']},{title:'Taxation of Mutual Fund Investors',shortTitle:'Taxation',eyebrow:'Module 19 · Commercial',searchTerms:['LTCG mutual fund','STCG mutual fund','equity fund taxation','debt fund taxation 2023','indexation removed','TDS NRI mutual fund']},{title:'Commercials & Pricing',shortTitle:'Commercials',eyebrow:'Module 20 · Commercial',searchTerms:['RTA fee structure','AUM based pricing','folio fee','transaction fee mutual fund RTA']},{title:'Contracts, SLAs & Governance',shortTitle:'Contracts & SLAs',eyebrow:'Module 21 · Commercial',searchTerms:['RTA agreement','service level agreement mutual fund','SEBI mandated TAT','governance MF RTA']},{title:'Nomination & Transmission',shortTitle:'Nomination & Transmission',eyebrow:'Module 22 · Advanced Operations',searchTerms:['nomination mandatory mutual fund','opt out declaration','transmission process death of investor','legal heir certificate']},{title:'Distributor Commission & Trail',shortTitle:'Distributor Commission',eyebrow:'Module 23 · Advanced Operations',searchTerms:['ARN','AMFI registration number','trail commission','upfront commission banned 2018','EUIN']},{title:'Corporate Actions & Change Requests',shortTitle:'Corporate Actions',eyebrow:'Module 24 · Advanced Operations',searchTerms:['IDCW payout processing','scheme merger','change of bank mutual fund','change of address KYC','change of broker']},{title:'Validus vs CAMS & KFin',shortTitle:'Competitive Positioning',eyebrow:'Module 25 · Strategy & Tools',searchTerms:['CAMS','KFin Technologies','Karvy','competitors','why Validus','MF RTA market share']},{title:'SIP Return Calculator',shortTitle:'SIP Calculator',eyebrow:'Module 26 · Strategy & Tools',searchTerms:['SIP calculator','future value SIP','compounding calculator','SIP returns tool']},{title:'Investor Type Selector',shortTitle:'Investor Type Selector',eyebrow:'Module 27 · Strategy & Tools',searchTerms:['investor checklist','KYC documents by investor type','NRI documents','HUF documents mutual fund']},{title:'MF RTA Quick Quiz',shortTitle:'Quick Quiz',eyebrow:'Module 28 · Strategy & Tools',searchTerms:['quiz','self assessment','test','knowledge check','MF RTA quiz','practice questions']}];
+buildSearchIndex(MODULES);const grid=document.getElementById('home-module-grid');MODULES.forEach((m,i)=>{const card=document.createElement('div');card.className='home-mod-card';card.innerHTML=`<div class="home-mod-num">Module ${i+1}</div><div class="home-mod-title">${m.title}</div>`;card.onclick=()=>goTo(i);grid.appendChild(card);});
+render(0,modHTML(0,MODULES[0].eyebrow,MODULES[0].title,`India's mutual fund industry, at a glance — size, structure, and why RTAs sit at the centre of it.`,`<div class="section">
+<div class="section-title">Industry at a glance</div>
+<div class="stat-grid">
+<div class="stat-card"><div class="stat-card-val">₹65+ lakh Cr</div><div class="stat-card-label">Industry AUM (average, FY25) — up roughly 5x in a decade</div></div>
+<div class="stat-card"><div class="stat-card-val">17+ Cr</div><div class="stat-card-label">Investor folios across the industry</div></div>
+<div class="stat-card"><div class="stat-card-val">₹20,000+ Cr</div><div class="stat-card-label">Monthly SIP contribution run-rate</div></div>
+<div class="stat-card"><div class="stat-card-val">45+</div><div class="stat-card-label">SEBI-registered Asset Management Companies</div></div>
+</div>
+</div>
+<div class="section">
+<div class="callout info">Mutual funds are regulated under the <strong>SEBI (Mutual Funds) Regulations, 1996</strong> — one of the oldest and most mature regulatory frameworks in Indian capital markets. AMFI (Association of Mutual Funds in India), the industry's self-regulatory body, was set up in 1995 to standardise practices, certify distributors, and run investor-awareness campaigns.</div>
+<table class="comp-table">
+<thead><tr><th>Period</th><th>Milestone</th><th>Why it mattered</th></tr></thead>
+<tbody>
+<tr><td>1963</td><td>UTI established</td><td>India's first mutual fund, a government monopoly for nearly three decades</td></tr>
+<tr><td>1993</td><td>Private sector entry permitted</td><td>Foreign and domestic private AMCs allowed for the first time</td></tr>
+<tr><td>1996</td><td>SEBI (Mutual Funds) Regulations notified</td><td>Single unified regulatory framework replacing scheme-by-scheme rules</td></tr>
+<tr><td>2009</td><td>Entry load abolished</td><td>SEBI banned upfront entry loads — reshaped distributor economics permanently</td></tr>
+<tr><td>2017</td><td>Scheme categorisation circular</td><td>Standardised scheme categories/sub-categories across all AMCs — one AMC, one scheme per category</td></tr>
+<tr><td>2018</td><td>Upfront commission banned</td><td>Distributor commission moved fully to trail-only basis</td></tr>
+<tr><td>2020 onward</td><td>SIP book crosses ₹10,000 Cr/month, then ₹20,000 Cr/month</td><td>Retail, systematic flows become the industry's structural growth engine</td></tr>
+</tbody>
+</table>
+</div>
+<div class="section">
+<div class="section-title">Where the RTA fits in</div>
+<div class="info-row">
+<div class="info-box accent"><div class="info-box-title">Two RTAs, ~99% of the industry</div><div class="info-box-body">CAMS and KFin Technologies (formerly Karvy) together service almost every AMC in India. This near-duopoly is a direct result of the heavy technology and compliance investment RTA operations require.</div></div>
+<div class="info-box teal"><div class="info-box-title">Why AMCs outsource</div><div class="info-box-body">Folio administration, KYC, transaction processing, and investor servicing are high-volume, low-margin, operationally intensive activities — AMCs focus on fund management and distribution, and outsource the back office.</div></div>
+</div>
+<div class="callout tip"><strong>Why this matters for Validus:</strong> the MF RTA market is large, well-understood, and dominated by two incumbents — which means the opportunity is less about explaining what an RTA does (every AMC already knows) and more about demonstrating a modern, reliable, cost-competitive alternative.</div>
+</div>`));
+render(1,modHTML(1,MODULES[1].eyebrow,MODULES[1].title,`What an RTA actually does, day to day, across the investor lifecycle — from folio creation to redemption.`,`<div class="section">
+<div class="section-title">The end-to-end RTA process flow</div>
+<div class="flow">
+<div class="flow-step"><div class="flow-line"><div class="flow-dot">1</div><div class="flow-connector"></div></div><div class="flow-body"><div class="flow-title">Scheme & fund setup</div><div class="flow-desc">When an AMC launches a new scheme, the RTA configures the scheme master — plans (Direct/Regular), options (Growth/IDCW), load structure, minimum investment amounts, and cut-off rules — before the NFO opens.</div><div class="flow-meta">Typically 2-3 weeks ahead of NFO launch</div></div></div>
+<div class="flow-step"><div class="flow-line"><div class="flow-dot">2</div><div class="flow-connector"></div></div><div class="flow-body"><div class="flow-title">Investor onboarding & folio creation</div><div class="flow-desc">KYC is validated via a KRA, the application is processed, and a folio is created — either fresh or linked to an existing folio if the investor already holds units with that AMC.</div><div class="flow-meta">Same day to T+1, depending on channel</div></div></div>
+<div class="flow-step"><div class="flow-line"><div class="flow-dot">3</div><div class="flow-connector"></div></div><div class="flow-body"><div class="flow-title">Transaction processing</div><div class="flow-desc">Purchases, redemptions, switches, and systematic transactions (SIP/STP/SWP) are captured from multiple channels — physical forms, BSE StAR MF, NSE NMF II, MFU, and AMC portals — validated, and applied at the correct NAV.</div><div class="flow-meta">Cut-off-time driven, same day or T+1 NAV</div></div></div>
+<div class="flow-step"><div class="flow-line"><div class="flow-dot">4</div><div class="flow-connector"></div></div><div class="flow-body"><div class="flow-title">Unit allotment & payout</div><div class="flow-desc">Units are allotted (purchases) or redemption proceeds are credited to the investor's registered bank account, with correct rounding, load application, and tax deduction (for NRIs) applied.</div><div class="flow-meta">Redemption payout: T+2/T+3 (equity), T+1 (debt), instant for eligible liquid schemes</div></div></div>
+<div class="flow-step"><div class="flow-line"><div class="flow-dot">5</div><div class="flow-connector"></div></div><div class="flow-body"><div class="flow-title">Servicing & reporting</div><div class="flow-desc">Consolidated Account Statements, transaction confirmations, tax statements (capital gains statements), and investor grievance handling run continuously across the folio's life.</div><div class="flow-meta">CAS: monthly / half-yearly per SEBI mandate</div></div></div>
+</div>
+</div>
+<div class="section">
+<div class="callout warn"><strong>The volume difference vs AIF RTA:</strong> where an AIF RTA might service a few thousand sophisticated investors across a handful of funds, an MF RTA processes millions of retail transactions daily across dozens of schemes per AMC — the entire operating model is built for volume, automation, and straight-through processing rather than white-glove handling.</div>
+</div>`));
+render(2,modHTML(2,MODULES[2].eyebrow,MODULES[2].title,`How Validus delivers MF RTA services — the operating model, team structure, and platform behind it.`,`<div class="section">
+<div class="section-title">Validus's MF RTA delivery model</div>
+<div class="terms-grid">
+<div class="term-card"><div class="term-tag">Team</div><div class="term-name">Dedicated RM + ops team</div><div class="term-def">Every AMC client gets a named Relationship Manager as single point of contact, backed by a dedicated operations team handling day-to-day transaction processing.</div></div>
+<div class="term-card"><div class="term-tag">Apps</div><div class="term-name">Three applications</div><div class="term-def">Front Office App (RM/distributor), Investor App (self-service), and an AMC portal for oversight, reporting, and campaign communication — mirroring the AIF platform architecture.</div></div>
+<div class="term-card"><div class="term-tag">Backend</div><div class="term-name">Solidus engine</div><div class="term-def">The same proprietary backend that powers AIF operations extends to MF — folio management, transaction processing, reconciliation, and statement generation on one platform.</div></div>
+<div class="term-card"><div class="term-tag">Channels</div><div class="term-name">Multi-channel intake</div><div class="term-def">Transactions are accepted physically, digitally through the Investor App, and via integration with BSE StAR MF and NSE NMF II for distributor-routed business.</div></div>
+</div>
+</div>
+<div class="section">
+<div class="section-title">Setup timeline for a new AMC client</div>
+<table class="comp-table">
+<thead><tr><th>Stage</th><th>What happens</th><th>Typical duration</th></tr></thead>
+<tbody>
+<tr><td>Agreement & scoping</td><td>RTA services agreement signed, scheme list and integration requirements finalised</td><td>1-2 weeks</td></tr>
+<tr><td>Platform configuration</td><td>Scheme masters, plan/option combinations, load structures configured in Solidus</td><td>2-3 weeks</td></tr>
+<tr><td>Exchange & KRA integration</td><td>BSE StAR MF / NSE NMF II onboarding, KRA connectivity testing</td><td>2-4 weeks (exchange-dependent)</td></tr>
+<tr><td>Migration (if applicable)</td><td>Folio and transaction history migrated from the outgoing RTA, reconciled, and validated</td><td>4-8 weeks</td></tr>
+<tr><td>Go-live</td><td>Parallel run, sign-off, and cutover</td><td>1-2 weeks</td></tr>
+</tbody>
+</table>
+<div class="callout tip">A greenfield AMC (new fund house, no prior RTA) can go live materially faster than one migrating from an existing RTA — migration timelines are dominated by data reconciliation, not platform setup.</div>
+</div>`));
+render(3,modHTML(3,MODULES[3].eyebrow,MODULES[3].title,`The trust structure behind every mutual fund, and how it differs from an AIF at a foundational level.`,`<div class="section">
+<div class="callout info"><strong>Definition:</strong> a mutual fund is a trust that pools money from many investors with a common investment objective and invests it in securities — equities, bonds, money market instruments, or a mix — on their behalf. Each investor owns <strong>units</strong> representing a proportional share of the pool.</div>
+<div class="section-title">The trust structure</div>
+<div class="terms-grid">
+<div class="term-card"><div class="term-name">Sponsor</div><div class="term-def">Establishes the mutual fund and appoints the Trustee, per SEBI's eligibility criteria (financial soundness, track record).</div></div>
+<div class="term-card"><div class="term-name">Trustee</div><div class="term-def">Holds the fund's assets in trust for unit holders and ensures the AMC operates in investors' interest — the fiduciary layer.</div></div>
+<div class="term-card"><div class="term-name">AMC (Asset Management Company)</div><div class="term-def">Manages the fund's investments day to day, launches schemes, and appoints the RTA, custodian, and fund accountant.</div></div>
+<div class="term-card"><div class="term-name">Unit / NAV</div><div class="term-def">A unit is the smallest tradeable share of a scheme. NAV (Net Asset Value) is the per-unit value — (total assets − liabilities) ÷ outstanding units — recalculated daily.</div></div>
+</div>
+</div>
+<div class="section">
+<div class="section-title">Mutual fund vs AIF — the core differences</div>
+<table class="comp-table">
+<thead><tr><th></th><th>Mutual Fund</th><th>AIF</th></tr></thead>
+<tbody>
+<tr><td>Regulation</td><td>SEBI (Mutual Funds) Regulations, 1996</td><td>SEBI (AIF) Regulations, 2012</td></tr>
+<tr><td>Investor base</td><td>Open to retail — no minimum net worth</td><td>Sophisticated investors only — ₹1 Cr minimum</td></tr>
+<tr><td>Minimum investment</td><td>As low as ₹100-500 (SIP) or ₹1,000-5,000 (lump sum)</td><td>₹1 crore per investor per scheme</td></tr>
+<tr><td>Liquidity</td><td>Daily purchase/redemption for open-ended schemes</td><td>Often closed-ended, limited liquidity</td></tr>
+<tr><td>Pricing</td><td>NAV-based, published daily</td><td>NAV/valuation typically periodic (quarterly)</td></tr>
+<tr><td>Structure</td><td>Always a trust</td><td>Trust, LLP, or company</td></tr>
+<tr><td>Investor count per scheme</td><td>Unlimited — often lakhs of investors</td><td>Capped at 1,000 (Cat I & II) unless large-value exemption</td></tr>
+</tbody>
+</table>
+<div class="callout tip">This retail-scale, daily-liquidity design is exactly why MF RTA operations are so different in character from AIF RTA — everything is built for volume and speed rather than bespoke handling.</div>
+</div>`));
+render(4,modHTML(4,MODULES[4].eyebrow,MODULES[4].title,`Every party involved in running a mutual fund scheme, and what each one is responsible for.`,`<div class="section">
+<div class="section-title">Who's involved in running a scheme</div>
+<div class="terms-grid">
+<div class="term-card"><div class="term-name">Custodian</div><div class="term-def">A SEBI-registered entity that holds the fund's securities in safekeeping and settles trades — legally distinct and independent from the AMC.</div></div>
+<div class="term-card"><div class="term-name">RTA</div><div class="term-def">Maintains investor records, folios, and unit holdings; processes every transaction; issues statements — the operational backbone covered in this guide.</div></div>
+<div class="term-card"><div class="term-name">Fund Accountant</div><div class="term-def">Computes NAV daily based on portfolio valuation, expenses, and accruals — sometimes performed in-house by the AMC, sometimes outsourced.</div></div>
+<div class="term-card"><div class="term-name">Distributor / RIA</div><div class="term-def">Distributors (ARN holders) sell mutual funds and earn trail commission; Registered Investment Advisers charge fee-only advice and cannot earn commission.</div></div>
+<div class="term-card"><div class="term-name">Depository (NSDL/CDSL)</div><div class="term-def">Where an investor chooses to hold units in demat form (rather than the RTA's statement-of-account form), the depository maintains that holding.</div></div>
+<div class="term-card"><div class="term-name">Auditor</div><div class="term-def">Independent statutory auditor for the scheme's annual accounts, separate from the AMC's own auditor.</div></div>
+</div>
+</div>
+<div class="section">
+<div class="section-title">Statement-of-account vs demat holding</div>
+<div class="two-col">
+<div class="info-box accent"><div class="info-box-title">SOA mode (the default)</div><div class="info-box-body">Units are recorded in the RTA's books against the investor's folio. No demat account needed. This is how the vast majority of MF investors hold units — it's simpler and free of demat/DP charges.</div></div>
+<div class="info-box teal"><div class="info-box-title">Demat mode</div><div class="info-box-body">Units are credited to the investor's demat account and appear alongside their equity/bond holdings. Useful for investors who want a single consolidated portfolio view, but attracts DP charges and adds a settlement layer.</div></div>
+</div>
+<div class="callout info">Unlike AIFs — where SEBI's 2023 circular made demat mandatory for new schemes — mutual fund demat remains investor's choice. The RTA supports both modes on the same folio structure.</div>
+</div>`));
+render(5,modHTML(5,MODULES[5].eyebrow,MODULES[5].title,`The full range of investor types an MF RTA onboards — each with distinct documentation and processing rules.`,`<div class="section">
+<div class="section-title">Investor categories</div>
+<table class="comp-table">
+<thead><tr><th>Category</th><th>Key characteristics</th><th>Documentation nuance</th></tr></thead>
+<tbody>
+<tr><td>Resident individual</td><td>The default, largest category</td><td>PAN + KYC via any KRA</td></tr>
+<tr><td>NRI</td><td>Repatriable (NRE-linked) or non-repatriable (NRO-linked) investment</td><td>FATCA/CRS declaration, overseas address proof, NRE/NRO bank mapping</td></tr>
+<tr><td>Minor</td><td>Investment held in the minor's name, operated by a guardian until age 18</td><td>Guardian's KYC + minor's birth certificate; folio auto-freezes at majority pending re-KYC</td></tr>
+<tr><td>HUF</td><td>Hindu Undivided Family — treated as a distinct legal person for tax</td><td>HUF PAN, Karta's KYC, HUF deed/declaration</td></tr>
+<tr><td>Company / Corporate</td><td>Board resolution required to authorise investment</td><td>Certificate of Incorporation, MoA/AoA, list of authorised signatories</td></tr>
+<tr><td>Trust</td><td>Registered or unregistered trusts, including AIFs investing in MF units</td><td>Trust deed, registration certificate, trustee KYC</td></tr>
+<tr><td>Partnership / LLP</td><td>Partnership deed defines who can operate the account</td><td>Partnership deed, LLP agreement, partners' KYC</td></tr>
+<tr><td>FPI</td><td>Foreign Portfolio Investors — subject to separate SEBI FPI regulations</td><td>FPI registration certificate, custodian confirmation</td></tr>
+</tbody>
+</table>
+</div>
+<div class="section">
+<div class="callout warn"><strong>Minor-to-major transition:</strong> when a minor investor turns 18, the folio is automatically frozen for further transactions until the (now adult) investor completes fresh KYC and submits a request to convert the folio to their own name — a routine but easy-to-miss compliance step RTAs must track proactively.</div>
+</div>`));
+render(6,modHTML(6,MODULES[6].eyebrow,MODULES[6].title,`SEBI's 2017 categorisation framework — the five broad buckets every scheme must fit into.`,`<div class="section">
+<div class="callout info">SEBI's <strong>October 2017 categorisation circular</strong> standardised scheme categories across the industry. Every scheme falls into one of five broad groups, and — with narrow exceptions — an AMC may offer only <strong>one scheme per sub-category</strong>. This ended the era of AMCs launching dozens of near-identical schemes.</div>
+<div class="section-title">The five broad categories</div>
+<div class="terms-grid">
+<div class="term-card"><div class="term-tag">Equity</div><div class="term-name">10 sub-categories</div><div class="term-def">Large cap, mid cap, small cap, multi cap, flexi cap, ELSS, sectoral/thematic, focused, dividend yield, value/contra — defined by market-cap allocation rules.</div></div>
+<div class="term-card"><div class="term-tag">Debt</div><div class="term-name">16 sub-categories</div><div class="term-def">Overnight, liquid, ultra-short, low duration, money market, short/medium/long duration, corporate bond, credit risk, banking & PSU, gilt, and more — defined by portfolio maturity and credit quality.</div></div>
+<div class="term-card"><div class="term-tag">Hybrid</div><div class="term-name">7 sub-categories</div><div class="term-def">Conservative, balanced, aggressive, dynamic asset allocation, multi-asset, arbitrage, equity savings — blend equity and debt in varying proportions.</div></div>
+<div class="term-card"><div class="term-tag">Solution-oriented</div><div class="term-name">Retirement & children's funds</div><div class="term-def">Carry a mandatory 5-year lock-in (or until retirement age/child turning 18, whichever is earlier).</div></div>
+<div class="term-card"><div class="term-tag">Other</div><div class="term-name">Index funds, FoFs, ETFs</div><div class="term-def">Passive strategies tracking an index, or funds investing in other funds.</div></div>
+</div>
+</div>
+<div class="section">
+<div class="section-title">Equity market-cap definitions (SEBI, by full market capitalisation rank)</div>
+<table class="comp-table">
+<thead><tr><th>Segment</th><th>Definition</th></tr></thead>
+<tbody>
+<tr><td>Large cap</td><td>1st-100th company by full market capitalisation</td></tr>
+<tr><td>Mid cap</td><td>101st-250th company</td></tr>
+<tr><td>Small cap</td><td>251st company onward</td></tr>
+</tbody>
+</table>
+<div class="callout tip">RTAs don't decide scheme categorisation — that's an AMC/SEBI filing matter — but the scheme master configured in the RTA system must correctly reflect the category, since it drives load structure, minimum investment rules, and reporting classification downstream.</div>
+</div>`));
+render(7,modHTML(7,MODULES[7].eyebrow,MODULES[7].title,`How a scheme's structure — open-ended, close-ended, or ELSS — shapes what transactions the RTA can even accept.`,`<div class="section">
+<div class="two-col">
+<div class="info-box accent"><div class="info-box-title">Open-ended</div><div class="info-box-body">The overwhelming majority of schemes. Investors can purchase or redeem on any business day at that day's NAV, in perpetuity — no fixed maturity. This is what "mutual fund" means to most retail investors.</div></div>
+<div class="info-box gold"><div class="info-box-title">Close-ended</div><div class="info-box-body">Units are sold only during a fixed New Fund Offer (NFO) window and cannot be redeemed until scheme maturity (typically 3-5 years). To provide liquidity, close-ended schemes are mandatorily listed on a stock exchange, where units trade like shares (often at a discount to NAV).</div></div>
+</div>
+</div>
+<div class="section">
+<div class="section-title">ELSS — the tax-saving category</div>
+<div class="callout warn"><strong>Equity Linked Savings Scheme (ELSS)</strong> is the only mutual fund category offering a Section 80C tax deduction (up to ₹1.5 lakh/year under the old tax regime). In exchange, every ELSS investment — including each SIP instalment — carries a mandatory <strong>3-year lock-in</strong>, the shortest lock-in among all 80C options.</div>
+<table class="comp-table">
+<thead><tr><th>Rule</th><th>Detail</th></tr></thead>
+<tbody>
+<tr><td>Lock-in</td><td>3 years from the date of each investment (each SIP instalment has its own 3-year clock)</td></tr>
+<tr><td>Redemption before lock-in</td><td>Not permitted — the RTA system blocks redemption/switch-out requests until the lock-in date</td></tr>
+<tr><td>Switch between ELSS funds</td><td>Not permitted during lock-in, since it constitutes a redemption</td></tr>
+<tr><td>SIP in ELSS</td><td>Allowed, but each instalment is tracked and locked independently — a common source of investor confusion at redemption time</td></tr>
+</tbody>
+</table>
+</div>
+<div class="section">
+<div class="callout tip">Operationally, this means the RTA's transaction-validation engine must check lock-in status <em>per instalment</em>, not just per folio, before allowing any ELSS redemption or switch-out request to proceed.</div>
+</div>`));
+render(8,modHTML(8,MODULES[8].eyebrow,MODULES[8].title,`Every scheme is really four scheme variants in one — plan × option — and RTAs must track each combination precisely.`,`<div class="section">
+<div class="section-title">Plan: Direct vs Regular</div>
+<table class="comp-table">
+<thead><tr><th></th><th>Direct Plan</th><th>Regular Plan</th></tr></thead>
+<tbody>
+<tr><td>Distributor commission</td><td>None</td><td>Trail commission paid to the distributor</td></tr>
+<tr><td>Expense ratio</td><td>Lower (no commission embedded)</td><td>Higher by the commission amount</td></tr>
+<tr><td>Who it's for</td><td>Investors who invest directly with the AMC/RTA, or through a fee-only RIA</td><td>Investors routing through a distributor (bank, broker, agent)</td></tr>
+<tr><td>NAV</td><td>Higher NAV over time (lower costs compound favourably)</td><td>Lower NAV, same underlying portfolio</td></tr>
+</tbody>
+</table>
+<div class="callout info">Direct and Regular plans of the same scheme are technically <strong>separate scheme codes</strong> with separate NAVs, even though they hold the identical portfolio — introduced by SEBI in January 2013 specifically to give cost-conscious investors a lower-cost route.</div>
+</div>
+<div class="section">
+<div class="section-title">Option: Growth vs IDCW</div>
+<div class="two-col">
+<div class="info-box teal"><div class="info-box-title">Growth</div><div class="info-box-body">No payouts. All gains are reinvested and reflected in a rising NAV. The default choice for wealth accumulation and the more tax-efficient option for most investors post the 2023-24 tax changes.</div></div>
+<div class="info-box gold"><div class="info-box-title">IDCW (Income Distribution cum Capital Withdrawal)</div><div class="info-box-body">Periodically pays out a portion of the scheme's distributable surplus, reducing NAV by the payout amount. Renamed from "Dividend option" by SEBI in 2021 to make clear that payouts can include a return of the investor's own capital, not just profit.</div></div>
+</div>
+<div class="callout tip">IDCW further splits into <strong>Payout</strong> (cash credited to bank) and <strong>Reinvestment</strong> (payout amount used to allot additional units at the ex-IDCW NAV) — meaning a single scheme can have up to six live variants: Direct-Growth, Direct-IDCW-Payout, Direct-IDCW-Reinvestment, and the same three under Regular.</div>
+</div>`));
+render(9,modHTML(9,MODULES[9].eyebrow,MODULES[9].title,`How an investor gets from zero to a validated folio — KYC, KRA, and the checks that happen before any money moves.`,`<div class="section">
+<div class="section-title">KYC — the non-negotiable first step</div>
+<div class="callout warn">No purchase transaction can be processed without valid KYC. This is stricter than most other financial products — PAN alone is not sufficient.</div>
+<div class="flow">
+<div class="flow-step"><div class="flow-line"><div class="flow-dot">1</div><div class="flow-connector"></div></div><div class="flow-body"><div class="flow-title">KYC registration</div><div class="flow-desc">The investor completes KYC once, with any SEBI-registered KRA (KYC Registration Agency) — CVL KRA, CAMS KRA, NDML, Karvy KRA, or DotEx. This single KYC is then valid across every AMC and every RTA — no need to repeat it per fund house.</div></div></div>
+<div class="flow-step"><div class="flow-line"><div class="flow-dot">2</div><div class="flow-connector"></div></div><div class="flow-body"><div class="flow-title">Verification method</div><div class="flow-desc">Aadhaar-based e-KYC (OTP or biometric) enables fully paperless onboarding. Physical KYC still requires In-Person Verification (IPV) — historically done by a distributor or bank branch official.</div></div></div>
+<div class="flow-step"><div class="flow-line"><div class="flow-dot">3</div><div class="flow-connector"></div></div><div class="flow-body"><div class="flow-title">CKYC check</div><div class="flow-desc">The RTA also checks CERSAI's Central KYC Registry (CKYC) — a government-run cross-industry KYC utility spanning banks, insurers, and mutual funds — to avoid duplicate data collection.</div></div></div>
+<div class="flow-step"><div class="flow-line"><div class="flow-dot">4</div><div class="flow-connector"></div></div><div class="flow-body"><div class="flow-title">Status flags</div><div class="flow-desc">KYC status returns as Verified, Registered (submitted but pending verification), Hold, or Rejected. Only "Verified" status allows unrestricted transacting — "Registered" status permits limited investment (up to ₹50,000/year per SEBI's small-KYC relaxation) pending full verification.</div></div></div>
+</div>
+</div>
+<div class="section">
+<div class="section-title">The Common Account Number (CAN)</div>
+<div class="callout info">A <strong>CAN</strong> lets an investor consolidate multiple folios across different AMCs under one reference number for unified reporting and easier future transactions — an MFU (MF Utilities) concept, distinct from a folio number, which remains AMC-specific.</div>
+</div>`));
+render(10,modHTML(10,MODULES[10].eyebrow,MODULES[10].title,`What a folio actually is, how holding modes work, and the paperwork behind first-time investment.`,`<div class="section">
+<div class="section-title">What is a folio?</div>
+<div class="callout info">A <strong>folio</strong> is an investor's account number with a specific AMC — the container that holds all of that investor's units across every scheme they hold with that fund house. One investor can have multiple folios with the same AMC (e.g. if they invested through different distributors or under slightly different holding details) or choose to consolidate into one.</div>
+<table class="comp-table">
+<thead><tr><th>Document</th><th>Purpose</th></tr></thead>
+<tbody>
+<tr><td>Common Application Form (CAF)</td><td>SEBI-standardised form (same layout industry-wide) used for first investment in a new folio</td></tr>
+<tr><td>Additional Purchase / Transaction Slip</td><td>Used for subsequent investments into an existing folio — shorter, since KYC/bank details are already on file</td></tr>
+<tr><td>FATCA/CRS Self-Declaration</td><td>Mandatory for every investor — declares US/foreign tax residency status</td></tr>
+<tr><td>Nomination Form / Opt-out Declaration</td><td>Mandatory since SEBI's 2022 nomination circular — investor must either nominate or explicitly opt out</td></tr>
+</tbody>
+</table>
+</div>
+<div class="section">
+<div class="section-title">Joint holding modes</div>
+<div class="two-col">
+<div class="info-box accent"><div class="info-box-title">Anyone or Survivor</div><div class="info-box-body">Any one joint holder can independently instruct transactions — redemptions, changes — without the other's signature. On death of one holder, the survivor(s) automatically continue as sole holder(s).</div></div>
+<div class="info-box teal"><div class="info-box-title">Joint</div><div class="info-box-body">All joint holders must sign/authorise every transaction. More restrictive, less commonly chosen, but sometimes required for institutional or trust holdings.</div></div>
+</div>
+<div class="callout tip">Up to three holders can be registered on a single folio (1st, 2nd, 3rd holder) — but only the first holder's PAN is used for tax reporting (capital gains statements, TDS for NRIs) regardless of holding mode.</div>
+</div>`));
+render(11,modHTML(11,MODULES[11].eyebrow,MODULES[11].title,`How money actually gets into a scheme — channels, minimums, and payment modes the RTA has to validate.`,`<div class="section">
+<div class="section-title">Purchase channels</div>
+<div class="pill-list">
+<span class="pill">Physical application form</span>
+<span class="pill">BSE StAR MF</span>
+<span class="pill">NSE NMF II</span>
+<span class="pill">MF Utilities (MFU)</span>
+<span class="pill">AMC website / app</span>
+<span class="pill">RTA investor portal</span>
+<span class="pill">Distributor platforms</span>
+</div>
+</div>
+<div class="section">
+<div class="section-title">Typical minimum investment amounts</div>
+<table class="comp-table">
+<thead><tr><th>Transaction type</th><th>Typical minimum</th></tr></thead>
+<tbody>
+<tr><td>First-time lump sum</td><td>₹1,000 - ₹5,000 (scheme-dependent; often ₹100 for some retail-focused schemes)</td></tr>
+<tr><td>Additional purchase</td><td>₹500 - ₹1,000, in multiples thereafter</td></tr>
+<tr><td>SIP instalment</td><td>As low as ₹100 - ₹500/month for many schemes</td></tr>
+</tbody>
+</table>
+</div>
+<div class="section">
+<div class="section-title">Payment modes and their rules</div>
+<div class="terms-grid">
+<div class="term-card"><div class="term-name">Cheque / DD</div><div class="term-def">Still accepted for physical transactions; realisation date (not application date) can affect NAV applicability.</div></div>
+<div class="term-card"><div class="term-name">NEFT / RTGS</div><div class="term-def">Standard for larger transactions; the RTA matches the bank credit to the application via UTR/reference number.</div></div>
+<div class="term-card"><div class="term-name">UPI</div><div class="term-def">Permitted for transactions up to ₹2 lakh per SEBI/NPCI rules — the dominant mode for digital retail purchases today.</div></div>
+<div class="term-card"><div class="term-name">NACH mandate</div><div class="term-def">A one-time bank mandate that enables auto-debit for recurring SIP instalments — set up once, used repeatedly.</div></div>
+</div>
+<div class="callout warn"><strong>Third-party payment restriction:</strong> the payment must come from a bank account where the investor is an account holder. Payments from a third party's account are rejected unless specific documented exceptions apply (e.g. a parent paying for a minor's investment, employer-employee SIP schemes) — this is a standard AML control across the industry.</div>
+</div>`));
+render(12,modHTML(12,MODULES[12].eyebrow,MODULES[12].title,`How units leave a folio — redemption payout timelines, exit loads, and how a switch is really two transactions in one.`,`<div class="section">
+<div class="section-title">Redemption payout timelines</div>
+<table class="comp-table">
+<thead><tr><th>Scheme type</th><th>Standard payout timeline</th></tr></thead>
+<tbody>
+<tr><td>Equity & hybrid schemes</td><td>T+2 to T+3 working days from redemption date</td></tr>
+<tr><td>Debt schemes (most)</td><td>T+1 working day</td></tr>
+<tr><td>Liquid / overnight schemes</td><td>T+1, with <strong>Instant Redemption</strong> facility available up to ₹50,000 or 90% of folio value (whichever is lower) — credited within minutes, 24x7</td></tr>
+</tbody>
+</table>
+<div class="callout info">SEBI progressively tightened redemption TATs over the years specifically to improve investor experience — the industry-wide move toward T+1 for debt schemes was a direct outcome of post-2019 credit-event scrutiny (the IL&FS and Franklin Templeton episodes).</div>
+</div>
+<div class="section">
+<div class="section-title">Exit load</div>
+<div class="callout warn">Most equity schemes charge a 1% exit load if redeemed within 12 months of investment — designed to discourage short-term trading. Liquid and overnight funds typically carry no exit load, or a tiny graded load only for redemptions within the first few days. Exit load is deducted from redemption proceeds and added back to the scheme (not paid to the AMC or distributor).</div>
+</div>
+<div class="section">
+<div class="section-title">Switch = redemption + purchase</div>
+<div class="callout info">A <strong>switch</strong> (moving from one scheme to another, or between plans/options of the same scheme) is processed as a redemption from the source scheme and a simultaneous purchase into the target scheme, at their respective NAVs. For tax purposes, it is treated exactly like a real redemption — capital gains tax applies on the "sold" leg even though no cash reaches the investor's bank account.</div>
+</div>`));
+render(13,modHTML(13,MODULES[13].eyebrow,MODULES[13].title,`The three systematic transaction types that generate the bulk of an RTA's daily transaction volume.`,`<div class="section">
+<div class="terms-grid">
+<div class="term-card"><div class="term-tag">SIP</div><div class="term-name">Systematic Investment Plan</div><div class="term-def">Fixed amount auto-debited at a chosen frequency (usually monthly) and invested into a scheme — India's dominant retail investing behaviour, driving the ₹20,000+ Cr monthly SIP book.</div></div>
+<div class="term-card"><div class="term-tag">STP</div><div class="term-name">Systematic Transfer Plan</div><div class="term-def">Automated periodic switch from one scheme to another within the same AMC — commonly used to move a lump sum from a liquid fund into an equity fund gradually, averaging entry price.</div></div>
+<div class="term-card"><div class="term-tag">SWP</div><div class="term-name">Systematic Withdrawal Plan</div><div class="term-def">Automated periodic redemption of a fixed amount or unit quantity — popular for generating regular income from an accumulated corpus, e.g. in retirement.</div></div>
+</div>
+</div>
+<div class="section">
+<div class="section-title">How a SIP is registered and processed</div>
+<div class="flow">
+<div class="flow-step"><div class="flow-line"><div class="flow-dot">1</div><div class="flow-connector"></div></div><div class="flow-body"><div class="flow-title">Mandate registration</div><div class="flow-desc">Investor sets up a NACH mandate (bank auto-debit authorisation) or UPI Autopay — a one-time registration that then powers every future instalment.</div></div></div>
+<div class="flow-step"><div class="flow-line"><div class="flow-dot">2</div><div class="flow-connector"></div></div><div class="flow-body"><div class="flow-title">SIP registration</div><div class="flow-desc">Investor chooses scheme, amount, frequency, and start/end date (or perpetual). A unique SIP registration number is generated and linked to the mandate.</div></div></div>
+<div class="flow-step"><div class="flow-line"><div class="flow-dot">3</div><div class="flow-connector"></div></div><div class="flow-body"><div class="flow-title">Auto-debit & allotment</div><div class="flow-desc">On each due date, the bank auto-debits the amount; once realised, units are allotted at the applicable NAV — same rules as any lump sum purchase.</div></div></div>
+<div class="flow-step"><div class="flow-line"><div class="flow-dot">4</div><div class="flow-connector"></div></div><div class="flow-body"><div class="flow-title">Failure handling</div><div class="flow-desc">Insufficient balance causes a bounced instalment — no units allotted for that cycle, the SIP simply continues to the next due date (with a bounce charge levied by the bank, not the AMC).</div></div></div>
+</div>
+</div>
+<div class="section">
+<div class="callout tip">SIP "pause" and "step-up" (automatic annual increase in instalment amount) have become standard features — both are configuration changes to the existing mandate/registration, not new SIPs, so continuity of the original SIP start date is preserved for any milestone or loyalty-linked benefits.</div>
+</div>`));
+render(14,modHTML(14,MODULES[14].eyebrow,MODULES[14].title,`The single most operationally important rule in MF RTA — which NAV a transaction actually gets, and why.`,`<div class="section">
+<div class="callout warn">Getting cut-off rules wrong is the single most common source of investor complaints and RTA operational errors — a transaction applied even one minute past cut-off gets a materially different NAV.</div>
+<div class="section-title">Standard cut-off times</div>
+<table class="comp-table">
+<thead><tr><th>Scheme type</th><th>Cut-off time</th><th>NAV applicability rule</th></tr></thead>
+<tbody>
+<tr><td>Equity, hybrid, most debt (purchase)</td><td>3:00 PM</td><td>Same-day NAV if application <strong>and</strong> funds are realised before cut-off; next business day NAV otherwise</td></tr>
+<tr><td>Liquid & overnight funds (purchase)</td><td>1:30 PM</td><td>Same-day NAV only if funds are realised and available for investment before cut-off — realisation, not just application, is what counts</td></tr>
+<tr><td>All schemes (redemption)</td><td>3:00 PM</td><td>Same-day NAV if the request is received before cut-off; next business day NAV if after</td></tr>
+</tbody>
+</table>
+</div>
+<div class="section">
+<div class="section-title">Why "realisation" matters more than "application"</div>
+<div class="callout info">For purchases <strong>above ₹2 lakh</strong>, SEBI rules require that the NAV applied is based on the date funds are actually credited to the scheme's bank account and available for investment — not simply the date the application was submitted. A cheque submitted before cut-off but realised two days later gets the NAV of the realisation date, not the application date. This is why UPI/NEFT (near-instant realisation) is preferred over cheques for time-sensitive investments.</div>
+<div class="callout tip">For purchases below ₹2 lakh, same-day NAV applies based on application time and a valid instrument (not full realisation) — a deliberate relaxation to keep small-ticket retail investing simple.</div>
+</div>`));
+render(15,modHTML(15,MODULES[15].eyebrow,MODULES[15].title,`The shared industry infrastructure that routes the majority of India's mutual fund transactions.`,`<div class="section">
+<div class="section-title">The exchange & utility platforms</div>
+<div class="terms-grid">
+<div class="term-card"><div class="term-name">BSE StAR MF</div><div class="term-def">BSE's mutual fund order-routing platform — the largest by transaction volume. Distributors and RIAs place orders here, which flow through to the RTA for processing. Widely used for both purchase and redemption transactions.</div></div>
+<div class="term-card"><div class="term-name">NSE NMF II</div><div class="term-def">NSE's equivalent platform. Many distributors integrate with both BSE StAR MF and NSE NMF II for redundancy and reach.</div></div>
+<div class="term-card"><div class="term-name">MF Utilities (MFU)</div><div class="term-def">An industry-owned, AMC-agnostic utility that lets an investor transact across multiple AMCs using a single Common Account Number (CAN) — reduces duplicate paperwork for multi-AMC investors.</div></div>
+<div class="term-card"><div class="term-name">MFCentral</div><div class="term-def">A joint investor self-service portal run by CAMS and KFin together — covers KYC updates, nomination, folio consolidation, and account statements across both RTAs from one login.</div></div>
+</div>
+</div>
+<div class="section">
+<div class="section-title">How this affects the RTA</div>
+<div class="callout info">The RTA doesn't compete with these platforms — it integrates with them. A transaction placed on BSE StAR MF by a distributor still lands on the RTA's system for validation, folio update, and unit allotment; the exchange platform is purely the order-capture and routing layer. Building and maintaining robust, low-latency integrations with all of these is a baseline requirement for any credible MF RTA.</div>
+</div>`));
+render(16,modHTML(16,MODULES[16].eyebrow,MODULES[16].title,`The applications and backend that power Validus's MF RTA service delivery.`,`<div class="section">
+<div class="section-title">Three applications, one backend</div>
+<div class="terms-grid">
+<div class="term-card"><div class="term-tag">Distributors & RMs</div><div class="term-name">Front Office App</div><div class="term-def">Order placement, client folio view, commission tracking, and business MIS for distributors and relationship managers.</div></div>
+<div class="term-card"><div class="term-tag">Investors</div><div class="term-name">Investor App</div><div class="term-def">Self-service purchase, redemption, SIP management, statement download, and service requests — mirrors the AIF Investor App experience.</div></div>
+<div class="term-card"><div class="term-tag">AMC</div><div class="term-name">AMC Portal</div><div class="term-def">Scheme configuration oversight, reporting, campaign communication via CCC, and business dashboards for the fund house.</div></div>
+<div class="term-card"><div class="term-tag">Backend</div><div class="term-name">Solidus</div><div class="term-def">The same proprietary engine powering AIF operations — extended for MF's higher transaction volumes, folio-level ledgers, and multi-channel order intake.</div></div>
+</div>
+</div>
+<div class="section">
+<div class="section-title">Communication Command Center (CCC)</div>
+<div class="callout tip">Transaction confirmations, CAS delivery, SIP reminders, and KYC re-verification alerts are dispatched through the same omnichannel CCC used for AIF — email, SMS, WhatsApp, and in-app push — but tuned for MF's much higher message volumes and stricter SEBI-mandated delivery timelines.</div>
+</div>`));
+render(17,modHTML(17,MODULES[17].eyebrow,MODULES[17].title,`The regulatory obligations an MF RTA carries — spanning SEBI, AMFI, PMLA, and investor-protection rules.`,`<div class="section">
+<div class="section-title">The compliance stack</div>
+<div class="terms-grid">
+<div class="term-card"><div class="term-name">SEBI (Mutual Funds) Regulations, 1996</div><div class="term-def">The foundational framework — scheme categorisation, disclosure norms, TAT for servicing, and RTA registration requirements all trace back here.</div></div>
+<div class="term-card"><div class="term-name">AMFI guidelines</div><div class="term-def">Industry self-regulatory standards — uniform KYC processes, distributor code of conduct, and standardised forms across all AMCs and RTAs.</div></div>
+<div class="term-card"><div class="term-name">PMLA & AML</div><div class="term-def">Same Prevention of Money Laundering Act obligations as any regulated financial intermediary — risk-based due diligence, STR filing, and periodic re-screening.</div></div>
+<div class="term-card"><div class="term-name">SCORES</div><div class="term-def">SEBI's centralised online investor grievance portal — RTAs must respond to complaints routed through SCORES within SEBI-mandated timelines, currently 21 calendar days.</div></div>
+</div>
+</div>
+<div class="section">
+<div class="section-title">Investor-protection specifics unique to MF</div>
+<table class="comp-table">
+<thead><tr><th>Obligation</th><th>What it requires</th></tr></thead>
+<tbody>
+<tr><td>Unclaimed amounts</td><td>Redemption/IDCW proceeds unclaimed by investors are tracked separately, deployed in liquid schemes on the investor's behalf, and remain claimable indefinitely — the AMC cannot simply absorb them</td></tr>
+<tr><td>Investor Education & Protection</td><td>AMCs contribute to AMFI-run investor awareness programmes; RTAs support with data on investor demographics and complaint patterns</td></tr>
+<tr><td>NISM certification (distributors)</td><td>Every mutual fund distributor must hold a valid NISM-Series-V-A certification — RTAs typically validate this before empanelling a new distributor's ARN</td></tr>
+<tr><td>Change/withdrawal TAT</td><td>SEBI mandates specific turnaround times for processing redemptions, dispatching statements, and resolving investor requests — non-compliance risks regulatory action against the AMC (and by extension, scrutiny of the RTA)</td></tr>
+</tbody>
+</table>
+</div>`));
+render(18,modHTML(18,MODULES[18].eyebrow,MODULES[18].title,`How capital gains on mutual fund units are taxed — and why the rules diverge sharply between equity and debt funds.`,`<div class="section">
+<div class="callout warn">Tax rules for mutual funds changed materially in <strong>Budget 2023</strong> (debt fund indexation removed) and again in <strong>Budget 2024</strong> (equity LTCG/STCG rates revised) — RTAs must keep capital gains statement logic current with the latest applicable regime for each transaction date.</div>
+<div class="section-title">Equity-oriented schemes (≥65% equity allocation)</div>
+<table class="comp-table">
+<thead><tr><th>Holding period</th><th>Classification</th><th>Tax treatment</th></tr></thead>
+<tbody>
+<tr><td>Under 12 months</td><td>Short-Term Capital Gains (STCG)</td><td>Flat 20% (post Budget 2024)</td></tr>
+<tr><td>12 months or more</td><td>Long-Term Capital Gains (LTCG)</td><td>12.5%, with ₹1.25 lakh/year exemption, no indexation benefit</td></tr>
+</tbody>
+</table>
+</div>
+<div class="section">
+<div class="section-title">Debt-oriented schemes (&lt;35% equity allocation)</div>
+<div class="callout info">Since 1 April 2023, gains on debt-oriented mutual funds — regardless of holding period — are added to the investor's income and taxed at their applicable <strong>slab rate</strong>. The old regime (20% with indexation for holdings over 3 years) no longer applies to units purchased after that date. This single change reshaped debt fund attractiveness relative to bank fixed deposits.</div>
+</div>
+<div class="section">
+<div class="section-title">Operational tax duties for the RTA</div>
+<div class="terms-grid">
+<div class="term-card"><div class="term-name">Capital Gains Statement</div><div class="term-def">Generated annually (and on-demand) per folio, computing realised gains/losses across every redemption and switch during the financial year — using FIFO (first-in-first-out) for cost-basis matching.</div></div>
+<div class="term-card"><div class="term-name">TDS for NRIs</div><div class="term-def">Unlike resident investors (no TDS on capital gains), NRI redemptions attract TDS at source — the RTA deducts and deposits it, and issues Form 16A.</div></div>
+<div class="term-card"><div class="term-name">Securities Transaction Tax</div><div class="term-def">STT applies to equity-fund redemptions/switches, deducted automatically at the point of transaction — reflected as a minor NAV-adjustment, not a separate deduction.</div></div>
+</div>
+</div>`));
+render(19,modHTML(19,MODULES[19].eyebrow,MODULES[19].title,`How MF RTA services are commercially structured — the components that make up an AMC's RTA fee.`,`<div class="section">
+<div class="section-title">Typical fee components</div>
+<table class="comp-table">
+<thead><tr><th>Component</th><th>Basis</th><th>Notes</th></tr></thead>
+<tbody>
+<tr><td>AUM-based fee</td><td>Basis points on average AUM serviced</td><td>The largest component for established AMCs; typically tiered — the rate reduces as AUM scales up</td></tr>
+<tr><td>Folio maintenance fee</td><td>Per active folio, per period</td><td>Covers the fixed cost of statements, KYC upkeep, and standing data maintenance regardless of transaction activity</td></tr>
+<tr><td>Transaction fee</td><td>Per transaction processed</td><td>Sometimes bundled into the AUM fee for high-volume AMCs, charged separately for others</td></tr>
+<tr><td>One-time setup fee</td><td>Fixed, at onboarding</td><td>Covers scheme master configuration, exchange integration, and go-live testing</td></tr>
+<tr><td>Migration fee</td><td>Fixed or per-folio, one-time</td><td>Applies only when migrating from an incumbent RTA — scales with folio count and data complexity</td></tr>
+</tbody>
+</table>
+<div class="callout tip">Because MF RTA is a volume business with thin per-unit economics, pricing conversations with AMCs are fundamentally different from AIF RTA — the pitch is about scale efficiency, platform reliability, and total cost of ownership rather than bespoke service depth.</div>
+</div>`));
+render(20,modHTML(20,MODULES[20].eyebrow,MODULES[20].title,`The agreement structure and the SEBI-mandated turnaround times that govern day-to-day service delivery.`,`<div class="section">
+<div class="section-title">SEBI-mandated turnaround times (indicative)</div>
+<table class="comp-table">
+<thead><tr><th>Activity</th><th>Standard TAT</th></tr></thead>
+<tbody>
+<tr><td>Redemption payout</td><td>T+1 to T+3 depending on scheme type (see Module 13)</td></tr>
+<tr><td>Dispatch of statement of account</td><td>Within 5 business days of the transaction (or immediately if opted for electronic delivery)</td></tr>
+<tr><td>Investor grievance resolution (via SCORES)</td><td>21 calendar days</td></tr>
+<tr><td>Change of bank / address processing</td><td>Typically within 3-10 business days depending on verification method</td></tr>
+<tr><td>Transmission processing</td><td>Varies by claim value and documentation completeness — typically 15-30 business days</td></tr>
+</tbody>
+</table>
+<div class="callout warn">Missing a SEBI-mandated TAT isn't just an SLA breach with the AMC — it's a regulatory compliance failure that the AMC is ultimately accountable for, which makes RTA reliability a governance issue, not just an operational one.</div>
+</div>
+<div class="section">
+<div class="section-title">What the RTA agreement typically covers</div>
+<div class="pill-list">
+<span class="pill">Scope of services</span>
+<span class="pill">Fee schedule</span>
+<span class="pill">SLA & penalty clauses</span>
+<span class="pill">Data ownership & portability</span>
+<span class="pill">Confidentiality & DPDP compliance</span>
+<span class="pill">Termination & transition assistance</span>
+<span class="pill">Audit & inspection rights</span>
+</div>
+</div>`));
+render(21,modHTML(21,MODULES[21].eyebrow,MODULES[21].title,`SEBI's 2022 nomination mandate, and the transmission process that follows an investor's death.`,`<div class="section">
+<div class="callout warn">Since <strong>SEBI's 2022 circular</strong>, every investor must either register a nomination or submit an explicit opt-out declaration — folios without either are flagged, and in some enforcement phases, restricted from certain transactions until resolved.</div>
+<div class="section-title">Nomination rules</div>
+<table class="comp-table">
+<thead><tr><th>Rule</th><th>Detail</th></tr></thead>
+<tbody>
+<tr><td>Number of nominees</td><td>Up to 3 per folio, each with a specified percentage share (must total 100%)</td></tr>
+<tr><td>Who can nominate</td><td>Individual investors only (not applicable to non-individual folios like companies or trusts)</td></tr>
+<tr><td>Minor as nominee</td><td>Permitted, with a mandatory guardian named to receive on the minor's behalf</td></tr>
+<tr><td>Opt-out</td><td>Requires a signed physical or digitally-verified declaration explicitly waiving nomination — cannot be a silent default</td></tr>
+</tbody>
+</table>
+</div>
+<div class="section">
+<div class="section-title">Transmission — the process on death</div>
+<div class="flow">
+<div class="flow-step"><div class="flow-line"><div class="flow-dot">1</div><div class="flow-connector"></div></div><div class="flow-body"><div class="flow-title">Claim intimation</div><div class="flow-desc">Nominee or legal heir notifies the RTA, submitting a death certificate and their own KYC documents.</div></div></div>
+<div class="flow-step"><div class="flow-line"><div class="flow-dot">2</div><div class="flow-connector"></div></div><div class="flow-body"><div class="flow-title">Documentation, by claim value</div><div class="flow-desc">Small-value claims (typically under ₹2-5 lakh, AMC-dependent) need minimal documentation. Larger claims require an indemnity bond, notarised affidavit, and — for very large or contested claims — a legal heir or succession certificate.</div></div></div>
+<div class="flow-step"><div class="flow-line"><div class="flow-dot">3</div><div class="flow-connector"></div></div><div class="flow-body"><div class="flow-title">Verification & transfer</div><div class="flow-desc">Once verified, units are transmitted into a new folio in the claimant's name (or, for joint-holding "Anyone or Survivor" folios, the survivor simply continues on the existing folio without a formal transmission event).</div></div></div>
+</div>
+<div class="callout tip">A registered nominee dramatically simplifies this process — without one, the RTA must fall back to full legal-heir documentation, which can take months longer and is a major source of investor grievance industry-wide.</div>
+</div>`));
+render(22,modHTML(22,MODULES[22].eyebrow,MODULES[22].title,`How distributors get paid, and the compliance identifiers an RTA must validate before commission flows.`,`<div class="section">
+<div class="terms-grid">
+<div class="term-card"><div class="term-name">ARN</div><div class="term-def">AMFI Registration Number — the unique identifier every mutual fund distributor must hold, renewed periodically, tied to a valid NISM certification.</div></div>
+<div class="term-card"><div class="term-name">EUIN</div><div class="term-def">Employee Unique Identification Number — identifies the specific individual (e.g. a bank relationship manager) who actually advised the investor, distinct from the distributor entity's ARN — used for accountability in mis-selling investigations.</div></div>
+<div class="term-card"><div class="term-name">Trail commission</div><div class="term-def">An ongoing percentage of AUM, paid periodically (usually monthly) for as long as the investor stays invested — the only form of commission permitted since 2018.</div></div>
+<div class="term-card"><div class="term-name">Upfront commission</div><div class="term-def">A one-time payment at the point of sale — banned by SEBI in 2018 industry-wide to eliminate the incentive for churning investors into new schemes purely to generate fresh commission.</div></div>
+</div>
+</div>
+<div class="section">
+<div class="section-title">Where the RTA sits in commission processing</div>
+<div class="callout info">The RTA calculates and processes trail commission based on the distributor/RM mapping recorded against each folio, the applicable commission slab (set by the AMC), and the folio's average daily AUM for the period. Correct distributor-to-investor mapping at the point of transaction is what makes accurate commission computation possible — errors here are a direct source of distributor disputes.</div>
+<div class="callout warn">Direct-plan investments carry <strong>zero</strong> distributor commission by design — a transaction routed through a distributor code but flagged as a Direct plan purchase is a data-integrity red flag the RTA's validation logic should catch.</div>
+</div>`));
+render(23,modHTML(23,MODULES[23].eyebrow,MODULES[23].title,`The recurring housekeeping events an RTA processes across the life of every folio.`,`<div class="section">
+<div class="section-title">Scheme-level corporate actions</div>
+<div class="terms-grid">
+<div class="term-card"><div class="term-name">IDCW payout / reinvestment</div><div class="term-def">On the record date, the RTA computes each folio's entitlement, processes bank credit (payout) or additional unit allotment (reinvestment) at the ex-IDCW NAV.</div></div>
+<div class="term-card"><div class="term-name">Scheme merger / consolidation</div><div class="term-def">When an AMC merges two similar schemes (common after the 2017 categorisation rules forced consolidation), the RTA maps unit holdings from the merging scheme into the surviving scheme at a defined conversion ratio.</div></div>
+<div class="term-card"><div class="term-name">Fundamental attribute change</div><div class="term-def">Any material change to a scheme's investment objective triggers a mandatory exit window — investors can redeem without exit load during that window, which the RTA must track and enforce.</div></div>
+</div>
+</div>
+<div class="section">
+<div class="section-title">Investor-initiated change requests</div>
+<table class="comp-table">
+<thead><tr><th>Request type</th><th>Verification needed</th></tr></thead>
+<tbody>
+<tr><td>Bank account change</td><td>Cancelled cheque / bank statement, penny-drop verification of the new account</td></tr>
+<tr><td>Address / email / mobile change</td><td>Self-attested proof for address; OTP verification for email/mobile</td></tr>
+<tr><td>Change of broker / distributor</td><td>Investor's signed request (physical or digital) — reassigns the folio-to-distributor mapping and future trail commission</td></tr>
+<tr><td>Signature update</td><td>Fresh specimen signature with supporting ID proof, particularly relevant for physical-mode transactions</td></tr>
+</tbody>
+</table>
+<div class="callout tip">Bank account changes get the tightest scrutiny of any change request industry-wide — it's the single most common vector for redemption-proceeds fraud, so penny-drop verification (crediting ₹1 to confirm the account is live and correctly named) is treated as non-negotiable.</div>
+</div>`));
+render(24,modHTML(24,MODULES[24].eyebrow,MODULES[24].title,`How Validus positions against the two incumbents that service almost the entire industry.`,`<div class="section">
+<div class="callout warn">CAMS and KFin Technologies together service roughly <strong>99% of the mutual fund RTA market</strong>. Any competitive conversation has to start by acknowledging this honestly — the pitch is not "the incumbents are bad," it's "here is a credible, modern alternative built on newer technology."</div>
+<div class="section-title">Positioning framework</div>
+<table class="comp-table">
+<thead><tr><th>Dimension</th><th>Incumbents (CAMS / KFin)</th><th>Validus</th></tr></thead>
+<tbody>
+<tr><td>Technology stack</td><td>Legacy systems, built up and extended over 20-30 years</td><td>Modern, unified platform (Solidus) built from a clean slate</td></tr>
+<tr><td>Client experience</td><td>Mature but dated interfaces; large-scale support processes</td><td>Purpose-built apps for investors, distributors, and AMCs</td></tr>
+<tr><td>Onboarding speed</td><td>Established but process-heavy, geared for large AMCs</td><td>Faster configuration cycles, well suited to newer/smaller AMCs</td></tr>
+<tr><td>Cross-product synergy</td><td>MF-focused (KFin also serves AIFs separately)</td><td>Single platform spanning both AIF and MF RTA operations</td></tr>
+<tr><td>Market position</td><td>Dominant scale, deep AMC relationships</td><td>Challenger — needs to win on service quality and platform experience</td></tr>
+</tbody>
+</table>
+</div>
+<div class="section">
+<div class="callout tip"><strong>Where Validus wins deals:</strong> AMCs frustrated with incumbent responsiveness at their current scale, newer/smaller AMCs that want a platform that grows with them without an enterprise-scale price tag, and fund houses that value a single RTA relationship across both their MF and AIF businesses.</div>
+</div>`));
+render(25,modHTML(25,MODULES[25].eyebrow,MODULES[25].title,`An interactive tool for client meetings — show a prospect exactly what their SIP could grow into.`,`<div class="section">
+<div class="section-title">SIP future value calculator</div>
+<div class="callout tip"><strong>Use this live in a client meeting.</strong> Enter a monthly SIP amount, an assumed annual return, and a tenure — see the projected corpus, total invested, and estimated gain update instantly.</div>
+<div id="sip-calc" style="background:var(--bg2,#f7f9fc);border:1px solid var(--border,rgba(0,0,0,0.08));border-radius:10px;padding:16px 18px;margin-top:8px">
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:12px">
+    <div><label style="font-size:11px;color:var(--text3,#6b7a8d);display:block;margin-bottom:4px">Monthly SIP amount (₹)</label><input type="number" id="sip-amount" value="10000" step="500" style="width:100%;padding:6px 10px;border:1px solid var(--border2,rgba(0,0,0,0.13));border-radius:6px;font-size:13px;background:var(--bg2,#fff)" oninput="sipCalc()"></div>
+    <div><label style="font-size:11px;color:var(--text3,#6b7a8d);display:block;margin-bottom:4px">Expected annual return (%)</label><input type="number" id="sip-return" value="12" step="0.5" style="width:100%;padding:6px 10px;border:1px solid var(--border2,rgba(0,0,0,0.13));border-radius:6px;font-size:13px;background:var(--bg2,#fff)" oninput="sipCalc()"></div>
+    <div><label style="font-size:11px;color:var(--text3,#6b7a8d);display:block;margin-bottom:4px">Tenure (years)</label><input type="number" id="sip-years" value="10" step="1" style="width:100%;padding:6px 10px;border:1px solid var(--border2,rgba(0,0,0,0.13));border-radius:6px;font-size:13px;background:var(--bg2,#fff)" oninput="sipCalc()"></div>
+  </div>
+  <div id="sip-result" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px"></div>
+</div>
+<div class="callout warn" style="margin-top:14px">This is an illustrative tool for client conversations, not investment advice — actual returns depend on market performance and are never guaranteed. Always pair this with a scheme's actual risk disclosure documents.</div>
+</div>`));
+render(26,modHTML(26,MODULES[26].eyebrow,MODULES[26].title,`A quick-reference tool — click an investor category to see the documentation checklist for onboarding.`,`<div class="section">
+<div class="section-title">Select an investor type</div>
+<div id="inv-types" style="display:flex;flex-wrap:wrap;margin-bottom:14px"></div>
+<div id="inv-detail"></div>
+</div>`));
+render(27,modHTML(27,MODULES[27].eyebrow,MODULES[27].title,`Test your knowledge before a client meeting — questions drawn at random from a rotating question bank.`,`<div class="section"><div class="section-title">MF RTA knowledge quiz</div>
+<div id="quiz-wrap">
+  <div id="quiz-progress-bar" style="height:4px;background:var(--border2,rgba(0,0,0,0.1));border-radius:2px;margin-bottom:16px"><div id="quiz-pbar" style="height:100%;width:0%;background:var(--accent,#1A6BC8);border-radius:2px;transition:width .3s"></div></div>
+  <div id="quiz-q-counter" style="font-size:11px;color:var(--text3,#6b7a8d);margin-bottom:8px"></div>
+  <div id="quiz-body"></div>
+  <div id="quiz-result" style="display:none"></div>
+</div>
+</div>`));
+var quizBank=[
+{q:"What is the maximum amount eligible for Instant Redemption from a liquid fund?",opts:["\u20b925,000 or 50% of folio value","\u20b950,000 or 90% of folio value, whichever is lower","\u20b91 lakh, no percentage cap","There is no cap"],ans:1,exp:"Instant Redemption is capped at \u20b950,000 or 90% of the folio value in that scheme, whichever is lower \u2014 credited within minutes, 24x7, including holidays.",mod:12},
+{q:"Since April 2023, how are gains on debt-oriented mutual funds taxed?",opts:["20% with indexation, regardless of holding period","At the investor's slab rate, regardless of holding period","10% flat, no indexation","Same as equity funds"],ans:1,exp:"The Finance Act 2023 removed indexation benefit and LTCG classification for debt funds (under 35% equity allocation) \u2014 all gains are now taxed at the investor's income slab rate, irrespective of how long the units were held.",mod:18},
+{q:"What is the standard cut-off time for equity fund purchase transactions to receive same-day NAV?",opts:["12:30 PM","1:30 PM","3:00 PM","5:00 PM"],ans:2,exp:"3:00 PM is the standard cut-off for most equity, hybrid, and debt scheme purchases and redemptions. Liquid/overnight funds use an earlier 1:30 PM cut-off.",mod:14},
+{q:"For a purchase above \u20b92 lakh, what determines the NAV applied?",opts:["The date the application form was signed","The date funds are realised and available for investment","The date the cheque was dated","The date the distributor submitted the order"],ans:1,exp:"Above \u20b92 lakh, SEBI rules require NAV to be based on the realisation date of funds \u2014 not the application date \u2014 which is why instant payment modes like UPI/NEFT are preferred for time-sensitive large investments.",mod:14},
+{q:"What is the mandatory lock-in period for ELSS investments?",opts:["1 year","3 years","5 years","No lock-in"],ans:1,exp:"ELSS carries a 3-year lock-in from the date of each investment \u2014 including each individual SIP instalment, which is tracked and locked independently.",mod:7},
+{q:"What happened to distributor commission structures in 2018?",opts:["Trail commission was banned","Upfront commission was banned, leaving trail-only","Both upfront and trail were banned","Commission rates were capped at 1%"],ans:1,exp:"SEBI banned upfront commission industry-wide in 2018 specifically to remove the incentive to churn investors into new schemes just to generate fresh commission. Only trail commission (an ongoing % of AUM) remains permitted.",mod:22},
+{q:"Which entity is CERSAI's central KYC registry, checked alongside a KRA during onboarding?",opts:["MFU","CKYC","SCORES","AMFI"],ans:1,exp:"CKYC (Central KYC Registry) is a government-run, cross-industry KYC utility spanning banks, insurers, and mutual funds \u2014 checked to avoid duplicate KYC data collection across sectors.",mod:9},
+{q:"Under SEBI's 2022 nomination circular, what must every mutual fund folio have?",opts:["At least one nominee, no exceptions","Either a nomination or an explicit opt-out declaration","Nomination is optional with no action required","A nominee only if the folio exceeds \u20b91 lakh"],ans:1,exp:"Every individual folio must either register a nomination (up to 3 nominees) or submit an explicit signed opt-out declaration \u2014 silence or inaction is not compliant.",mod:21},
+{q:"What is the standard redemption payout timeline for equity mutual fund schemes?",opts:["Same day","T+1","T+2 to T+3 working days","T+7"],ans:2,exp:"Equity and hybrid scheme redemptions are typically paid out in T+2 to T+3 working days. Debt schemes are faster at T+1, and eligible liquid/overnight schemes offer Instant Redemption.",mod:12},
+{q:"What distinguishes a Direct plan from a Regular plan of the same scheme?",opts:["Direct plans invest in different securities","Direct plans carry no distributor commission, resulting in a lower expense ratio","Direct plans have a shorter lock-in","Direct plans are only for institutional investors"],ans:1,exp:"Direct and Regular plans hold an identical underlying portfolio \u2014 the only difference is that Direct plans carry no distributor commission, which lowers the expense ratio and results in a higher NAV over time versus the Regular plan.",mod:8},
+{q:"What is a Systematic Transfer Plan (STP) typically used for?",opts:["Automating SIP payments","Moving a lump sum gradually from one scheme to another within the same AMC","Withdrawing a fixed amount periodically","Registering a new folio"],ans:1,exp:"STP automates a periodic switch from one scheme to another (commonly liquid \u2192 equity) within the same AMC, used to average entry price when deploying a lump sum gradually rather than all at once.",mod:13},
+{q:"Who is responsible for computing a mutual fund scheme's daily NAV?",opts:["The RTA","The Fund Accountant","The Custodian","The Distributor"],ans:1,exp:"The Fund Accountant computes NAV daily based on portfolio valuation, expenses, and accruals \u2014 sometimes performed in-house by the AMC, sometimes outsourced, but distinct from the RTA's role.",mod:4},
+{q:"What percentage of shares/control typically classifies an individual as a UBO for AML purposes?",opts:["10%","25%","51%","Any ownership"],ans:1,exp:"25% ownership or control is the standard SEBI/PMLA threshold for identifying a Beneficial Owner in non-individual investor structures like companies and trusts.",mod:5},
+{q:"Which platform is a joint investor self-service portal run together by CAMS and KFin?",opts:["MFU","BSE StAR MF","MFCentral","NSE NMF II"],ans:2,exp:"MFCentral is the joint investor self-service portal operated by CAMS and KFin together, covering KYC updates, nomination, folio consolidation, and statements across both RTAs from a single login.",mod:15},
+{q:"What is the SEBI-mandated timeline for resolving an investor grievance filed via SCORES?",opts:["7 calendar days","21 calendar days","45 calendar days","90 calendar days"],ans:1,exp:"SEBI mandates a 21 calendar day resolution window for grievances routed through SCORES, its centralised online investor complaint portal.",mod:20},
+{q:"On the death of one holder in an \"Anyone or Survivor\" joint folio, what happens?",opts:["The folio is frozen until a legal heir certificate is submitted","The surviving holder(s) automatically continue as sole holder(s), no formal transmission needed","The units are automatically redeemed","A fresh KYC is required for the survivor before any action"],ans:1,exp:"Under \"Anyone or Survivor\" mode, the surviving holder(s) simply continue on the existing folio \u2014 no formal transmission event is triggered, unlike a sole-holder folio where transmission documentation is required.",mod:21},
+];
+var quizState={current:0,score:0,answers:[],started:false};function shuffleArray(arr){var a=arr.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var tmp=a[i];a[i]=a[j];a[j]=tmp;}
+return a;}
+var quizData=[];function initQuiz(){var wrap=document.getElementById('quiz-body');if(!wrap)return;var QUIZ_LENGTH=12;quizData=shuffleArray(quizBank).slice(0,Math.min(QUIZ_LENGTH,quizBank.length));quizState={current:0,score:0,answers:[],started:true};showQuestion(0);}
+function showQuestion(n){var q=quizData[n];if(!q){showQuizResult();return;}
+var pct=Math.round((n/quizData.length)*100);var pb=document.getElementById('quiz-pbar');if(pb)pb.style.width=pct+'%';var ctr=document.getElementById('quiz-q-counter');if(ctr)ctr.textContent='Question '+(n+1)+' of '+quizData.length;var body=document.getElementById('quiz-body');if(!body)return;var opts=q.opts.map(function(o,i){return'<button onclick="answerQ('+n+','+i+')" style="display:block;width:100%;text-align:left;padding:10px 14px;margin-bottom:8px;border-radius:8px;border:1px solid var(--border2,rgba(0,0,0,0.13));background:var(--bg2,#fff);color:var(--text,#1a2233);font-size:13.5px;cursor:pointer;transition:all .12s" onmouseover="this.style.background=\'var(--bg3,#eef1f7)\'" onmouseout="this.style.background=\'var(--bg2,#fff)\'">'
++'<span style="display:inline-block;width:22px;height:22px;border-radius:50%;background:var(--bg3,#eef1f7);color:var(--text2,#4a5568);font-size:11px;font-weight:600;text-align:center;line-height:22px;margin-right:10px">'+String.fromCharCode(65+i)+'</span>'+o+'</button>';}).join('');body.innerHTML='<div style="font-size:15px;font-weight:500;color:var(--text,#1a2233);line-height:1.6;margin-bottom:16px">'+q.q+'</div>'+opts;}
+function answerQ(qn,chosen){var q=quizData[qn];var correct=chosen===q.ans;if(correct)quizState.score++;quizState.answers.push({qn:qn,chosen:chosen,correct:correct});var body=document.getElementById('quiz-body');if(!body)return;var btns=body.querySelectorAll('button');btns.forEach(function(b,i){b.onclick=null;b.onmouseover=null;b.onmouseout=null;if(i===q.ans){b.style.background='#E2F0D9';b.style.borderColor='#0D8A65';b.style.color='#1a2233';}
+else if(i===chosen&&!correct){b.style.background='#FCE4E4';b.style.borderColor='#B93030';b.style.color='#1a2233';}
+else{b.style.opacity='0.5';}});var exp=document.createElement('div');exp.style.cssText='margin-top:12px;padding:12px 14px;border-radius:8px;font-size:13px;line-height:1.7;background:'+(correct?'#E2F0D9':'#FCE4E4')+';color:#1a2233;border:1px solid '+(correct?'#0D8A65':'#B93030');exp.innerHTML='<strong>'+(correct?'Correct!':'Incorrect.')+'</strong> '+q.exp+'<br><span style="font-size:11px;color:#6b7a8d;margin-top:4px;display:block">See Module '+(q.mod+1)+' for full coverage.</span>';body.appendChild(exp);var next=document.createElement('button');next.style.cssText='margin-top:12px;padding:9px 20px;border-radius:8px;background:var(--accent,#1A6BC8);color:#fff;border:none;font-size:13.5px;cursor:pointer;font-weight:500';next.textContent=qn<quizData.length-1?'Next question \u2192':'See results';next.onclick=function(){showQuestion(qn+1);};body.appendChild(next);}
+function showQuizResult(){var body=document.getElementById('quiz-body');var result=document.getElementById('quiz-result');if(body)body.style.display='none';var pb=document.getElementById('quiz-pbar');if(pb)pb.style.width='100%';var ctr=document.getElementById('quiz-q-counter');if(ctr)ctr.textContent='Complete';if(!result)return;result.style.display='block';var pct=Math.round((quizState.score/quizData.length)*100);var msg=pct>=90?'Excellent! You are client-meeting ready.':pct>=70?'Good. Review the modules flagged below before your next meeting.':'Worth revisiting the key modules before a client meeting.';var colBg=pct>=90?'#E2F0D9':pct>=70?'#FDF0E2':'#FCE4E4';var colBr=pct>=90?'#0D8A65':pct>=70?'#C07800':'#B93030';var wrongItems=quizState.answers.filter(function(a){return!a.correct;}).map(function(a){var q=quizData[a.qn];return'<div style="padding:8px 0;border-bottom:1px solid var(--border,rgba(0,0,0,0.07));font-size:13px;color:var(--text2,#4a5568)">'
++'<span style="color:#B93030;font-weight:600;margin-right:6px">\u2717</span>'
++q.q
++'<div style="font-size:11.5px;color:var(--text3,#6b7a8d);margin-top:3px">Your answer: '+q.opts[a.chosen]+' \u00b7 See Module '+(q.mod+1)+'</div>'
++'</div>';}).join('');result.innerHTML='<div style="padding:16px;border-radius:10px;background:'+colBg+';border:1px solid '+colBr+';margin-bottom:16px;text-align:center">'
++'<div style="font-size:36px;font-weight:700;color:'+colBr+'">'+quizState.score+'/'+quizData.length+'</div>'
++'<div style="font-size:14px;color:var(--text,#1a2233);margin-top:4px">'+msg+'</div>'
++'</div>'
++(wrongItems?'<div style="font-size:11px;font-weight:600;letter-spacing:.7px;text-transform:uppercase;color:var(--text3,#6b7a8d);margin-bottom:8px">Review these</div>'+wrongItems:'')
++'<button onclick="initQuiz()" style="margin-top:16px;padding:9px 20px;border-radius:8px;background:var(--accent,#1A6BC8);color:#fff;border:none;font-size:13.5px;cursor:pointer;font-weight:500">Retake quiz</button>'
++(pct>=67?'<div id="complete-training-wrap" style="margin-top:20px;padding:16px;border-radius:10px;background:rgba(13,138,101,0.08);border:1px solid rgba(13,138,101,0.25);text-align:center">'
++'<div style="font-size:13px;font-weight:600;color:var(--teal,#0D8A65);margin-bottom:4px">🎓 Training requirement met</div>'
++'<div style="font-size:12px;color:var(--text2,#4a5568);margin-bottom:12px">You scored '+quizState.score+'/'+quizData.length+' — you can now claim your completion certificate.</div>'
++'<button onclick="requestCompletion()" style="padding:11px 28px;border-radius:8px;background:#0D8A65;color:#fff;border:none;font-size:14px;cursor:pointer;font-weight:600">Complete Training &amp; Get Certificate →</button>'
++'</div>':'<div style="margin-top:16px;font-size:12px;color:var(--text3,#6b7a8d)">Score at least 8/12 to unlock the completion certificate.</div>');try{window.parent.postMessage({type:'quizAttempted',moduleId:'mf-mastery',score:quizState.score,total:quizData.length},'*');}catch(e){}}
+function requestCompletion(){try{window.parent.postMessage({type:'completeTraining',moduleId:'mf-mastery',score:quizState.score,total:quizData.length,},'*');}catch(e){alert('Please open this module inside Nexus to claim your certificate.');}}
+function sipCalc(){var amt=parseFloat((document.getElementById('sip-amount')||{}).value)||0;var annRet=parseFloat((document.getElementById('sip-return')||{}).value)||0;var years=parseFloat((document.getElementById('sip-years')||{}).value)||1;var months=years*12;var r=annRet/100/12;var fv=r>0?amt*((Math.pow(1+r,months)-1)/r)*(1+r):amt*months;var invested=amt*months;var gain=fv-invested;var el=document.getElementById('sip-result');if(!el)return;var cols=[{label:'Total invested',val:'\u20b9'+Math.round(invested).toLocaleString('en-IN')},{label:'Estimated gain',val:'\u20b9'+Math.round(gain).toLocaleString('en-IN')},{label:'Projected corpus',val:'\u20b9'+Math.round(fv).toLocaleString('en-IN')},];el.innerHTML=cols.map(function(c){return '<div style="background:var(--bg2,#fff);border:1px solid var(--border,rgba(0,0,0,0.08));border-radius:8px;padding:10px 12px;text-align:center">'
++'<div style="font-size:11px;color:var(--text3,#6b7a8d);margin-bottom:4px">'+c.label+'</div>'
++'<div style="font-size:16px;font-weight:600;color:var(--text,#1a2233)">'+c.val+'</div>'
++'</div>';}).join('');}
+var invData=[
+{name:'Resident Individual',kyc:'Standard KYC via any KRA (Aadhaar e-KYC or physical + IPV)',docs:'PAN, Aadhaar/address proof, bank proof, photograph',payment:'Own bank account only; UPI up to \u20b92 lakh',nom:'Mandatory nomination or explicit opt-out',tat:'Same day (digital) / T+1 (physical)'},
+{name:'NRI \u2014 NRE basis',kyc:'Standard KYC + FATCA/CRS + overseas address proof',docs:'PAN, passport copy, overseas address proof, NRE bank proof',payment:'NRE account (fully repatriable)',nom:'Mandatory nomination or explicit opt-out',tat:'2-4 business days'},
+{name:'NRI \u2014 NRO basis',kyc:'Standard KYC + FATCA/CRS + overseas address proof',docs:'PAN, passport copy, overseas address proof, NRO bank proof',payment:'NRO account (non-repatriable, subject to limits)',nom:'Mandatory nomination or explicit opt-out',tat:'2-4 business days'},
+{name:'Minor',kyc:'Guardian\u2019s KYC on file; minor\u2019s own KYC done at majority',docs:'Minor\u2019s birth certificate, guardian relationship proof, guardian KYC',payment:'Guardian\u2019s or minor\u2019s own bank account only',nom:'Nomination not applicable while a minor',tat:'Same day (digital) / T+1 (physical)'},
+{name:'HUF',kyc:'Karta\u2019s individual KYC + HUF-level PAN',docs:'HUF PAN card, HUF deed/declaration, Karta\u2019s KYC and photo',payment:'HUF\u2019s own bank account only',nom:'Nomination not applicable to HUF folios',tat:'2-3 business days'},
+{name:'Company / Corporate',kyc:'Corporate KYC + authorised signatory KYC',docs:'Certificate of Incorporation, MoA/AoA, Board Resolution, list of authorised signatories, FATCA/CRS (entity)',payment:'Company\u2019s own bank account only',nom:'Nomination not applicable to non-individual folios',tat:'3-5 business days'},
+{name:'Trust',kyc:'Trust-level KYC + trustee KYC',docs:'Trust deed, registration certificate (if registered), list of trustees, PAN of trust',payment:'Trust\u2019s own bank account only',nom:'Nomination not applicable to non-individual folios',tat:'3-5 business days'},
+{name:'FPI',kyc:'FPI registration verification + custodian confirmation',docs:'SEBI FPI registration certificate, custodian letter, PAN',payment:'Designated FPI bank account via custodian',nom:'Nomination not applicable to non-individual folios',tat:'5-7 business days'},
+];
+function initInvSelector(){var container=document.getElementById('inv-types');if(!container||container.children.length>0)return;invData.forEach(function(d,i){var btn=document.createElement('button');btn.id='invbtn-'+i;btn.textContent=d.name;btn.style.cssText='padding:6px 14px;border-radius:99px;font-size:12px;cursor:pointer;border:1px solid var(--border2,rgba(0,0,0,0.13));color:var(--text2,#4a5568);background:var(--bg2,#fff);margin:0 4px 4px 0;transition:all .12s';btn.onclick=(function(idx){return function(){selInv(idx);};})(i);container.appendChild(btn);});selInv(0);}
+function selInv(i){document.querySelectorAll('[id^=invbtn-]').forEach(function(b,j){b.style.background=j===i?'var(--accent,#1A6BC8)':'var(--bg2,#fff)';b.style.color=j===i?'#fff':'var(--text2,#4a5568)';b.style.borderColor=j===i?'var(--accent,#1A6BC8)':'var(--border2,rgba(0,0,0,0.13))';});var d=invData[i];var det=document.getElementById('inv-detail');if(!det)return;var meta=[{l:'KYC requirement',v:d.kyc},{l:'Key documents',v:d.docs},{l:'Payment mode',v:d.payment},{l:'Nomination',v:d.nom},{l:'Typical onboarding TAT',v:d.tat},];det.innerHTML='<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">'+meta.map(function(m){return '<div style="background:var(--bg2,#fff);border:1px solid var(--border,rgba(0,0,0,0.08));border-radius:8px;padding:10px 12px">'
++'<div style="font-size:10px;color:var(--text3,#6b7a8d);font-weight:600;letter-spacing:.5px;text-transform:uppercase;margin-bottom:3px">'+m.l+'</div>'
++'<div style="font-size:12.5px;color:var(--text,#1a2233);line-height:1.5">'+m.v+'</div>'
++'</div>';}).join('')+'</div>';}
+
+</script>
+</body>
+</html>
