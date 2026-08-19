@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<script>
+// Early message listener — placed before copy protection so it isn't blocked
+window.__editorReady = false;
+window.addEventListener('message', function(ev) {
+  if (!ev.data || ev.data.type !== 'openEditor') return;
+  // Store the request; will be picked up once main script is ready
+  window.__pendingEditorOpen = ev.data;
+});
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Compliance & Regulatory Framework — Validus Learning Module</title>
+<style>@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Sora:wght@400;600;700&display=swap');[data-theme="light"]{--bg:#F4F6FA;--bg2:#FFFFFF;--bg3:#EEF1F7;--bg4:#E4E8F0;--text:#1A2233;--text2:#4A5568;--text3:#8A95A8;--border:rgba(0,0,0,0.08);--border2:rgba(0,0,0,0.13);--card:rgba(0,0,0,0.03);--card2:rgba(0,0,0,0.06);--sidebar:#FFFFFF;--sidebar-border:rgba(0,0,0,0.09);--accent:#1A6BC8;--accent2:#1558A8;--accent-bg:rgba(26,107,200,0.08);--accent-text:#1558A8;--gold:#C07800;--gold-bg:rgba(192,120,0,0.08);--teal:#0D8A65;--teal-bg:rgba(13,138,101,0.08);--red:#B93030;--red-bg:rgba(185,48,48,0.08);--nav-active-bg:#EEF4FF;--nav-done:#0D8A65;--shadow:0 1px 4px rgba(0,0,0,0.10);--hero-bg:linear-gradient(135deg,#1A3A6A 0%,#1E4D8C 100%);--hero-text:#FFFFFF;--hero-sub:rgba(255,255,255,0.75)}[data-theme="dark"]{--bg:#0D1B2A;--bg2:#152336;--bg3:#1E3250;--bg4:#243A58;--text:#E8EBF0;--text2:#9AA5B4;--text3:#6B7A8D;--border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.13);--card:rgba(255,255,255,0.04);--card2:rgba(255,255,255,0.08);--sidebar:#152336;--sidebar-border:rgba(255,255,255,0.07);--accent:#2A7FE8;--accent2:#1A6BC8;--accent-bg:rgba(42,127,232,0.15);--accent-text:#7AB8F5;--gold:#E8A020;--gold-bg:rgba(232,160,32,0.12);--teal:#1A9E78;--teal-bg:rgba(26,158,120,0.12);--red:#D44040;--red-bg:rgba(212,64,64,0.12);--nav-active-bg:rgba(42,127,232,0.12);--nav-done:#1A9E78;--shadow:0 1px 4px rgba(0,0,0,0.4);--hero-bg:linear-gradient(135deg,#152336 0%,#1E3250 100%);--hero-text:#FFFFFF;--hero-sub:rgba(255,255,255,0.65)}*{box-sizing:border-box;margin:0;padding:0}html,body{height:100%;font-family:'Poppins',system-ui,sans-serif;background:var(--bg);color:var(--text);font-size:15px;line-height:1.6}body{display:flex;flex-direction:column;overflow:hidden}#app{display:flex;flex:1;overflow:hidden;min-height:0}#sidebar{width:260px;flex-shrink:0;background:var(--sidebar);border-right:1px solid var(--sidebar-border);display:flex;flex-direction:column;height:100%;transition:width .25s;overflow:hidden;z-index:10}#sidebar.collapsed{width:0;border-right:none}.sidebar-head{padding:18px 16px 14px;border-bottom:1px solid var(--border);flex-shrink:0}.sidebar-brand{font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--accent);margin-bottom:3px}.sidebar-title{font-family:'Poppins',system-ui,sans-serif;font-size:15px;font-weight:700;color:var(--text);white-space:nowrap}.sidebar-sub{font-size:11px;color:var(--text3);margin-top:2px;white-space:nowrap}.progress-bar{height:2px;background:var(--border2);margin:12px 16px 0;border-radius:2px;overflow:hidden}.progress-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--teal));border-radius:2px;transition:width .4s}.progress-label{font-size:10px;color:var(--text3);padding:4px 16px 10px;display:flex;justify-content:space-between;white-space:nowrap}nav{flex:1;overflow-y:auto;padding:6px 0 20px}nav::-webkit-scrollbar{width:4px}nav::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}.nav-section{font-size:9px;font-weight:600;letter-spacing:1.2px;text-transform:uppercase;color:var(--text3);padding:14px 16px 5px;white-space:nowrap}.nav-item{display:flex;align-items:center;gap:9px;padding:7px 16px;cursor:pointer;border-left:2px solid transparent;font-size:12.5px;color:var(--text2);transition:background .12s,color .12s;white-space:nowrap;overflow:hidden}.nav-item:hover{background:var(--card2);color:var(--text)}.nav-item.active{background:var(--nav-active-bg);border-left-color:var(--accent);color:var(--text);font-weight:500}.nav-item.done .nav-num{background:var(--nav-done)!important;color:#fff!important}.nav-num{width:18px;height:18px;border-radius:50%;background:var(--bg4);font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--text3)}.nav-item.active .nav-num{background:var(--accent);color:#fff}#topbar{display:flex;align-items:center;gap:8px;padding:0 16px;height:44px;flex-shrink:0;background:var(--bg2);border-bottom:1px solid var(--border);z-index:20;box-shadow:var(--shadow)}#toggle-sidebar{background:none;border:1px solid var(--border2);border-radius:6px;padding:5px 8px;cursor:pointer;color:var(--text2);font-size:13px;display:flex;align-items:center;gap:5px;transition:background .12s}#toggle-sidebar:hover{background:var(--card2)}#search-box{max-width:300px;position:relative;margin-left:auto}#search-box input{width:100%;padding:5px 10px 5px 30px;border-radius:7px;border:1px solid var(--border2);background:var(--bg3);color:var(--text);font-size:12.5px;outline:none}#search-box input:focus{border-color:var(--accent)}#search-box .search-icon{position:absolute;left:9px;top:50%;transform:translateY(-50%);font-size:12px;color:var(--text3);pointer-events:none}#search-results{position:absolute;top:calc(100% + 4px);left:0;right:0;background:var(--bg2);border:1px solid var(--border2);border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,0.15);max-height:280px;overflow-y:auto;z-index:100;display:none}.search-result{padding:8px 12px;cursor:pointer;font-size:12.5px;border-bottom:1px solid var(--border)}.search-result:last-child{border-bottom:none}.search-result:hover{background:var(--card2)}.search-result-title{font-weight:500;color:var(--text)}.search-result-sub{font-size:11px;color:var(--text3);margin-top:1px}.topbar-right{margin-left:auto;display:flex;align-items:center;gap:8px}.topbar-logo{font-family:'Poppins',system-ui,sans-serif;font-size:12px;font-weight:700;color:var(--accent);white-space:nowrap;margin-left:4px}#main{flex:1;overflow-y:auto;height:100%;min-width:0}#main::-webkit-scrollbar{width:6px}#main::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}.screen{display:none}.screen.active{display:block}#screen-home.active{min-height:100%;display:flex;flex-direction:column;justify-content:center;padding:48px 64px;background:var(--hero-bg)}.home-eyebrow{font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.6);margin-bottom:14px}.home-title{font-family:'Poppins',system-ui,sans-serif;font-size:40px;font-weight:700;line-height:1.2;color:#fff;margin-bottom:14px}.home-title span{color:#7AB8F5}.home-desc{font-size:15px;color:rgba(255,255,255,0.72);max-width:560px;line-height:1.75;margin-bottom:36px}.home-stats{display:flex;gap:36px;flex-wrap:wrap;margin-bottom:48px}.stat-val{font-family:'Poppins',system-ui,sans-serif;font-size:26px;font-weight:700;color:#fff}.stat-label{font-size:11px;color:rgba(255,255,255,0.55);margin-top:2px}.home-modules{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;max-width:900px}.home-mod-card{background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:12px 16px;cursor:pointer;transition:background .15s,border-color .15s}.home-mod-card:hover{background:rgba(255,255,255,0.14);border-color:rgba(255,255,255,0.22)}.home-mod-num{font-size:10px;font-weight:600;color:rgba(255,255,255,0.45);margin-bottom:3px}.home-mod-title{font-size:13px;font-weight:500;color:rgba(255,255,255,0.9);line-height:1.4}.mod-page{padding:36px 56px 48px;max-width:960px}.mod-eyebrow{font-size:10px;font-weight:600;letter-spacing:1.2px;text-transform:uppercase;color:var(--text3);margin-bottom:6px}.mod-title{font-family:'Poppins',system-ui,sans-serif;font-size:26px;font-weight:700;color:var(--text);line-height:1.3;margin-bottom:8px}.mod-desc{font-size:14px;color:var(--text2);line-height:1.75;max-width:720px;margin-bottom:32px}.section{margin-bottom:32px}.section-title{font-size:11px;font-weight:700;letter-spacing:.9px;text-transform:uppercase;color:var(--text3);margin-bottom:14px;padding-bottom:7px;border-bottom:1px solid var(--border)}.terms-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px}.term-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px 16px;transition:border-color .15s,box-shadow .15s}.term-card:hover{border-color:var(--border2);box-shadow:var(--shadow)}.term-name{font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px}.term-def{font-size:13px;color:var(--text2);line-height:1.6}.term-tag{display:inline-block;font-size:10px;font-weight:600;padding:2px 8px;border-radius:99px;background:var(--accent-bg);color:var(--accent-text);margin-bottom:7px}.comp-table{width:100%;border-collapse:collapse;font-size:13px;border-radius:10px;overflow:hidden;border:1px solid var(--border)}.comp-table th{background:var(--bg3);color:var(--text2);font-weight:600;font-size:11px;letter-spacing:.5px;text-transform:uppercase;padding:9px 13px;text-align:left;border-bottom:1px solid var(--border2)}.comp-table td{padding:10px 13px;border-bottom:1px solid var(--border);color:var(--text2);vertical-align:top;line-height:1.5}.comp-table tr:last-child td{border-bottom:none}.comp-table tr:hover td{background:var(--card);color:var(--text)}.comp-table td:first-child{font-weight:500;color:var(--text)}.hl-gold{color:var(--gold)!important;font-weight:600}.hl-teal{color:var(--teal)!important;font-weight:600}.hl-red{color:var(--red)!important}.hl-acc{color:var(--accent)!important;font-weight:600}.flow{display:flex;flex-direction:column}.flow-step{display:flex;gap:14px;align-items:flex-start}.flow-line{display:flex;flex-direction:column;align-items:center;flex-shrink:0}.flow-dot{width:30px;height:30px;border-radius:50%;background:var(--bg3);border:1.5px solid var(--accent);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--accent);flex-shrink:0;z-index:1}.flow-connector{width:1.5px;height:24px;background:var(--border2);margin:0 auto}.flow-body{padding-bottom:20px;flex:1}.flow-title{font-size:13.5px;font-weight:600;color:var(--text);margin-bottom:3px}.flow-desc{font-size:13px;color:var(--text2);line-height:1.6}.flow-meta{display:inline-block;font-size:11px;background:var(--accent-bg);color:var(--accent-text);padding:2px 8px;border-radius:99px;margin-top:5px}.info-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px;margin-bottom:10px}.info-box{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px 16px}.info-box.accent{border-left:3px solid var(--accent)}.info-box.gold{border-left:3px solid var(--gold)}.info-box.teal{border-left:3px solid var(--teal)}.info-box.red{border-left:3px solid var(--red)}.info-box-title{font-size:13px;font-weight:600;color:var(--text);margin-bottom:5px}.info-box-body{font-size:13px;color:var(--text2);line-height:1.6}.info-box-val{font-family:'Poppins',system-ui,sans-serif;font-size:20px;font-weight:700;color:var(--text);margin-bottom:2px}.callout{border-radius:10px;padding:13px 16px;margin-bottom:14px;font-size:13px;line-height:1.7}.callout.tip{background:var(--teal-bg);border:1px solid rgba(26,158,120,0.2);color:var(--teal)}.callout.warn{background:var(--gold-bg);border:1px solid rgba(232,160,32,0.2);color:var(--gold)}.callout.info{background:var(--accent-bg);border:1px solid rgba(42,127,232,0.2);color:var(--accent)}.callout.red{background:var(--red-bg);border:1px solid rgba(212,64,64,0.2);color:var(--red)}.callout strong{font-weight:600}.two-col{display:grid;grid-template-columns:1fr 1fr;gap:18px}.pill-list{display:flex;flex-wrap:wrap;gap:7px;margin-top:8px}.pill{font-size:12px;padding:4px 11px;border-radius:99px;border:1px solid var(--border2);color:var(--text2);background:var(--bg2)}.waterfall{display:flex;flex-direction:column;gap:2px}.wf-item{display:flex;align-items:center;gap:10px;padding:9px 14px;border-radius:8px;font-size:13px}.wf-num{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0}.wf-label{flex:1;font-weight:500;color:var(--text)}.wf-note{font-size:11.5px;color:var(--text3)}.wf-1{background:var(--accent-bg)}.wf-1 .wf-num{background:rgba(42,127,232,0.25);color:var(--accent)}.wf-2{background:var(--accent-bg);opacity:.8}.wf-2 .wf-num{background:rgba(42,127,232,0.18);color:var(--accent)}.wf-3{background:var(--teal-bg)}.wf-3 .wf-num{background:rgba(26,158,120,0.25);color:var(--teal)}.wf-4{background:var(--gold-bg)}.wf-4 .wf-num{background:rgba(232,160,32,0.25);color:var(--gold)}.wf-5{background:var(--gold-bg);opacity:.8}.wf-5 .wf-num{background:rgba(232,160,32,0.18);color:var(--gold)}.wf-6{background:var(--red-bg)}.wf-6 .wf-num{background:rgba(212,64,64,0.2);color:var(--red)}.mod-nav{display:flex;justify-content:space-between;align-items:center;margin-top:40px;padding-top:20px;border-top:1px solid var(--border)}.nav-btn{display:flex;align-items:center;gap:7px;padding:9px 18px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;transition:all .12s;border:1px solid var(--border2);background:transparent;color:var(--text2)}.nav-btn:hover{background:var(--card2);color:var(--text)}.nav-btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}.nav-btn.primary:hover{background:var(--accent2)}.nav-btn:disabled{opacity:.3;cursor:default;pointer-events:none}.nav-btn.green{background:var(--teal);border-color:var(--teal);color:#fff}.mod-progress{font-size:12px;color:var(--text3)}.faq-search-bar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}.faq-search-bar input,.faq-search-bar select{padding:7px 12px;border-radius:8px;border:1px solid var(--border2);background:var(--bg2);color:var(--text);font-size:13px;outline:none}.faq-search-bar input{flex:1;min-width:180px}.faq-search-bar input:focus,.faq-search-bar select:focus{border-color:var(--accent)}.faq-section-label{font-size:10px;font-weight:700;letter-spacing:.9px;text-transform:uppercase;color:var(--text3);margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid var(--border)}.faq-item{border-radius:8px;margin-bottom:7px;overflow:hidden;border:1px solid var(--border)}.faq-q{padding:9px 13px;font-size:13px;font-weight:600;color:var(--text);line-height:1.5;cursor:pointer;transition:background .12s;display:flex;justify-content:space-between;align-items:flex-start;gap:8px}.faq-q:hover{background:var(--card2)}.faq-q-text{flex:1}.faq-chevron{flex-shrink:0;font-size:11px;color:var(--text3);transition:transform .2s;margin-top:2px}.faq-a{display:none;padding:9px 13px;font-size:13px;color:var(--text2);line-height:1.7;border-top:1px solid var(--border);background:var(--bg2)}.faq-a.open{display:block}.stat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px}.stat-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px 16px;text-align:center}.stat-card-val{font-family:'Poppins',system-ui,sans-serif;font-size:22px;font-weight:700;color:var(--accent);margin-bottom:3px}.stat-card-label{font-size:12px;color:var(--text2);line-height:1.4}@media(max-width:840px){#sidebar{position:fixed;z-index:20;height:100%}.mod-page{padding:24px 20px 36px}#screen-home{padding:36px 20px}.home-title{font-size:28px}.two-col{grid-template-columns:1fr}.home-modules{grid-template-columns:1fr 1fr}}#editor-modal{display:none;position:fixed;inset:0;background:rgba(10,15,30,0.7);z-index:9000;align-items:flex-start;justify-content:center;padding:24px 16px;overflow-y:auto}#editor-modal.open{display:flex}.editor-panel{background:#ffffff;border-radius:14px;width:min(860px,98vw);display:flex;flex-direction:column;box-shadow:0 32px 80px rgba(0,0,0,0.35);flex-shrink:0;margin:auto}.editor-hdr{display:flex;align-items:center;justify-content:space-between;padding:16px 22px;border-bottom:2px solid #e8eaf0;flex-wrap:wrap;gap:8px;background:#f7f8fc;border-radius:14px 14px 0 0}.editor-hdr-title{font-size:14px;font-weight:700;color:#1a2233;max-width:400px}.editor-tabs{display:flex;gap:6px;flex-wrap:wrap}.editor-tab{padding:5px 14px;border-radius:7px;border:1.5px solid #d0d5e0;background:#ffffff;font-size:12.5px;cursor:pointer;color:#4a5568;font-family:var(--font);font-weight:500}.editor-tab.active{background:#1A6BC8;color:#fff;border-color:#1A6BC8}.editor-tab.close-tab{border-color:#e0d0d0;color:#c0392b}.editor-body{padding:18px 22px;overflow-y:auto;max-height:60vh}.editor-label{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:#8a95a8;margin-bottom:6px}.editor-input{width:100%;padding:9px 13px;border-radius:8px;border:1.5px solid #d0d5e0;background:#ffffff;color:#1a2233;font-family:var(--font);font-size:13.5px;user-select:text!important;-webkit-user-select:text!important;margin-bottom:16px;box-sizing:border-box}.editor-input:focus{outline:none;border-color:#1A6BC8;box-shadow:0 0 0 3px rgba(26,107,200,0.1)}.rte-toolbar{display:flex;gap:4px;padding:8px 10px;background:#f0f2f7;border:1.5px solid #d0d5e0;border-bottom:none;border-radius:8px 8px 0 0;flex-wrap:wrap}.rte-btn{padding:4px 9px;border-radius:5px;border:1px solid #d0d5e0;background:#ffffff;font-size:12px;cursor:pointer;color:#1a2233;font-family:var(--font);line-height:1.4;min-width:28px;text-align:center}.rte-btn:hover{background:#e8eaf0}.rte-btn.active{background:#1A6BC8;color:#fff;border-color:#1A6BC8}.rte-sep{width:1px;background:#d0d5e0;margin:2px 4px}.rte-body{min-height:340px;padding:14px 16px;border:1.5px solid #d0d5e0;border-radius:0 0 8px 8px;background:#ffffff;color:#1a2233;font-family:var(--font);font-size:14px;line-height:1.7;user-select:text!important;-webkit-user-select:text!important;overflow-y:auto;outline:none;margin-bottom:14px}.rte-body:focus{border-color:#1A6BC8;box-shadow:0 0 0 3px rgba(26,107,200,0.1)}.rte-body h3{font-size:15px;font-weight:700;color:#1a2233;margin:14px 0 6px}.rte-body ul,.rte-body ol{padding-left:22px;margin:6px 0}.rte-body li{margin:3px 0}.rte-body table{border-collapse:collapse;width:100%;margin:10px 0;font-size:13px}.rte-body th{background:#f0f2f7;padding:7px 10px;border:1px solid #d0d5e0;text-align:left;font-weight:600}.rte-body td{padding:7px 10px;border:1px solid #d0d5e0}.rte-body blockquote{border-left:3px solid #1A6BC8;padding:8px 14px;background:#f4f7fb;margin:10px 0;border-radius:0 6px 6px 0;font-style:italic}.editor-footer{display:flex;align-items:center;justify-content:space-between;padding:12px 22px;border-top:2px solid #e8eaf0;flex-shrink:0;background:#f7f8fc;border-radius:0 0 14px 14px}.editor-meta{font-size:11px;color:#8a95a8}.btn-save-content{padding:9px 26px;border-radius:8px;background:#1A6BC8;color:#fff;border:none;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font)}.btn-save-content:hover{background:#1558A8}.btn-save-content:disabled{opacity:.5;cursor:not-allowed}.history-row{display:flex;align-items:center;padding:10px 0;border-bottom:1px solid #e8eaf0}.history-row:last-child{border-bottom:none}.history-ver{font-weight:700;color:#1A6BC8;font-size:13px;min-width:50px}.history-info{flex:1;margin:0 14px}.history-who{font-size:12px;color:#1a2233;font-weight:600}.history-when{font-size:11px;color:#8a95a8}.history-badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px;background:rgba(0,160,100,.12);color:#008060}.btn-restore{padding:5px 12px;border-radius:6px;background:#0D8A65;color:#fff;border:none;font-size:11.5px;cursor:pointer;font-family:var(--font)}.edit-mod-btn{position:absolute;top:10px;right:10px;z-index:10;padding:4px 12px;border-radius:6px;background:#1A6BC8;color:#fff;border:none;font-size:11px;font-weight:600;cursor:pointer;font-family:var(--font);opacity:.9}.edit-mod-btn:hover{opacity:1;background:#1558A8}.live-badge{display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:600;color:#008060;background:rgba(0,128,90,.1);padding:2px 8px;border-radius:99px;margin-left:8px;vertical-align:middle}.live-badge::before{content:'●';font-size:7px}</style>
+<script>
+(function(){
+  var ALLOWED = ['INPUT','TEXTAREA'];
+
+  function inEditor(el) {
+    // Allow all interactions inside the editor modal
+    while (el) {
+      if (el.id === 'editor-modal') return true;
+      if (el.contentEditable === 'true') return true;
+      el = el.parentElement;
+    }
+    return false;
+  }
+  function isInput(){ 
+    var ae = document.activeElement;
+    return ALLOWED.includes(ae && ae.tagName) || inEditor(ae);
+  }
+  function isInputTarget(e){ 
+    return ALLOWED.includes(e.target && e.target.tagName) || inEditor(e.target);
+  }
+
+  document.addEventListener('contextmenu', function(e){
+    if (inEditor(e.target)) return; // allow right-click in editor
+    e.preventDefault(); return false;
+  });
+
+  document.addEventListener('keydown', function(e){
+    if (inEditor(e.target)) return; // allow all keys in editor
+    var k = (e.key || '').toLowerCase();
+    if (
+      (e.ctrlKey && k === 'u') ||
+      (e.ctrlKey && k === 's') ||
+      (e.ctrlKey && !isInput() && k === 'a') ||
+      (e.ctrlKey && !isInput() && k === 'c') ||
+      (e.ctrlKey && !isInput() && k === 'x') ||
+      (e.ctrlKey && e.shiftKey && ['i','j','c'].includes(k)) ||
+      k === 'f12'
+    ) { e.preventDefault(); e.stopPropagation(); return false; }
+  }, true);
+
+  document.addEventListener('selectstart', function(e){
+    if (isInputTarget(e)) return;
+    e.preventDefault(); return false;
+  }, true);
+
+  document.addEventListener('copy', function(e){
+    if (isInput()) return; // allow copy in editor/inputs
+    e.preventDefault();
+    if (e.clipboardData){ e.clipboardData.setData('text/plain',''); }
+    if (navigator.clipboard && navigator.clipboard.writeText){
+      try { navigator.clipboard.writeText(''); } catch(err){}
+    }
+    return false;
+  }, true);
+
+  document.addEventListener('cut', function(e){
+    if (isInput()) return;
+    e.preventDefault(); return false;
+  }, true);
+
+  document.addEventListener('mouseup', function(e){
+    if (isInputTarget(e)) return;
+    var sel = window.getSelection ? window.getSelection() : document.selection;
+    if (sel){ try { sel.removeAllRanges ? sel.removeAllRanges() : sel.empty(); } catch(err){} }
+  });
+
+  document.addEventListener('dragstart', function(e){
+    if (isInputTarget(e)) return;
+    e.preventDefault(); return false;
+  });
+})();
+</script>
+</head>
+<body>
+
+<div id="topbar">
+    <button id="toggle-sidebar" onclick="toggleSidebar()" title="Toggle sidebar">☰</button>
+    <span class="topbar-logo">Compliance & Regulatory Framework</span>
+    <div id="search-box">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="global-search" placeholder="Jump to any topic…" oninput="doSearch(this.value)" onblur="hideSearch()" onfocus="if(this.value)doSearch(this.value)">
+      <div id="search-results"></div>
+    </div>
+  </div>
+
+<div id="app">
+
+<aside id="sidebar">
+  <div class="sidebar-head">
+    <div class="sidebar-brand">Validus Learning</div>
+    <div class="sidebar-title">Compliance &amp; Regulatory Framework</div>
+    <div class="sidebar-sub">Client Engagement Playbook</div>
+  </div>
+  <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+  <div class="progress-label"><span id="progress-text">0 of 12 visited</span><span id="progress-pct">0%</span></div>
+  <nav id="sidebar-nav">
+    <div class="nav-item active" onclick="goTo('home')" id="nav-home"><div class="nav-num">⌂</div><div class="nav-label">Home</div></div>
+    <div class="nav-section">Foundation</div>
+    <div class="nav-item" onclick="goTo(0)" id="nav-0"><div class="nav-num">1</div><div class="nav-label">Regulatory Landscape</div></div>
+    <div class="nav-section">Securities Law</div>
+    <div class="nav-item" onclick="goTo(1)" id="nav-1"><div class="nav-num">2</div><div class="nav-label">SEBI MF Regs</div></div>
+    <div class="nav-item" onclick="goTo(2)" id="nav-2"><div class="nav-num">3</div><div class="nav-label">SEBI AIF Regs</div></div>
+    <div class="nav-section">Financial Crime</div>
+    <div class="nav-item" onclick="goTo(3)" id="nav-3"><div class="nav-num">4</div><div class="nav-label">AML & PMLA</div></div>
+    <div class="nav-item" onclick="goTo(4)" id="nav-4"><div class="nav-num">5</div><div class="nav-label">KYC & KRA</div></div>
+    <div class="nav-section">Data & Privacy</div>
+    <div class="nav-item" onclick="goTo(5)" id="nav-5"><div class="nav-num">6</div><div class="nav-label">DPDP Act</div></div>
+    <div class="nav-section">Investor Protection</div>
+    <div class="nav-item" onclick="goTo(6)" id="nav-6"><div class="nav-num">7</div><div class="nav-label">Grievance Redressal</div></div>
+    <div class="nav-section">Distribution Compliance</div>
+    <div class="nav-item" onclick="goTo(7)" id="nav-7"><div class="nav-num">8</div><div class="nav-label">NISM & Distributors</div></div>
+    <div class="nav-section">Governance</div>
+    <div class="nav-item" onclick="goTo(8)" id="nav-8"><div class="nav-num">9</div><div class="nav-label">Governance & Controls</div></div>
+    <div class="nav-section">Financial Compliance</div>
+    <div class="nav-item" onclick="goTo(9)" id="nav-9"><div class="nav-num">10</div><div class="nav-label">Taxation Compliance</div></div>
+    <div class="nav-section">Governance</div>
+    <div class="nav-item" onclick="goTo(10)" id="nav-10"><div class="nav-num">11</div><div class="nav-label">Compliance Calendar</div></div>
+    <div class="nav-section">Assessment</div>
+    <div class="nav-item" onclick="goTo(11)" id="nav-11"><div class="nav-num">12</div><div class="nav-label">Deep-Dive Quiz</div></div>
+  </nav>
+</aside>
+<main id="main">
+  <section class="screen active" id="screen-home">
+    <div class="home-eyebrow">Validus Fintech · Compliance &amp; Regulatory Affairs</div>
+    <h1 class="home-title">Master the <span>Regulatory Framework</span><br>we operate inside.</h1>
+    <p class="home-desc">12 modules covering every regulatory layer that touches Validus's AIF and MF RTA operations — SEBI, AMFI, PMLA/AML, KYC frameworks, DPDP data protection, investor grievance redressal, distributor compliance, governance controls, and taxation. Built for anyone who needs to speak confidently about "why we do it this way" in a client or audit conversation.</p>
+    <div class="home-stats">
+      <div><div class="stat-val">12</div><div class="stat-label">Modules</div></div>
+      <div><div class="stat-val">6+</div><div class="stat-label">Regulators &amp; frameworks covered</div></div>
+      <div><div class="stat-val">2013-2023</div><div class="stat-label">Key legislation spanned</div></div>
+      <div><div class="stat-val">AIF + MF</div><div class="stat-label">Both business lines</div></div>
+    </div>
+    <div class="home-modules" id="home-module-grid"></div>
+  </section>
+  <div id="module-screens"></div>
+</main>
+</div>
+<script>const NEXUS_AUTH_URL='https://script.google.com/macros/s/AKfycbwoEMLW5k5kXGrQiEBOErQVa3R0aTc4YcvYw7DcOwlM3G9Rx9q0eX586f0AXhaX_dB2/exec';var editorState={isAdmin:false,adminEmail:'',editingIdx:null,liveContent:{},};(function(){try{if(window.parent&&window.parent!==window&&window.parent.state){const isDark=!!window.parent.state.dark;document.documentElement.setAttribute('data-theme',isDark?'dark':'light');}}catch(e){}})();let sidebarOpen=true;function toggleSidebar(){sidebarOpen=!sidebarOpen;document.getElementById('sidebar').classList.toggle('collapsed',!sidebarOpen);}
+const visited=new Set();let current='home';function goTo(idx){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));if(idx==='home'){document.getElementById('screen-home').classList.add('active');document.getElementById('nav-home').classList.add('active');current='home';}else{const screen=document.getElementById('screen-'+idx);if(screen){screen.classList.add('active');if(editorState.isAdmin&&!screen.querySelector('.edit-mod-btn')){const eb=document.createElement('button');eb.className='edit-mod-btn';eb.textContent='✏ Edit';eb.onclick=function(e){e.stopPropagation();openEditor(idx);};screen.style.position='relative';screen.appendChild(eb);}
+const main=document.getElementById('main');main.scrollTo({top:0,behavior:'smooth'});}
+const nav=document.getElementById('nav-'+idx);if(nav)nav.classList.add('active');for(let i=0;i<idx;i++){const n=document.getElementById('nav-'+i);if(n&&!n.classList.contains('active'))n.classList.add('done');}
+visited.add(idx);current=idx;updateProgress();}
+document.getElementById('global-search').value='';document.getElementById('search-results').style.display='none';if(idx===11)setTimeout(initQuiz,80);}
+function updateProgress(){const pct=Math.round((visited.size/MODULES.length)*100);const fill=document.getElementById('progress-fill');const txt=document.getElementById('progress-text');const pctEl=document.getElementById('progress-pct');if(fill)fill.style.width=pct+'%';if(txt)txt.textContent=visited.size+' of '+MODULES.length+' visited';if(pctEl)pctEl.textContent=pct+'%';}
+function next(n){goTo(typeof current==='number'?current+n:0);}
+const searchIndex=[];function buildSearchIndex(modules){modules.forEach((mod,idx)=>{searchIndex.push({title:mod.title,sub:mod.eyebrow,idx});if(mod.searchTerms)mod.searchTerms.forEach(t=>{searchIndex.push({title:t,sub:mod.title,idx});});});}
+function doSearch(val){const box=document.getElementById('search-results');if(!val.trim()){box.style.display='none';return;}
+const q=val.trim().replace(/[.*+?^${}()|[\]\\]/g,'\\$&');const re=new RegExp('\\b'+q+'\\b','i');const hits=searchIndex.filter(s=>re.test(s.title)||re.test(s.sub)).slice(0,8);if(!hits.length){box.style.display='none';return;}
+box.innerHTML=hits.map(h=>`<div class="search-result" onmousedown="goTo(${h.idx})">
+      <div class="search-result-title">${h.title}</div>
+      <div class="search-result-sub">${h.sub}</div>
+    </div>`).join('');box.style.display='block';}
+function hideSearch(){setTimeout(()=>{document.getElementById('search-results').style.display='none';},200);}
+function render(idx,html){const div=document.createElement('div');div.className='screen';div.id='screen-'+idx;div.innerHTML=html;document.getElementById('module-screens').appendChild(div);}
+function prevBtn(idx){return idx>0?`<button class="nav-btn" onclick="goTo(${idx-1})">← ${MODULES[idx-1] ? MODULES[idx-1].shortTitle : 'Back'}</button>`:`<button class="nav-btn" onclick="goTo('home')">← Home</button>`;}
+function nextBtn(idx){return idx<MODULES.length-1?`<button class="nav-btn primary" onclick="goTo(${idx+1})">Next: ${MODULES[idx+1].shortTitle} →</button>`:`<button class="nav-btn green" onclick="goTo('home')">↺ Back to Home</button>`;}
+function navFooter(idx){return`<div class="mod-nav">${prevBtn(idx)}<span class="mod-progress">Module ${idx+1} of ${MODULES.length}</span>${nextBtn(idx)}</div>`;}
+function modHTML(idx,eyebrow,title,desc,body){return`<div class="mod-page"><div class="mod-eyebrow">${eyebrow}</div><h2 class="mod-title">${title}</h2><p class="mod-desc">${desc}</p>${body}${navFooter(idx)}</div>`;}
+const MODULES=[{title:'The Regulatory Landscape',shortTitle:'Regulatory Landscape',eyebrow:'Module 1 · Foundation',searchTerms:['SEBI','AMFI','RBI','FIU','regulators','who regulates RTAs']},{title:'SEBI Mutual Fund Regulations — Deep Dive',shortTitle:'SEBI MF Regs',eyebrow:'Module 2 · Securities Law',searchTerms:['SEBI Mutual Funds Regulations 1996','scheme categorisation','RTA registration','TAT']},{title:'SEBI AIF Regulations — Deep Dive',shortTitle:'SEBI AIF Regs',eyebrow:'Module 3 · Securities Law',searchTerms:['SEBI AIF Regulations 2012','Category I II III','large value fund','accredited investor']},{title:'AML & PMLA Compliance Framework',shortTitle:'AML & PMLA',eyebrow:'Module 4 · Financial Crime',searchTerms:['Prevention of Money Laundering Act','AML','STR','predicate offence','risk based approach']},{title:'KYC, KRA & CKYC Requirements',shortTitle:'KYC & KRA',eyebrow:'Module 5 · Financial Crime',searchTerms:['KYC Registration Agency','CKYC','CERSAI','Aadhaar eKYC','IPV']},{title:'Data Protection — DPDP Act, 2023',shortTitle:'DPDP Act',eyebrow:'Module 6 · Data & Privacy',searchTerms:['Digital Personal Data Protection Act','data fiduciary','data processor','data breach']},{title:'Investor Grievance Redressal',shortTitle:'Grievance Redressal',eyebrow:'Module 7 · Investor Protection',searchTerms:['SCORES','SEBI grievance portal','complaint resolution','turnaround time']},{title:'NISM Certification & Distributor Compliance',shortTitle:'NISM & Distributors',eyebrow:'Module 8 · Distribution Compliance',searchTerms:['NISM Series V-A','ARN','EUIN','distributor certification']},{title:'Corporate Governance & Internal Controls',shortTitle:'Governance & Controls',eyebrow:'Module 9 · Governance',searchTerms:['maker checker','internal audit','segregation of duties','conflict of interest']},{title:'Taxation Compliance Overview',shortTitle:'Taxation Compliance',eyebrow:'Module 10 · Financial Compliance',searchTerms:['TDS','STT','capital gains reporting','Form 16A','tax compliance']},{title:'Compliance Calendar & Regulatory Reporting',shortTitle:'Compliance Calendar',eyebrow:'Module 11 · Governance',searchTerms:['compliance calendar','regulatory filing cadence','reporting deadlines']},{title:'Regulatory Deep-Dive Quiz',shortTitle:'Deep-Dive Quiz',eyebrow:'Module 12 · Assessment',searchTerms:['quiz','compliance quiz','regulatory knowledge check']}];
+buildSearchIndex(MODULES);const grid=document.getElementById('home-module-grid');MODULES.forEach((m,i)=>{const card=document.createElement('div');card.className='home-mod-card';card.innerHTML=`<div class="home-mod-num">Module ${i+1}</div><div class="home-mod-title">${m.title}</div>`;card.onclick=()=>goTo(i);grid.appendChild(card);});
+render(0,modHTML(0,MODULES[0].eyebrow,MODULES[0].title,`Every regulator whose rules touch Validus's day-to-day operations, and why.`,`<div class="section">
+<div class="section-title">The regulators that shape our work</div>
+<div class="terms-grid">
+<div class="term-card"><div class="term-name">SEBI</div><div class="term-def">Securities and Exchange Board of India — the primary regulator for both AIFs (2012 Regulations) and Mutual Funds (1996 Regulations), and for RTAs themselves.</div></div>
+<div class="term-card"><div class="term-name">AMFI</div><div class="term-def">Association of Mutual Funds in India — the MF industry's self-regulatory body, standardising KYC, distributor conduct, and investor communication practices.</div></div>
+<div class="term-card"><div class="term-name">RBI</div><div class="term-def">Reserve Bank of India — governs banking-side matters relevant to RTA operations: NACH mandates, payment systems, and FEMA rules for NRI/foreign investments.</div></div>
+<div class="term-card"><div class="term-name">FIU-IND</div><div class="term-def">Financial Intelligence Unit — India's central agency for receiving and analysing Suspicious Transaction Reports (STRs) under PMLA.</div></div>
+</div>
+</div>
+<div class="section">
+<div class="callout info">As an RTA, Validus doesn't just follow one rulebook — we operate at the intersection of securities law, banking regulation, data protection law, and labour law. This module set is a working reference, not a substitute for legal advice — when in doubt, escalate to the compliance team.</div>
+</div>`));
+render(1,modHTML(1,MODULES[1].eyebrow,MODULES[1].title,`The foundational framework governing every mutual fund scheme we service.`,`<div class="section">
+<div class="section-title">What the 1996 Regulations govern</div>
+<table class="comp-table">
+<thead><tr><th>Area</th><th>What it covers</th></tr></thead>
+<tbody>
+<tr><td>Scheme structure</td><td>Trust-based structure, roles of Sponsor/Trustee/AMC, scheme categorisation (2017 circular)</td></tr>
+<tr><td>Disclosure</td><td>Scheme Information Document (SID), Key Information Memorandum (KIM), portfolio disclosures</td></tr>
+<tr><td>Investor protection</td><td>NAV computation rules, cut-off timing, redemption TAT, unclaimed amounts handling</td></tr>
+<tr><td>RTA obligations</td><td>Registration requirements, record-keeping standards, investor grievance handling</td></tr>
+<tr><td>Advertising & conduct</td><td>Restrictions on misleading performance claims, standardised risk disclosures</td></tr>
+</tbody>
+</table>
+<div class="callout warn">SEBI periodically issues circulars that amend or clarify these regulations — the demat mandate, nomination rules, and expense ratio caps all arrived this way. The compliance team tracks circulars continuously; operational teams implement them once notified.</div>
+</div>`));
+render(2,modHTML(2,MODULES[2].eyebrow,MODULES[2].title,`The framework governing every AIF scheme we service — distinct in almost every respect from mutual fund regulation.`,`<div class="section">
+<div class="section-title">What the 2012 Regulations govern</div>
+<table class="comp-table">
+<thead><tr><th>Area</th><th>What it covers</th></tr></thead>
+<tbody>
+<tr><td>Categorisation</td><td>Category I, II, III — each with distinct investment restrictions and leverage rules</td></tr>
+<tr><td>Investor eligibility</td><td>₹1 crore minimum investment; investor count capped at 1,000 per scheme (with large-value exemptions)</td></tr>
+<tr><td>Governance</td><td>Investment Manager obligations, conflict-of-interest disclosure, valuation norms</td></tr>
+<tr><td>Reporting</td><td>Periodic reporting to SEBI, benchmarking of performance, leverage disclosure for Cat III</td></tr>
+<tr><td>Demat mandate</td><td>Since 2023, new AIF schemes must issue units only in dematerialised form</td></tr>
+</tbody>
+</table>
+<div class="callout info"><strong>Accredited investors</strong> — a 2021 SEBI framework allows certain high-net-worth individuals and institutions, once accredited, to access relaxed investment conditions in AIFs. RTAs must verify accreditation status during onboarding where relevant.</div>
+</div>`));
+render(3,modHTML(3,MODULES[3].eyebrow,MODULES[3].title,`How Validus screens for and reports suspicious financial activity across every business line.`,`<div class="section">
+<div class="section-title">The PMLA obligation chain</div>
+<div class="flow">
+<div class="flow-step"><div class="flow-line"><div class="flow-dot">1</div><div class="flow-connector"></div></div><div class="flow-body"><div class="flow-title">Risk-Based Approach (RBA)</div><div class="flow-desc">Every investor is risk-classified at onboarding — standard, or enhanced due diligence for higher-risk profiles (PEPs, high-risk jurisdictions, complex structures).</div></div></div>
+<div class="flow-step"><div class="flow-line"><div class="flow-dot">2</div><div class="flow-connector"></div></div><div class="flow-body"><div class="flow-title">Ongoing monitoring</div><div class="flow-desc">Every transaction — drawdown, purchase, redemption — is screened against AML parameters, not just the initial onboarding check.</div></div></div>
+<div class="flow-step"><div class="flow-line"><div class="flow-dot">3</div><div class="flow-connector"></div></div><div class="flow-body"><div class="flow-title">STR identification</div><div class="flow-desc">Suspicious patterns are flagged internally and escalated to the AMC, who as the reporting entity decides whether to file a Suspicious Transaction Report with FIU-IND.</div></div></div>
+<div class="flow-step"><div class="flow-line"><div class="flow-dot">4</div><div class="flow-connector"></div></div><div class="flow-body"><div class="flow-title">Record retention</div><div class="flow-desc">KYC records and transaction history are retained for the periods PMLA mandates — critical for regulatory inspection readiness.</div></div></div>
+</div>
+</div>
+<div class="section">
+<div class="callout warn">Confidentiality note: STR-related information is never disclosed to the investor under investigation ("tipping off" is itself an offence under PMLA). Only the AMC, as reporting entity, is informed.</div>
+</div>`));
+render(4,modHTML(4,MODULES[4].eyebrow,MODULES[4].title,`The regulatory backbone behind every investor's identity verification.`,`<div class="section">
+<div class="terms-grid">
+<div class="term-card"><div class="term-name">KRA</div><div class="term-def">SEBI-registered KYC Registration Agencies (CVL KRA, CAMS KRA, NDML, and others) hold a centralised, industry-wide KYC record — completed once, usable across every AMC and RTA.</div></div>
+<div class="term-card"><div class="term-name">CKYC</div><div class="term-def">CERSAI's Central KYC Registry — a government-run utility spanning banks, insurers, and mutual funds, cross-checked to avoid duplicate KYC collection across financial sectors.</div></div>
+<div class="term-card"><div class="term-name">Aadhaar e-KYC</div><div class="term-def">OTP or biometric-based paperless verification — the fastest onboarding path, subject to consent and regulatory limits on Aadhaar-based authentication.</div></div>
+<div class="term-card"><div class="term-name">IPV</div><div class="term-def">In-Person Verification — required for physical-mode onboarding, traditionally performed by a distributor or bank official; increasingly supplemented by video-based verification.</div></div>
+</div>
+</div>
+<div class="section">
+<div class="callout info">KYC status flows in four states — <strong>Verified, Registered, Hold, Rejected</strong> — and only Verified status permits unrestricted transacting. A small-value relaxation (up to ₹50,000/year) allows limited investment on "Registered" status pending full verification, a deliberate SEBI accommodation for financial inclusion.</div>
+</div>`));
+render(5,modHTML(5,MODULES[5].eyebrow,MODULES[5].title,`India's data protection law, and exactly where Validus sits in its structure.`,`<div class="section">
+<div class="section-title">Our position in the DPDP framework</div>
+<div class="two-col">
+<div class="info-box accent"><div class="info-box-title">Data Fiduciary</div><div class="info-box-body">The AMC/fund manager we serve — they determine the purpose and means of processing investor personal data, and bear primary accountability to the investor and to regulators.</div></div>
+<div class="info-box teal"><div class="info-box-title">Data Processor</div><div class="info-box-body">Validus — we process investor personal data strictly on the Data Fiduciary's instructions, for the purposes they've authorised, and no further.</div></div>
+</div>
+</div>
+<div class="section">
+<div class="section-title">What this means operationally</div>
+<div class="terms-grid">
+<div class="term-card"><div class="term-name">Data localisation</div><div class="term-def">Investor data is stored on infrastructure located in India, with no investor PII stored or processed outside the country.</div></div>
+<div class="term-card"><div class="term-name">Purpose limitation</div><div class="term-def">Data collected for onboarding/servicing cannot be repurposed (e.g. for unrelated marketing) without fresh consent.</div></div>
+<div class="term-card"><div class="term-name">Breach notification</div><div class="term-def">Any suspected data breach must be escalated immediately per internal incident-response protocol — DPDP imposes strict notification timelines to the Data Protection Board and affected individuals.</div></div>
+<div class="term-card"><div class="term-name">Access controls</div><div class="term-def">Role-based access ensures employees see only the data their function requires — a core technical safeguard under the Act's "reasonable security" standard.</div></div>
+</div>
+</div>`));
+render(6,modHTML(6,MODULES[6].eyebrow,MODULES[6].title,`How an investor complaint reaches us, and the clock that starts ticking the moment it does.`,`<div class="section">
+<div class="section-title">SCORES — SEBI's centralised grievance system</div>
+<div class="callout info">SCORES (SEBI Complaints Redress System) is the mandatory online portal through which investors can escalate unresolved grievances directly to the regulator. A complaint reaching SCORES means the AMC — and by extension Validus as their RTA — didn't resolve it fast enough through normal channels.</div>
+<table class="comp-table">
+<thead><tr><th>Stage</th><th>Timeline</th></tr></thead>
+<tbody>
+<tr><td>Direct investor complaint (email/call/app) to RTA</td><td>Typically resolved within 5-10 business days depending on complexity</td></tr>
+<tr><td>Escalation to AMC if unresolved</td><td>AMC-defined internal escalation matrix</td></tr>
+<tr><td>SCORES complaint resolution</td><td>21 calendar days, SEBI-mandated</td></tr>
+</tbody>
+</table>
+</div>
+<div class="section">
+<div class="callout warn">Every complaint — regardless of channel — should be logged, tracked to resolution, and never left to quietly expire. A pattern of unresolved complaints is a regulatory red flag for the AMC, not just a service metric.</div>
+</div>`));
+render(7,modHTML(7,MODULES[7].eyebrow,MODULES[7].title,`The certification and identification chain that keeps distribution compliant.`,`<div class="section">
+<div class="terms-grid">
+<div class="term-card"><div class="term-name">NISM-Series-V-A</div><div class="term-def">The mandatory certification every mutual fund distributor must hold and periodically renew — administered by the National Institute of Securities Markets.</div></div>
+<div class="term-card"><div class="term-name">ARN</div><div class="term-def">AMFI Registration Number — the distributor entity's unique identifier, tied to a valid NISM certification.</div></div>
+<div class="term-card"><div class="term-name">EUIN</div><div class="term-def">Employee Unique Identification Number — identifies the individual who actually advised the investor, used for accountability in mis-selling investigations.</div></div>
+<div class="term-card"><div class="term-name">Upfront commission ban</div><div class="term-def">Since 2018, only trail commission is permitted industry-wide — removing the incentive to churn investors for fresh upfront payouts.</div></div>
+</div>
+</div>
+<div class="section">
+<div class="callout warn">Onboarding a distributor without a valid, current ARN and NISM certification is a compliance failure, not an oversight — RTA systems should validate this before enabling any distributor code for transaction routing.</div>
+</div>`));
+render(8,modHTML(8,MODULES[8].eyebrow,MODULES[8].title,`The internal control principles that keep RTA operations trustworthy at scale.`,`<div class="section">
+<div class="section-title">Core control principles</div>
+<div class="terms-grid">
+<div class="term-card"><div class="term-name">Maker-checker</div><div class="term-def">No single individual can both initiate and approve a sensitive transaction or data change — a second, independent reviewer must sign off.</div></div>
+<div class="term-card"><div class="term-name">Segregation of duties</div><div class="term-def">Roles that could enable fraud if combined — e.g. onboarding an investor and approving their redemption — are kept with different people.</div></div>
+<div class="term-card"><div class="term-name">Audit trail</div><div class="term-def">Every action on investor or fund data is logged — who, what, when — supporting both internal review and external regulatory inspection.</div></div>
+<div class="term-card"><div class="term-name">Independent audit</div><div class="term-def">Periodic internal and statutory audits verify that controls are actually operating as designed, not just documented on paper.</div></div>
+</div>
+</div>
+<div class="section">
+<div class="callout tip">Controls exist to protect the business, the client, and the individual employee — a well-designed maker-checker step protects the "maker" from an honest mistake just as much as it protects against deliberate misconduct.</div>
+</div>`));
+render(9,modHTML(9,MODULES[9].eyebrow,MODULES[9].title,`The tax-related obligations an RTA carries on behalf of investors and funds.`,`<div class="section">
+<div class="terms-grid">
+<div class="term-card"><div class="term-name">TDS (NRI investors)</div><div class="term-def">Tax Deducted at Source applies to NRI redemptions — the RTA deducts and deposits it, and issues Form 16A. Resident investors have no TDS on capital gains.</div></div>
+<div class="term-card"><div class="term-name">STT</div><div class="term-def">Securities Transaction Tax applies automatically on equity-fund redemptions and switches, reflected as a minor NAV-adjustment.</div></div>
+<div class="term-card"><div class="term-name">Capital Gains Statements</div><div class="term-def">Generated annually (and on-demand) using FIFO cost-basis matching — a core investor-servicing and tax-filing-support deliverable.</div></div>
+<div class="term-card"><div class="term-name">FATCA/CRS reporting</div><div class="term-def">Foreign tax residency declarations collected at onboarding feed into AMC-level regulatory reporting for cross-border tax transparency.</div></div>
+</div>
+</div>
+<div class="section">
+<div class="callout info">Tax rules change with each Union Budget — 2023 (debt fund indexation removed) and 2024 (equity capital gains rates revised) both materially changed how RTA systems must compute and report gains. The compliance team tracks these changes; operational teams implement the updated logic.</div>
+</div>`));
+render(10,modHTML(10,MODULES[10].eyebrow,MODULES[10].title,`The recurring rhythm of regulatory obligations that never stops running in the background.`,`<div class="section">
+<div class="section-title">Recurring compliance activities</div>
+<table class="comp-table">
+<thead><tr><th>Activity</th><th>Typical cadence</th></tr></thead>
+<tbody>
+<tr><td>AML/KYC re-screening</td><td>Monthly, plus real-time on every transaction</td></tr>
+<tr><td>SEBI periodic reporting (AIF/MF)</td><td>Quarterly and annual, per applicable regulation</td></tr>
+<tr><td>FATCA/CRS annual filing</td><td>Annual, AMC-level</td></tr>
+<tr><td>KYC re-verification cycles</td><td>Periodic, risk-based (more frequent for higher-risk investors)</td></tr>
+<tr><td>Internal & statutory audits</td><td>Periodic per audit plan, plus surprise inspections</td></tr>
+</tbody>
+</table>
+<div class="callout tip">A compliance calendar is only useful if it's actively monitored — missed deadlines are rarely due to not knowing the rule, but to the reminder not reaching the right person in time.</div>
+</div>`));
+render(11,modHTML(11,MODULES[11].eyebrow,MODULES[11].title,`Test your grasp of the regulatory framework before you're the one answering a client's compliance question.`,`<div class="section"><div class="section-title">Compliance knowledge check</div>
+<div id="quiz-wrap">
+  <div id="quiz-progress-bar" style="height:4px;background:var(--border2,rgba(0,0,0,0.1));border-radius:2px;margin-bottom:16px"><div id="quiz-pbar" style="height:100%;width:0%;background:var(--accent,#1A6BC8);border-radius:2px;transition:width .3s"></div></div>
+  <div id="quiz-q-counter" style="font-size:11px;color:var(--text3,#6b7a8d);margin-bottom:8px"></div>
+  <div id="quiz-body"></div>
+  <div id="quiz-result" style="display:none"></div>
+</div>
+</div>`));
+var quizBank=[
+{q:"Under PMLA, who decides whether to actually file a Suspicious Transaction Report?",opts:["The RTA (Validus)","The AMC, as the reporting entity","The investor","SEBI directly"],ans:1,exp:"Validus flags suspicious activity and shares details with the AMC, but the AMC \u2014 as the reporting entity \u2014 decides whether to file the STR with FIU-IND.",mod:3},
+{q:"What is the maximum number of investors permitted in a standard Category I or II AIF scheme?",opts:["500","1,000","2,000","No limit"],ans:1,exp:"SEBI caps investor count at 1,000 per scheme for Category I and II AIFs, with large-value fund exemptions available under specific conditions.",mod:2},
+{q:"Under India's DPDP Act, what role does the AMC play with respect to investor data?",opts:["Data Processor","Data Fiduciary","Data Subject","Data Controller"],ans:1,exp:"The AMC is the Data Fiduciary, determining the purpose and means of processing investor data. Validus acts as their Data Processor.",mod:5},
+{q:"What is the SEBI-mandated resolution timeline for a complaint filed via SCORES?",opts:["7 calendar days","21 calendar days","45 calendar days","90 calendar days"],ans:1,exp:"SCORES complaints must be resolved within 21 calendar days \u2014 a strict SEBI-mandated turnaround time.",mod:6},
+{q:"What certification must every mutual fund distributor hold?",opts:["NISM-Series-V-A","CFA Level 1","IRDA license","CA certification"],ans:0,exp:"NISM-Series-V-A is the mandatory certification for mutual fund distributors, administered by the National Institute of Securities Markets.",mod:7},
+{q:"What is the core purpose of a maker-checker control?",opts:["To speed up transaction processing","To ensure no single individual can both initiate and approve a sensitive action","To reduce staffing costs","To automate KYC verification"],ans:1,exp:"Maker-checker ensures a second, independent reviewer signs off on sensitive transactions or data changes \u2014 protecting against both error and misconduct.",mod:8},
+{q:"Since April 2023, how are gains on debt-oriented mutual funds taxed?",opts:["20% with indexation","At the investor's income slab rate","10% flat","Same as equity funds"],ans:1,exp:"The Finance Act 2023 removed indexation and LTCG treatment for debt funds \u2014 all gains are now taxed at the investor's slab rate regardless of holding period.",mod:9},
+{q:"What does EUIN identify, as distinct from ARN?",opts:["The distributor's bank account","The specific individual who advised the investor","The AMC's registration number","The investor's risk category"],ans:1,exp:"While ARN identifies the distributor entity, EUIN identifies the specific individual employee who advised the investor \u2014 used for accountability in mis-selling cases.",mod:7},
+{q:"What government utility helps avoid duplicate KYC collection across banks, insurers, and mutual funds?",opts:["SCORES","CKYC (via CERSAI)","MFU","NISM"],ans:1,exp:"CKYC, run by CERSAI, is a cross-industry central KYC registry spanning banks, insurers, and mutual funds \u2014 reducing duplicate KYC data collection.",mod:4},
+];
+var quizState={current:0,score:0,answers:[],started:false};function shuffleArray(arr){var a=arr.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var tmp=a[i];a[i]=a[j];a[j]=tmp;}
+return a;}
+var quizData=[];function initQuiz(){var wrap=document.getElementById('quiz-body');if(!wrap)return;var QUIZ_LENGTH=12;quizData=shuffleArray(quizBank).slice(0,Math.min(QUIZ_LENGTH,quizBank.length));quizState={current:0,score:0,answers:[],started:true};showQuestion(0);}
+function showQuestion(n){var q=quizData[n];if(!q){showQuizResult();return;}
+var pct=Math.round((n/quizData.length)*100);var pb=document.getElementById('quiz-pbar');if(pb)pb.style.width=pct+'%';var ctr=document.getElementById('quiz-q-counter');if(ctr)ctr.textContent='Question '+(n+1)+' of '+quizData.length;var body=document.getElementById('quiz-body');if(!body)return;var opts=q.opts.map(function(o,i){return'<button onclick="answerQ('+n+','+i+')" style="display:block;width:100%;text-align:left;padding:10px 14px;margin-bottom:8px;border-radius:8px;border:1px solid var(--border2,rgba(0,0,0,0.13));background:var(--bg2,#fff);color:var(--text,#1a2233);font-size:13.5px;cursor:pointer;transition:all .12s" onmouseover="this.style.background=\'var(--bg3,#eef1f7)\'" onmouseout="this.style.background=\'var(--bg2,#fff)\'">'
++'<span style="display:inline-block;width:22px;height:22px;border-radius:50%;background:var(--bg3,#eef1f7);color:var(--text2,#4a5568);font-size:11px;font-weight:600;text-align:center;line-height:22px;margin-right:10px">'+String.fromCharCode(65+i)+'</span>'+o+'</button>';}).join('');body.innerHTML='<div style="font-size:15px;font-weight:500;color:var(--text,#1a2233);line-height:1.6;margin-bottom:16px">'+q.q+'</div>'+opts;}
+function answerQ(qn,chosen){var q=quizData[qn];var correct=chosen===q.ans;if(correct)quizState.score++;quizState.answers.push({qn:qn,chosen:chosen,correct:correct});var body=document.getElementById('quiz-body');if(!body)return;var btns=body.querySelectorAll('button');btns.forEach(function(b,i){b.onclick=null;b.onmouseover=null;b.onmouseout=null;if(i===q.ans){b.style.background='#E2F0D9';b.style.borderColor='#0D8A65';b.style.color='#1a2233';}
+else if(i===chosen&&!correct){b.style.background='#FCE4E4';b.style.borderColor='#B93030';b.style.color='#1a2233';}
+else{b.style.opacity='0.5';}});var exp=document.createElement('div');exp.style.cssText='margin-top:12px;padding:12px 14px;border-radius:8px;font-size:13px;line-height:1.7;background:'+(correct?'#E2F0D9':'#FCE4E4')+';color:#1a2233;border:1px solid '+(correct?'#0D8A65':'#B93030');exp.innerHTML='<strong>'+(correct?'Correct!':'Incorrect.')+'</strong> '+q.exp+'<br><span style="font-size:11px;color:#6b7a8d;margin-top:4px;display:block">See Module '+(q.mod+1)+' for full coverage.</span>';body.appendChild(exp);var next=document.createElement('button');next.style.cssText='margin-top:12px;padding:9px 20px;border-radius:8px;background:var(--accent,#1A6BC8);color:#fff;border:none;font-size:13.5px;cursor:pointer;font-weight:500';next.textContent=qn<quizData.length-1?'Next question \u2192':'See results';next.onclick=function(){showQuestion(qn+1);};body.appendChild(next);}
+function showQuizResult(){var body=document.getElementById('quiz-body');var result=document.getElementById('quiz-result');if(body)body.style.display='none';var pb=document.getElementById('quiz-pbar');if(pb)pb.style.width='100%';var ctr=document.getElementById('quiz-q-counter');if(ctr)ctr.textContent='Complete';if(!result)return;result.style.display='block';var pct=Math.round((quizState.score/quizData.length)*100);var msg=pct>=90?'Excellent! You are client-meeting ready.':pct>=70?'Good. Review the modules flagged below before your next meeting.':'Worth revisiting the key modules before a client meeting.';var colBg=pct>=90?'#E2F0D9':pct>=70?'#FDF0E2':'#FCE4E4';var colBr=pct>=90?'#0D8A65':pct>=70?'#C07800':'#B93030';var wrongItems=quizState.answers.filter(function(a){return!a.correct;}).map(function(a){var q=quizData[a.qn];return'<div style="padding:8px 0;border-bottom:1px solid var(--border,rgba(0,0,0,0.07));font-size:13px;color:var(--text2,#4a5568)">'
++'<span style="color:#B93030;font-weight:600;margin-right:6px">\u2717</span>'
++q.q
++'<div style="font-size:11.5px;color:var(--text3,#6b7a8d);margin-top:3px">Your answer: '+q.opts[a.chosen]+' \u00b7 See Module '+(q.mod+1)+'</div>'
++'</div>';}).join('');result.innerHTML='<div style="padding:16px;border-radius:10px;background:'+colBg+';border:1px solid '+colBr+';margin-bottom:16px;text-align:center">'
++'<div style="font-size:36px;font-weight:700;color:'+colBr+'">'+quizState.score+'/'+quizData.length+'</div>'
++'<div style="font-size:14px;color:var(--text,#1a2233);margin-top:4px">'+msg+'</div>'
++'</div>'
++(wrongItems?'<div style="font-size:11px;font-weight:600;letter-spacing:.7px;text-transform:uppercase;color:var(--text3,#6b7a8d);margin-bottom:8px">Review these</div>'+wrongItems:'')
++'<button onclick="initQuiz()" style="margin-top:16px;padding:9px 20px;border-radius:8px;background:var(--accent,#1A6BC8);color:#fff;border:none;font-size:13.5px;cursor:pointer;font-weight:500">Retake quiz</button>'
++(pct>=67?'<div id="complete-training-wrap" style="margin-top:20px;padding:16px;border-radius:10px;background:rgba(13,138,101,0.08);border:1px solid rgba(13,138,101,0.25);text-align:center">'
++'<div style="font-size:13px;font-weight:600;color:var(--teal,#0D8A65);margin-bottom:4px">🎓 Training requirement met</div>'
++'<div style="font-size:12px;color:var(--text2,#4a5568);margin-bottom:12px">You scored '+quizState.score+'/'+quizData.length+' — you can now claim your completion certificate.</div>'
++'<button onclick="requestCompletion()" style="padding:11px 28px;border-radius:8px;background:#0D8A65;color:#fff;border:none;font-size:14px;cursor:pointer;font-weight:600">Complete Training &amp; Get Certificate →</button>'
++'</div>':'<div style="margin-top:16px;font-size:12px;color:var(--text3,#6b7a8d)">Score at least 8/12 to unlock the completion certificate.</div>');try{window.parent.postMessage({type:'quizAttempted',moduleId:'validus-compliance',score:quizState.score,total:quizData.length},'*');}catch(e){}}
+function requestCompletion(){try{window.parent.postMessage({type:'completeTraining',moduleId:'validus-compliance',score:quizState.score,total:quizData.length,},'*');}catch(e){alert('Please open this module inside Nexus to claim your certificate.');}}
+</script>
+</body>
+</html>
