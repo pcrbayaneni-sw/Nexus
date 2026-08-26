@@ -413,7 +413,7 @@ state.email='';state.userName='';state.role='';state.currentModule=null;state.ce
 function renderCatalogue(){const completed=Object.keys(state.completions).length;const available=MODULES.filter(m=>m.status==='available').length;document.getElementById('stat-available').textContent=available;document.getElementById('stat-completed').textContent=completed;document.getElementById('stat-inprogress').textContent=available-completed;const aifGrid=document.getElementById('grid-aif');aifGrid.innerHTML='';MODULES.forEach(m=>{if(m.status!=='available')return;const done=!!state.completions[m.id];const card=document.createElement('div');card.className='module-card'+(done?' completed':'');card.onclick=()=>openModule(m);card.innerHTML=`
       ${m.isNew && !done ? '<span class="module-card-ribbon ribbon-new">NEW</span>' : ''}
       ${done ? '<span class="module-card-ribbon ribbon-new">✓ DONE</span>' : ''}
-      <div class="module-card-track">${m.trackLabel}</div>
+      <div class="module-card-track">AIF OPERATIONS</div>
       <div class="module-card-title">${m.title}</div>
       <div class="module-card-desc">${m.description}</div>
       <div class="module-card-meta">
@@ -422,7 +422,7 @@ function renderCatalogue(){const completed=Object.keys(state.completions).length
           <span class="status-dot ${done?'dot-done':'dot-open'}"></span>
           ${done ? 'Completed ' + state.completions[m.id].date + (state.completions[m.id].score ? ' · ' + state.completions[m.id].score : '') : m.duration + ' · ' + m.modules + ' modules'}
         </span>
-      </div>dd-=h;if(dd<=w)return[x+w-dd,y+h];dd-=w;return[x,y+h-dd];}doc.setLineWidth(lineWidth);let dist=0,dashIndex=0;while(dist<perimeter){const dashStart=dist;const dashEnd=Math.min(dist+dashLen,perimeter);const color=(dashIndex%2===0)?colorA:colorB;doc.setDrawColor(...color);let segStart=dashStart;for(const c of corners){if(c>segStart&&c<dashEnd){const p1=pointAt(segStart),p2=pointAt(c);doc.line(p1[0],p1[1],p2[0],p2[1]);segStart=c;}}const p1=pointAt(segStart),p2=pointAt(dashEnd);doc.line(p1[0],p1[1],p2[0],p2[1]);dist+=dashLen+gapLen;dashIndex++;}}drawDashedRectAlternating(8,8,W-16,H-16,4,2.5,0.7,NAVY,RED);
+      </div>
       <div class="progress-bar-thin"><div class="progress-bar-fill" style="width:${done?100:0}%"></div></div>`;aifGrid.appendChild(card);});const comingGrid=document.getElementById('grid-coming');comingGrid.innerHTML='';COMING_SOON.forEach(m=>{const card=document.createElement('div');card.className='module-card locked';card.innerHTML=`
       <div class="module-card-track">COMING SOON</div>
       <div class="module-card-title">${m.title}</div>
@@ -430,7 +430,7 @@ function renderCatalogue(){const completed=Object.keys(state.completions).length
       <div class="module-card-meta">
         <span class="module-card-tag ${m.tag}">${m.tagLabel}</span>
         <span class="module-card-status"><span class="status-dot dot-locked"></span>Not yet available</span>
-      </div>`;comingGrid.appendChild(card);});document.getElementById('grid-coming').parentElement.style.display=COMING_SOON.length?'':'none';}
+      </div>`;comingGrid.appendChild(card);});}
 function openModule(mod){if(mod.status!=='available')return;state.currentModule=mod;document.getElementById('view-catalogue').style.display='none';document.getElementById('view-module').style.display='flex';document.getElementById('module-topbar-title').textContent=mod.title;const editBtn=document.getElementById('btn-edit-module');if(editBtn)editBtn.style.display=(state.role==='admin')?'block':'none';const iframe=document.getElementById('module-iframe');iframe.src=mod.url;iframe.onload=function(){applyTheme();function sendSession(){try{iframe.contentWindow.postMessage({type:'nexusSession',email:state.email,role:state.role,name:state.userName,},'*');}catch(e){}}sendSession();setTimeout(sendSession,1000);setTimeout(sendSession,3000);};}
 function showCatalogue(){document.getElementById('view-catalogue').style.display='block';document.getElementById('view-module').style.display='none';document.getElementById('view-admin').style.display='none';document.getElementById('module-iframe').src='';state.currentModule=null;renderCatalogue();}
 function triggerCompletion(score,total){if(!state.currentModule)return;const today=new Date().toLocaleDateString('en-IN',{day:'numeric',month:'long',year:'numeric'});const scoreText=(score!==undefined&&total!==undefined)?' I scored <strong>'+score+' out of '+total+'</strong> in the module assessment.':'';document.getElementById('decl-text').innerHTML='I, <strong id="decl-name-live">[your name]</strong>, declare that I have completed the training module '+'<strong>"'+state.currentModule.title+'"</strong> on <strong>'+today+'</strong> on the Validus Nexus Learning Platform.'+
